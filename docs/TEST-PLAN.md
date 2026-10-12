@@ -5,18 +5,18 @@
 ## Executable now
 
 ```bash
-npm ci
-npm test
-npm run test:rules
-npm run verify:all
-npm run typecheck
-npm run build
-npm run test:e2e
+pnpm install --frozen-lockfile
+pnpm test
+pnpm run test:rules
+pnpm run verify:all
+pnpm run typecheck
+pnpm run build
+pnpm run test:e2e
 ```
 
 The fast pure suite has 44 tests covering T01's validation repairs, the literal model and T02's independent oracle. The separate exhaustive loop requires a non-null answer for each of 62,208 Wizard boards and checks every answer with the cell-array oracle. It reuses canonical orientation data but does not call the engine's legality checks or use their masks. [Current evidence](TEST-RESULTS.md)
 
-T03 adds a strict Vite build and one browser startup case in all five configured projects. Browser binaries must be installed with `npx playwright install chromium firefox webkit`; Linux uses `--with-deps`. The startup case checks the title/heading, loaded TypeScript entry and CSS, page errors and failed requests. It does not test gameplay, dragging, records or accessibility. `npm run dev` and `npm run preview` serve the source entry and built artifact for inspection.
+T03 adds a strict Vite build and one browser startup case in all five configured projects. Browser binaries must be installed with `pnpm exec playwright install chromium firefox webkit`; Linux uses `--with-deps`. The startup case checks the title/heading, loaded TypeScript entry and CSS, page errors and failed requests. It does not test gameplay, dragging, records or accessibility. `pnpm run dev` and `pnpm run preview` serve the source entry and built artifact for inspection.
 
 ## Required coverage during implementation
 
@@ -43,12 +43,12 @@ Development projects are desktop Chromium/Firefox/WebKit and mobile Chromium/Web
 The full release sequence below includes `test:e2e:prod`, which becomes executable in T11. Other commands are available now with the current limited feature coverage:
 
 ```bash
-npm ci
-npm test
-npm run build
-npm run test:e2e
-npm run test:e2e:prod
-npm run verify:all
+pnpm install --frozen-lockfile
+pnpm test
+pnpm run build
+pnpm run test:e2e
+pnpm run test:e2e:prod
+pnpm run verify:all
 ```
 
 Build includes strict type checking. Production tests reuse that exact `dist/`; they do not rebuild. Keep exhaustive verification outside the fast default test and run it for release/rule changes. The Pages workflow publishes the checked artifact after successful checks.

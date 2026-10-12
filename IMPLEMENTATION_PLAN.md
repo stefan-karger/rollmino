@@ -42,7 +42,7 @@ Use plain TypeScript, Vite, SVG, plain CSS and native HTML controls. Keep rules 
 
 Follow [CODING_GUIDELINES.md](CODING_GUIDELINES.md). Extract modules for meaningful current responsibilities, not a target file length. There is one authoritative committed `Game`; previews are drafts. Do not add a state library, generic command framework, renderer adapter, event bus or future framework migration interface.
 
-Use Node 24 for development and CI. The existing reference suite also runs on Node 22.16+. Vite builds browser code; Node type stripping is only the pure test runner's mechanism. Keep the existing TypeScript compiler and add compatible Vite 8, Playwright Test, `@axe-core/playwright` and `@types/node` development dependencies. Commit the lockfile and use `npm ci` for repeatable checks. Vite transpilation does not replace `tsc --noEmit`. [Vite features](https://vite.dev/guide/features.html#transpile-only)
+Use Node 24 and pnpm for development and CI. pnpm is the user's confirmed default for web projects; `package.json` pins version 12.10.0. The existing reference suite also runs on Node 22.16+. Vite builds browser code; Node type stripping is only the pure test runner's mechanism. Keep the existing TypeScript compiler and add compatible Vite 8, Playwright Test, `@axe-core/playwright` and `@types/node` development dependencies. Commit `pnpm-lock.yaml` and use `pnpm install --frozen-lockfile` for repeatable checks. Vite transpilation does not replace `tsc --noEmit`. [Vite features](https://vite.dev/guide/features.html#transpile-only)
 
 Configure strict TypeScript with `noEmit`, `target: ES2022`, `module: ESNext`, `moduleResolution: Bundler`, `allowImportingTsExtensions`, DOM libraries and Node types for configuration files. Include `engine/`, `src/` and browser/configuration TypeScript; exclude provenance directories. Use Vite `base: './'`, an ES2022 build target, and no router. Relative assets allow the same artifact to load at the root and the Pages project path. [Vite build](https://vite.dev/guide/build.html)
 
@@ -269,10 +269,10 @@ vite.config.ts                     Relative base and explicit target
 playwright.config.ts               Development server and five browser projects
 playwright.production.config.ts    Two preview mounts; reuse already-built dist
 .github/workflows/pages.yml        Test/build artifact, then deploy main through Pages
-package.json / package-lock.json   Scripts and reproducible development dependencies
+package.json / pnpm-lock.yaml   Scripts and reproducible development dependencies
 ```
 
-Keep `AGENTS.md`, `CODING_GUIDELINES.md`, this plan and active docs as the handoff. Preserve `original-handoff/`, `research-archive/` and the original `SHA256SUMS.txt` as provenance; never import them into browser code or publish them in `dist/`. The manifest describes the initial archive, not this revised documentation. Do not maintain duplicate active engines. Extend `.gitignore` for Playwright reports/results. Update package name/description to Rollmino; `private: true` prevents accidental npm publication and does not make the GitHub repository private.
+Keep `AGENTS.md`, `CODING_GUIDELINES.md`, this plan and active docs as the handoff. Preserve `original-handoff/`, `research-archive/` and the original `SHA256SUMS.txt` as provenance; never import them into browser code or publish them in `dist/`. The manifest describes the initial archive, not this revised documentation. Do not maintain duplicate active engines. Extend `.gitignore` for Playwright reports/results. Update package name/description to Rollmino; `private: true` prevents accidental package publication and does not make the GitHub repository private.
 
 Pure session functions accept timestamps supplied by their caller so tests need no real clock. `app.ts` supplies current timestamps, DOM events and the browser's storage object. Catch access to `window.localStorage` at that boundary; `records.ts` handles get/set failures through the small storage object it also accepts in tests. No generalized persistence adapter is needed. Export only consumed functions.
 
@@ -290,34 +290,34 @@ Only `test`, `verify:all` and the engine-only `typecheck` exist now. Add these s
 | `verify:all` | `node --experimental-strip-types scripts/verify-all.mjs` |
 | `typecheck` | `tsc --noEmit` |
 | `dev` | `vite --host 127.0.0.1 --port 5173 --strictPort` |
-| `build` | `npm run typecheck && vite build` |
+| `build` | `pnpm run typecheck && vite build` |
 | `preview` | `vite preview --host 127.0.0.1 --port 4173 --strictPort` |
 | `test:e2e` | `playwright test` |
 | `test:e2e:prod` | `playwright test --config playwright.production.config.ts` |
 
-Development Playwright projects are `desktop-chromium`, `desktop-firefox`, `desktop-webkit`, `mobile-chromium` and `mobile-webkit`. Mobile projects enable touch and use representative phone viewport/device settings. Have `webServer` start `npm run dev`; CI must not reuse an unrelated running server. Keep production tests out of the development suite through test matching.
+Development Playwright projects are `desktop-chromium`, `desktop-firefox`, `desktop-webkit`, `mobile-chromium` and `mobile-webkit`. Mobile projects enable touch and use representative phone viewport/device settings. Have `webServer` start `pnpm run dev`; CI must not reuse an unrelated running server. Keep production tests out of the development suite through test matching.
 
-Production configuration starts `npm run preview` at port 4173 and `npm run preview -- --port 4174 --base /rollmino/` for the second mount. Run the same production smoke/fixture tests in Chromium projects at `http://127.0.0.1:4173/` and `http://127.0.0.1:4174/rollmino/`. Navigate relative to the project base URL, not a hardcoded `/`. Neither config rebuilds: both serve the preceding `npm run build` artifact. Vite preview supports an explicit base and is only a verification server. [Vite CLI](https://vite.dev/guide/cli#vite-preview)
+Production configuration starts `pnpm run preview` at port 4173 and `pnpm run preview --port 4174 --base /rollmino/` for the second mount. Run the same production smoke/fixture tests in Chromium projects at `http://127.0.0.1:4173/` and `http://127.0.0.1:4174/rollmino/`. Navigate relative to the project base URL, not a hardcoded `/`. Neither config rebuilds: both serve the preceding `pnpm run build` artifact. Vite preview supports an explicit base and is only a verification server. [Vite CLI](https://vite.dev/guide/cli#vite-preview)
 
 First installation after Slice 1 adds tooling:
 
 ```bash
-npm install --save-dev --save-exact vite@8 @playwright/test @axe-core/playwright @types/node@24
-npx playwright install chromium firefox webkit
+pnpm add -D --save-exact vite@8 @playwright/test @axe-core/playwright @types/node@24
+pnpm exec playwright install chromium firefox webkit
 ```
 
-On Linux CI use `npx playwright install --with-deps chromium firefox webkit`. The complete release verification sequence is:
+On Linux CI use `pnpm exec playwright install --with-deps chromium firefox webkit`. The complete release verification sequence is:
 
 ```bash
-npm ci
-npm test
-npm run build
-npm run test:e2e
-npm run test:e2e:prod
-npm run verify:all
+pnpm install --frozen-lockfile
+pnpm test
+pnpm run build
+pnpm run test:e2e
+pnpm run test:e2e:prod
+pnpm run verify:all
 ```
 
-Keep the exhaustive check separate from fast `npm test`; run it for initial release and rule/solver changes. No physical phone is required to pass these checks.
+Keep the exhaustive check separate from fast `pnpm test`; run it for initial release and rule/solver changes. No physical phone is required to pass these checks.
 
 ## 11. Ordered implementation slices
 
@@ -330,10 +330,10 @@ Tasks: begin T00's repository setup and establish the local Git baseline before 
 Manual checks: inspect the key/ID and sparse-dice reproductions, and confirm the repaired functions follow their failure contracts. This slice has no browser UI yet.
 
 ```bash
-npm install
-npm test
-npm run typecheck
-npm run verify:all
+pnpm install --frozen-lockfile
+pnpm test
+pnpm run typecheck
+pnpm run verify:all
 ```
 
 Exit: all fast checks pass, all 62,208 returned Wizard solutions pass the oracle, and the four reproduced defects fail closed.
@@ -347,11 +347,11 @@ Tasks: add tooling/configuration and the semantic/SVG board; implement real tran
 Manual checks in an available browser: before Start, no blocker information is visible. Solve `opening-seed`; the final valid committed move alone ends the run. Try illegal taps, a move onto the piece's own old footprint, both chiral flips, Undo to the opening board, active replay confirmation and cancellation. Complete a keyboard-only game. Resize without changing placements.
 
 ```bash
-npm run test:transforms
-npm run test:state
-npm test
-npm run build
-npm run test:e2e -- --project=desktop-chromium --project=mobile-chromium
+pnpm run test:transforms
+pnpm run test:state
+pnpm test
+pnpm run build
+pnpm run test:e2e --project=desktop-chromium --project=mobile-chromium
 ```
 
 Exit: both selected browser projects complete known fixtures through actual controls. Start/replay/background-time unit checks pass. Cancelled transitions and invalid attempts preserve committed play/history; solving freezes it once.
@@ -365,11 +365,11 @@ Tasks: implement section 8, selected-level record lists, local date/time formatt
 Manual checks: finish a seeded fresh run, reload, and inspect its time/date. Replay and complete it without another record. Clear one level while another has records; cancel clearing first. Clear during an active run and check its clock/board continue. Trigger blocked storage in a test context and verify play still completes.
 
 ```bash
-npm run test:records
-npm run test:state
-npm test
-npm run build
-npm run test:e2e -- e2e/records.spec.ts
+pnpm run test:records
+pnpm run test:state
+pnpm test
+pnpm run build
+pnpm run test:e2e e2e/records.spec.ts
 ```
 
 Exit: top-five sorting uses raw milliseconds, exact ties retain the older completion, writes occur once per ranked finish, and no persisted payload contains puzzle/session data.
@@ -383,9 +383,9 @@ Tasks: implement armed/dragging states, source hit testing, pointer capture, CTM
 Manual checks in the available browser/emulation: grab different occupied cells of cyan/red, move from tray to board and between board positions, rotate with R/F during a mouse drag, and return to the original slot. Try blocker/edge/other-piece drops, another tray slot, release outside the board and cancelling mid-drag. Scroll outside draggable regions. Verify the tap alternative still works after every cancellation.
 
 ```bash
-npm test
-npm run build
-npm run test:e2e -- e2e/input.spec.ts
+pnpm test
+pnpm run build
+pnpm run test:e2e e2e/input.spec.ts
 ```
 
 Exit: native mouse and Chromium touch sequences cover placement, movement, return and cancellation; invalid/cancelled releases never change committed placement/history or create a record. Capture survives leaving the source element and cleans up after completion/new run.
@@ -399,9 +399,9 @@ Tasks: finish dark-theme contrast, numbered restriction cues, roving focus, moda
 Manual checks in available tools: inspect 320/390/768/1440 CSS px widths and a short landscape viewport; check no horizontal overflow or unreachable controls. Inspect 200% zoom, visible focus and concise announcements. Check that timer refreshes do not steal focus, and all placement/removal/transform actions work without dragging.
 
 ```bash
-npm test
-npm run build
-npm run test:e2e
+pnpm test
+pnpm run build
+pnpm run test:e2e
 ```
 
 Exit: all configured projects pass their applicable cases; relevant axe failures are resolved; complete tap and keyboard fixtures work. Record emulation/browser versions honestly. Real Android Chrome checks are welcome later and are not a release dependency.
@@ -415,12 +415,12 @@ Tasks: add production root/subpath tests and the Pages workflow below. Update RE
 Manual checks: open both preview mounts, Start, solve the known fixture, reload retained records and confirm assets load. After deployment, inspect the live `/rollmino/` page for title/assets/Start and a representative placement; log this separately from local tests.
 
 ```bash
-npm ci
-npm test
-npm run build
-npm run test:e2e
-npm run test:e2e:prod
-npm run verify:all
+pnpm install --frozen-lockfile
+pnpm test
+pnpm run build
+pnpm run test:e2e
+pnpm run test:e2e:prod
+pnpm run verify:all
 ```
 
 Exit: the gates below pass; the same tested `dist/` is the deployment artifact. Do not mark an inaccessible live deployment as verified.
@@ -475,7 +475,7 @@ Production tests fail on page exceptions, unexpected error logs, missing app ass
 
 The release gate is testing executable here. Do not require a physical phone, current physical game set or manual screen-reader sign-off. Report anything not exercised as unverified instead of inventing a pass. A verified model/source conflict must still be corrected before claiming the corresponding behavior is accurate.
 
-Use one Pages workflow with test/build and deployment jobs. On pull requests, run checks without publishing. On pushes to `main` and manual dispatch, deploy after successful checks. Use Node 24 with the lockfile, install Playwright browsers, and run the release sequence. Upload the exact tested `dist/` with `actions/upload-pages-artifact@v4`; do not rebuild in the deploy job. The build job uses read-only repository access. The deploy job needs the build job, `pages: write`, `id-token: write` and the `github-pages` environment. Use official checkout/setup-node/configure-pages/deploy-pages actions, with versions from the linked documentation, and serialize Pages deployments. Select GitHub Actions as the repository's Pages source. No branch-generated Jekyll site or secrets for application APIs are needed. [Pages workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [Node setup](https://github.com/actions/setup-node)
+Use one Pages workflow with test/build and deployment jobs. On pull requests, run checks without publishing. On pushes to `main` and manual dispatch, deploy after successful checks. Install the pinned pnpm version through `pnpm/action-setup` before `actions/setup-node` configures Node 24 and `cache: pnpm` with `cache-dependency-path: pnpm-lock.yaml`. Use `pnpm install --frozen-lockfile`, install Playwright browsers, and run the release sequence. Upload the exact tested `dist/` with `actions/upload-pages-artifact@v4`; do not rebuild in the deploy job. The build job uses read-only repository access. The deploy job needs the build job, `pages: write`, `id-token: write` and the `github-pages` environment. Use official checkout/setup-node/configure-pages/deploy-pages actions and the maintained pnpm setup action, with versions from the linked documentation, and serialize Pages deployments. Select GitHub Actions as the repository's Pages source. No branch-generated Jekyll site or secrets for application APIs are needed. [Pages workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [Node setup](https://github.com/actions/setup-node), [pnpm setup](https://github.com/pnpm/action-setup)
 
 GitHub Free supports Pages from public repositories, matching the confirmed setup. Configure repository ownership/visibility and inspect for unintended private files before the first public push; the plan itself creates no repository or deployment. [Pages availability](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)
 

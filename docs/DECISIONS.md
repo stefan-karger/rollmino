@@ -33,6 +33,7 @@ Status: interview closed. The user confirmed the complete contract on 2026-10-12
 | Platform | Responsive website only. No PWA, service worker, app installation or Android package in V1. |
 | Hosting | GitHub Pages under the user's GitHub account. No custom domain initially. |
 | Stack | Pure TypeScript rules, Vite, SVG, plain CSS and native HTML controls; Node tests and Playwright. |
+| Package manager | pnpm is the user's default for web projects, confirmed on 2026-10-12. Pin it in `package.json`, maintain `pnpm-lock.yaml`, and use frozen-lockfile installation for verification and CI. |
 | Return to tray | Visible Remove button, desktop Delete shortcut, and dragging back to that piece's own tray slot. Other out-of-board releases reject/restore. |
 | Clear records | Clear only the selected difficulty's saved records, after confirmation. |
 | Available phone | Android with Chrome. Model not required for the plan. |

@@ -30,11 +30,11 @@ Extend `src/app.ts`/`src/styles.css` using the records/session modules. Add `e2e
 ## Verification
 
 ```bash
-npm run test:records
-npm run test:state
-npm test
-npm run build
-npm run test:e2e -- e2e/records.spec.ts
+pnpm run test:records
+pnpm run test:state
+pnpm test
+pnpm run build
+pnpm run test:e2e e2e/records.spec.ts
 ```
 
 Use deterministic physical rolls, public fixture completion and Playwright's clock. Test ranked insertion, repeated finish/render actions, more than five results, exact ties and millisecond ordering beneath equal displayed times. Seed localStorage history as browser storage when useful; never inject game placements.

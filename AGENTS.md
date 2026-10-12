@@ -28,6 +28,7 @@ Before changing the reference, run the fast tests and inspect the existing engin
 
 - Follow [CODING_GUIDELINES.md](CODING_GUIDELINES.md), adopted from the user's astro-portfolio KISS/YAGNI policy. Optimize for understandable cohesive code and ongoing maintenance, not a mechanical file/dependency minimum.
 - The confirmed stack is TypeScript, Vite, SVG, CSS, native HTML controls, Node tests and Playwright. Do not repeat a greenfield stack-selection exercise.
+- Use pnpm, pinned by `packageManager` in `package.json`, for dependencies and scripts. Keep `pnpm-lock.yaml` as the only dependency lockfile and use `pnpm install --frozen-lockfile` for verification/CI.
 - Keep pure testable rules, one authoritative committed game, deterministic fixtures and static hosting.
 - Begin with the documented validation regressions and repairs. Make every exhaustive answer's independent legality check reproducible.
 - Build playable slices with executable checks. Add modules only for meaningful current responsibilities.
@@ -45,9 +46,9 @@ Keep active docs consistent when an accepted decision changes. Routine implement
 ## Existing verification commands
 
 ```bash
-npm test
-npm run verify:all
-npm install && npm run typecheck
+pnpm test
+pnpm run verify:all
+pnpm install --frozen-lockfile && pnpm run typecheck
 ```
 
 The exhaustive check is separate from the fast suite. Node type stripping runs reference/pure tests, not the browser build. Browser commands listed in the plan become executable as tooling and files are added; their results are not yet established.

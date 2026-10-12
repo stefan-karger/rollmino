@@ -17,21 +17,21 @@ Source repository: [stefan-karger/rollmino](https://github.com/stefan-karger/rol
 
 ## Setup and current commands
 
-Use Node 24 for development. The current checks ran on Node 24.15.0. Node 22.16+ can also run the pure tests through native TypeScript type stripping. Strict checking includes the engine, browser entry, browser tests and configuration files.
+Use Node 24 and pnpm 12.10.0 for development. `package.json` pins pnpm through `packageManager`; commit `pnpm-lock.yaml` whenever dependencies change. Install pnpm using its [official setup instructions](https://pnpm.io/installation) if it is unavailable. Node 22.16+ can also run the pure tests through native TypeScript type stripping. Strict checking includes the engine, browser entry, browser tests and configuration files.
 
 ```bash
-npm ci
-npx playwright install chromium firefox webkit
-npm test
-npm run test:rules
-npm run build
-npm run test:e2e
-npm run dev
+pnpm install --frozen-lockfile
+pnpm exec playwright install chromium firefox webkit
+pnpm test
+pnpm run test:rules
+pnpm run build
+pnpm run test:e2e
+pnpm run dev
 ```
 
-`npm run dev` serves the entry at `http://127.0.0.1:5173/`. After building, `npm run preview` serves `dist/` at `http://127.0.0.1:4173/`. `npm run typecheck` checks TypeScript without building. On Linux, browser installation uses `npx playwright install --with-deps chromium firefox webkit`. The Windows certificate-store retry used here is recorded in [T03's evidence](docs/tickets/03-web-tooling.md#completion-evidence).
+`pnpm run dev` serves the entry at `http://127.0.0.1:5173/`. After building, `pnpm run preview` serves `dist/` at `http://127.0.0.1:4173/`. `pnpm run typecheck` checks TypeScript without building. On Linux, browser installation uses `pnpm exec playwright install --with-deps chromium firefox webkit`. The Windows certificate-store retry used here is recorded in [T03's evidence](docs/tickets/03-web-tooling.md#completion-evidence).
 
-The current fast suite has 44 tests, including the repaired malformed-state regressions, exact model/contact checks and independent oracle tests. The separate `npm run verify:all` command validates every returned solution for all 62,208 Wizard boards with a cell-array oracle. The oracle reuses canonical orientation data. [Recorded evidence and limits](docs/TEST-RESULTS.md)
+The current fast suite has 44 tests, including the repaired malformed-state regressions, exact model/contact checks and independent oracle tests. The separate `pnpm run verify:all` command validates every returned solution for all 62,208 Wizard boards with a cell-array oracle. The oracle reuses canonical orientation data. [Recorded evidence and limits](docs/TEST-RESULTS.md)
 
 The browser startup case passes in desktop Chromium/Firefox/WebKit and mobile Chromium/WebKit emulation. It checks the entry/title, loaded TypeScript behavior and CSS, page errors and failed asset requests. This establishes startup tooling; gameplay, mobile input and accessibility acceptance remain future tickets. Production root/subpath tests are added in T11.
 

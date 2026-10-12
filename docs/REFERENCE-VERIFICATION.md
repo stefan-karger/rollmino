@@ -22,10 +22,10 @@ On 2026-10-12, an additional handoff review audit checked all returned solutions
 ## Reproduce the maintained checks
 
 ```bash
-npm test
-npm run test:rules
-npm run verify:all
-npm install && npm run typecheck
+pnpm test
+pnpm run test:rules
+pnpm run verify:all
+pnpm install --frozen-lockfile && pnpm run typecheck
 ```
 
 The archived log is historical evidence, not a substitute for rerunning the canonical engine. T01 repaired malformed-state validation and T02 added the independent answer oracle required by [IMPLEMENTATION_PLAN.md](../IMPLEMENTATION_PLAN.md). The fast default suite does not enumerate all boards; `verify:all` is the separate exhaustive command.

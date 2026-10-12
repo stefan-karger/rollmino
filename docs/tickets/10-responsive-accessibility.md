@@ -31,9 +31,9 @@ Refine `src/styles.css`, semantic/focus wiring in `src/app.ts` and `index.html`.
 ## Verification
 
 ```bash
-npm test
-npm run build
-npm run test:e2e
+pnpm test
+pnpm run build
+pnpm run test:e2e
 ```
 
 Inspect the named viewport sizes, landscape, reduced motion and 200% zoom/reflow using available browser tools. Record the actual method if a zoom check uses a reflow simulation. Inspect board corners/center for visual/hit-target alignment. Complete a keyboard-only game and mobile-emulated tap game; verify scrolling outside drag sources.

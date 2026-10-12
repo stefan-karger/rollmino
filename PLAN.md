@@ -1,5 +1,7 @@
 # Historical Genius Square web V1 proposal
 
+Package-manager migration on 2026-10-12: commands in historical results below are current pnpm equivalents. Those earlier runs used the previous package manager; their original commands are preserved in commit `df3e241`. [Actual pnpm verification](docs/TEST-RESULTS.md#pnpm-migration-verification).
+
 Status: superseded by the user-confirmed [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) on 2026-10-12. The entire proposal below is historical. Its optional timer/hints, short Undo, preview-then-Place, optional touch drag and physical-device release gates are not active requirements. [docs/DECISIONS.md](docs/DECISIONS.md) records the accepted choices. Preserve the analysis/audit evidence; execute the new plan.
 
 Original review on 2026-10-12. The body preserves the initial proposals and verification findings, before the requirements interview closed. It did not build the browser app or change the reference engine. The confirmed plan carries forward the verified defects and useful evidence with the agreed scope.
@@ -32,13 +34,13 @@ The mandatory documents were read in the specified order. The remaining document
 
 The folder is an unpacked handoff, not a Git repository. Before implementation, establish version control or preserve a baseline copy. Do not maintain three active copies of the engine. `original-handoff/` and `research-archive/` remain provenance only.
 
-Fresh results on this Windows environment, using Node 24.15.0, npm 11.12.1 and TypeScript 5.8.3:
+Fresh results on this Windows environment, using Node 24.15.0, the pre-migration package manager 11.12.1 and TypeScript 5.8.3:
 
 | Check | Result and limit |
 | --- | --- |
-| `npm test` | All 13 reference tests passed. These test the rules engine, not a browser app. |
-| `npm run verify:all` | All 62,208 Wizard configurations returned a non-null answer in 30.94 seconds. The maintained script validates one example answer, then checks only answer existence for the exhaustive loop. |
-| `npm install` followed by `npm run typecheck` | Installation and strict engine type checking passed. Installation generated `package-lock.json`. |
+| `pnpm test` | All 13 reference tests passed. These test the rules engine, not a browser app. |
+| `pnpm run verify:all` | All 62,208 Wizard configurations returned a non-null answer in 30.94 seconds. The maintained script validates one example answer, then checks only answer existence for the exhaustive loop. |
+| `pnpm install --frozen-lockfile` followed by `pnpm run typecheck` | Installation and strict engine type checking passed. Installation generated the pre-migration lockfile; the current dependency lockfile is `pnpm-lock.yaml`. |
 | Additional exhaustive audit | A separate cell-array checker validated every returned solution for nine distinct IDs, bounds, blockers, overlaps, complete coverage and Wizard adjacency. All 62,208 passed in 28.77 seconds. It reused the engine's orientation data, so it independently checks placement legality, not the physical provenance of those shapes. |
 | Solver timing during that audit | The largest observed empty-board solve was 14.20 ms. This includes runtime noise and is not a worst-case guarantee. |
 | Deterministic partial-position sample | A xorshift sample with seed `0x6a09e667` tested 200 legally constructed partial positions per level. The largest observed solve was 9.02 ms. Many partial positions were dead ends. This sample is not a measure of player difficulty or phone performance. |
@@ -314,7 +316,7 @@ Existing archive directories stay in place. The runtime/test files are proposed 
 ```text
 index.html                          Native page structure, app mount and instructions
 package.json                        Existing reference scripts plus web/E2E commands
-package-lock.json                   Dependency pins, generated during verification
+pnpm-lock.yaml                   Dependency pins, generated during verification
 tsconfig.json                       Strict browser/core/config TypeScript check
 vite.config.ts                      Static base path and explicit modern build target
 playwright.config.ts                Development server and browser/device projects
@@ -363,7 +365,7 @@ Do not import archived experiments or fixture solutions into production. Keep th
 
 ## Commands to introduce during implementation
 
-Keep `npm test` as the fast, DOM-free command. Add these scripts as the corresponding files appear:
+Keep `pnpm test` as the fast, DOM-free command. Add these scripts as the corresponding files appear:
 
 | Script | Definition |
 | --- | --- |
@@ -374,10 +376,10 @@ Keep `npm test` as the fast, DOM-free command. Add these scripts as the correspo
 | `verify:all` | Existing `node --experimental-strip-types scripts/verify-all.mjs`, strengthened in Slice 0 |
 | `typecheck` | `tsc --noEmit`, using the new project configuration |
 | `dev` | `vite --host 127.0.0.1` |
-| `build` | `npm run typecheck && vite build` |
+| `build` | `pnpm run typecheck && vite build` |
 | `preview` | `vite preview --host 127.0.0.1 --port 4173 --strictPort` |
 | `test:e2e` | `playwright test` |
-| `test:e2e:prod` | `playwright test --config playwright.production.config.ts`, against the preceding `npm run build` output |
+| `test:e2e:prod` | `playwright test --config playwright.production.config.ts`, against the preceding `pnpm run build` output |
 
 Configure TypeScript with strict checking, no emit, ES2022 and DOM libraries, bundler module resolution, TypeScript import-extension support and `resolveJsonModule` for test fixtures. Include `engine/`, `src/`, E2E helpers and the tool configuration files. Exclude the archived copies from compilation. The browser build should preserve native BigInt support rather than attempt a 32-bit mask fallback. Verify support in the actual browsers chosen for release.
 
@@ -407,10 +409,10 @@ Manual checks: compare the shape/restriction tables in this plan with the offici
 Executable verification:
 
 ```bash
-npm install
-npm test
-npm run typecheck
-npm run verify:all
+pnpm install --frozen-lockfile
+pnpm test
+pnpm run typecheck
+pnpm run verify:all
 ```
 
 Exit gate: no false wins for the regressions; all three fixtures and all 62,208 independently validated Wizard answers pass. No dice, shape or rule change without evidence and a recorded correction.
@@ -433,8 +435,8 @@ Tasks:
 Proposed dependency installation:
 
 ```bash
-npm install -D --save-exact vite@8.3.4 @playwright/test@1.64.0 @axe-core/playwright@4.13.0 @types/node@24.19.2
-npx playwright install chromium firefox webkit
+pnpm add -D --save-exact vite@8.3.4 @playwright/test@1.64.0 @axe-core/playwright@4.13.0 @types/node@24.19.2
+pnpm exec playwright install chromium firefox webkit
 ```
 
 Manual checks: launch at 390 px and desktop widths, inspect A1/F6, compare a seeded roll to its seven blockers, change levels and restart. Check that the board never needs a backend request.
@@ -442,10 +444,10 @@ Manual checks: launch at 390 px and desktop widths, inspect A1/F6, compare a see
 Executable verification after scripts are added:
 
 ```bash
-npm test
-npm run build
-npm run test:e2e -- tests/e2e/play.spec.ts --project=chromium
-npm run dev
+pnpm test
+pnpm run build
+pnpm run test:e2e tests/e2e/play.spec.ts --project=chromium
+pnpm run dev
 ```
 
 Exit gate: correct board/tray/setup in a browser; strict checking and production build pass; original reference checks still pass.
@@ -470,11 +472,11 @@ Manual checks: finish `opening-seed` on a phone using tap, preview and Place. Fi
 Executable verification:
 
 ```bash
-npm test
-npm run test:transforms
-npm run test:state
-npm run build
-npm run test:e2e -- tests/e2e/play.spec.ts tests/e2e/input.spec.ts
+pnpm test
+pnpm run test:transforms
+pnpm run test:state
+pnpm run build
+pnpm run test:e2e tests/e2e/play.spec.ts tests/e2e/input.spec.ts
 ```
 
 Exit gate: known fixture completions work through mouse clicks, mobile-emulated taps and keyboard; each expected rule rejection leaves committed occupancy unchanged; one completion announcement per win transition.
@@ -499,9 +501,9 @@ Manual checks: grab different cells of the cyan piece; rotate/flip it while drag
 Executable verification:
 
 ```bash
-npm test
-npm run build
-npm run test:e2e -- tests/e2e/input.spec.ts
+pnpm test
+pnpm run build
+pnpm run test:e2e tests/e2e/input.spec.ts
 ```
 
 Exit gate: successful release commits exactly once; unsuccessful/cancelled gestures make no placement or history change. Native mouse movement tests pass on Chromium, Firefox and WebKit.
@@ -525,9 +527,9 @@ Manual checks: undo a moved piece, a removed piece and the final winning move. I
 Executable verification:
 
 ```bash
-npm test
-npm run build
-npm run test:e2e
+pnpm test
+pnpm run build
+pnpm run test:e2e
 ```
 
 Exit gate: no lost focus or state corruption, all required actions work without drag, no relevant automated accessibility violations remain, and the manual device cases are recorded as pass/fail. Emulation alone cannot close this gate.
@@ -545,9 +547,9 @@ Manual checks: try the existing Wizard dead end at B6, then undo/remove and requ
 Executable verification:
 
 ```bash
-npm test
-npm run build
-npm run test:e2e
+pnpm test
+pnpm run build
+pnpm run test:e2e
 ```
 
 Exit gate: adopted assistance preserves player placements, never describes unknown/failed computation as a solution or a dead-end proof, and has no unresolved phone responsiveness issue.
@@ -571,12 +573,12 @@ Manual checks: load the production build through a plain static host at a subdir
 Executable verification:
 
 ```bash
-npm ci
-npm test
-npm run build
-npm run test:e2e
-npm run test:e2e:prod
-npm run verify:all
+pnpm install --frozen-lockfile
+pnpm test
+pnpm run build
+pnpm run test:e2e
+pnpm run test:e2e:prod
+pnpm run verify:all
 ```
 
 Exit gate: all required acceptance checks below pass, documentation matches the commands, and `dist/` is ready for static hosting. This does not itself publish the app or establish permission to use the game title commercially.
@@ -637,7 +639,7 @@ For drag tests, use native mouse down/move/up sequences. A generic HTML `dragTo`
 | Solver trust | Fixed pieces are honored, known dead ends return no completion, and every exhaustive answer passes the independent oracle. Hint gates apply only if hints ship. |
 | Production | Strict check, browser suites and compiled-app tests pass; no page/console errors or missing assets; root/subdirectory serving works without runtime APIs. |
 | KISS/YAGNI | Added modules, APIs, dependencies and state fields serve current behavior or improve its readability/maintenance. There are no forwarding layers or unused future capabilities. Substantial opaque artwork has an editable asset boundary when useful. |
-| Reproducibility | A clean `npm ci` installation with documented supported Node and Playwright browser installation can run the listed commands. |
+| Reproducibility | A clean `pnpm install --frozen-lockfile` installation with documented supported Node and Playwright browser installation can run the listed commands. |
 | Distribution readiness | Original UI assets only; no copied official manual/art/logos or archived experiment data in `dist/`; title/branding and current physical-dice evidence are assessed before a fidelity-branded public release. |
 
 ## Risks, assumptions and unresolved decisions

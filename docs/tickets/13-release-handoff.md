@@ -31,12 +31,12 @@ Update `README.md`, `docs/TEST-RESULTS.md`, active scope/UI/test summaries and a
 Review current T11/T12 evidence and perform a clean contributor setup if it has not been demonstrated on the final application/configuration. Use the full release sequence for changed runtime/build code:
 
 ```bash
-npm ci
-npm test
-npm run build
-npm run test:e2e
-npm run test:e2e:prod
-npm run verify:all
+pnpm install --frozen-lockfile
+pnpm test
+pnpm run build
+pnpm run test:e2e
+pnpm run test:e2e:prod
+pnpm run verify:all
 ```
 
 Documentation-only edits need link/command consistency checks rather than invented new app-test results. Inspect the README steps and compare every listed script with `package.json`. Verify that all local plan gates have evidence and that live verification remains explicitly pending T14.

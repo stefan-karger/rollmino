@@ -1,5 +1,7 @@
 # T01. Harden rules and committed-state validation
 
+Package-manager migration on 2026-10-12: commands in historical results below are current pnpm equivalents. Those earlier runs used the previous package manager; their original commands are preserved in commit `df3e241`. [Actual pnpm verification](../TEST-RESULTS.md#pnpm-migration-verification).
+
 [Tracker](README.md) | [Product specification](../../IMPLEMENTATION_PLAN.md) | [Coding guidelines](../../CODING_GUIDELINES.md)
 
 ## Blockers
@@ -34,10 +36,10 @@ Use [the plan's exact model](../../IMPLEMENTATION_PLAN.md#3-exact-puzzle-model) 
 ## Verification
 
 ```bash
-npm install
-npm test
-npm run typecheck
-npm run verify:all
+pnpm install --frozen-lockfile
+pnpm test
+pnpm run typecheck
+pnpm run verify:all
 ```
 
 At this point the exhaustive script may still check answer existence only; T02 owns its stronger oracle. Check literal 42-face data/multiplicities, the exact 36-cell partition, nine shapes/29 cells/28 orientations/625 candidates, and all six numbered-piece pairs at all five levels in both placement orders. Cover diagonal, blocker, boundary and unrestricted contact, plus no F-to-A edge wrapping.
@@ -54,11 +56,11 @@ Also cover null/missing values, sparse arrays, unknown/prototype-derived IDs, ex
 
 ## Completion evidence
 
-Completed checks on 2026-10-12, Windows, Node 24.15.0, npm 11.12.1 and TypeScript 5.8.3. [Detailed results](../TEST-RESULTS.md#t01-implementation-verification).
+Completed checks on 2026-10-12, Windows, Node 24.15.0, the pre-migration package manager 11.12.1 and TypeScript 5.8.3. [Detailed results](../TEST-RESULTS.md#t01-implementation-verification).
 
 - [engine/core.ts](../../engine/core.ts) adds shared setup/placement guards and validates committed occupancy/contact before placement, completion or fixed-piece solving. Invalid setup throws only through the documented constructor/dice/solver contracts; predicate checks return false. Winning and solver termination require all nine IDs and full coverage. RNG injection rejects invalid numbers.
 - [tests/core.test.mjs](../../tests/core.test.mjs) expands the fast suite from 13 to 30 tests. The four required regressions failed before repair and pass afterwards. Literal model tests, all six restricted pairs at five levels in both orders, diagonal/blocker/boundary/unrestricted contacts, malformed state, self-overlap moves, all fixtures, frozen solver input and the legal B6 dead end pass.
-- `npm install`, `npm test`, `npm run typecheck` and `git diff --check` passed. The final `npm run verify:all` returned answers for all 62,208 Wizard boards in 27.11 seconds and replay-validated one example through the engine.
+- `pnpm install --frozen-lockfile`, `pnpm test`, `pnpm run typecheck` and `git diff --check` passed. The final `pnpm run verify:all` returned answers for all 62,208 Wizard boards in 27.11 seconds and replay-validated one example through the engine.
 - Dice order, orientation generation, fixtures and provenance copies remain unchanged. README and the active test summaries now describe the repaired validation and current test count.
 
 The exhaustive loop still checks answer existence. It does not independently validate every returned answer; that is T02. This ticket has no browser UI, and no browser/device/screen-reader checks are claimed.

@@ -1,5 +1,7 @@
 # T00. Create the GitHub repository and synchronize the local workspace
 
+Package-manager migration on 2026-10-12: commands in historical results below are current pnpm equivalents. Those earlier runs used the previous package manager; their original commands are preserved in commit `df3e241`. [Actual pnpm verification](../TEST-RESULTS.md#pnpm-migration-verification).
+
 [Tracker](README.md) | [Product specification](../../IMPLEMENTATION_PLAN.md) | [Coding guidelines](../../CODING_GUIDELINES.md)
 
 ## Blockers
@@ -89,7 +91,7 @@ Implemented on 2026-10-12; initial synchronization verified at 14:29 UTC.
 - Initial baseline: [9188f0b](https://github.com/stefan-karger/rollmino/commit/9188f0b6ef4d26b336cfa5f1eafe9bde2e626527), `chore: initialize Rollmino handoff`, with 49 reviewed files.
 - `git rev-parse HEAD`, `git rev-parse origin/main` and `git ls-remote origin refs/heads/main` all returned `9188f0b6ef4d26b336cfa5f1eafe9bde2e626527` after fetch; `git status --short` was empty.
 - Git 2.54.0.windows.1 and GitHub CLI 2.91.0 used the existing GitHub credential helper for the intended owner. No new browser/CLI login or repository credential file was needed; credentials were not recorded.
-- `npm test` passed all 13 existing reference tests. No rule fixes or browser app work were included.
+- `pnpm test` passed all 13 existing reference tests. No rule fixes or browser app work were included.
 - An independent byte/hash check verified all 15 original reference/archive code and provenance files against `SHA256SUMS.txt`, in both the workspace and committed Git objects. Dependencies/build/test artifacts are absent from tracked files.
 - Added `.gitattributes` to keep text at LF under the existing Windows Git configuration and preserve archive bytes. Removed extra EOF blank lines in ticket Markdown. The two preserved research documents retain intentional Markdown hard-break spaces; whitespace checks on other staged files passed.
 - README and the tracker now record the setup. Their completion bookkeeping is committed and synchronized separately from the original baseline.

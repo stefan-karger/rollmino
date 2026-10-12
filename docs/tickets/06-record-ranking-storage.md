@@ -28,9 +28,9 @@ Add `src/records.ts`, `tests/records.test.mjs` and `test:records`. The only stor
 ## Verification
 
 ```bash
-npm run test:records
-npm test
-npm run typecheck
+pnpm run test:records
+pnpm test
+pnpm run typecheck
 ```
 
 Test empty data, more than five entries, all five independent levels, exact-duration ties, equal timestamps and two durations that render identically but differ in milliseconds. Include corrupt JSON, non-object payloads, wrong arrays, bad dates, fractional/negative/infinite values, unknown fields, and throwing read/write operations. Use a small storage fake with an unrelated sentinel key and verify it survives clearing.

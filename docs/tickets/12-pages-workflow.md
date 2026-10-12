@@ -19,8 +19,8 @@ Create `.github/workflows/pages.yml` and document its triggers/permissions/setup
 ## Implementation steps
 
 1. Add pull-request, main-push and manual triggers. Pull requests run checks without deployment. Main/manual deployment runs only after the required checks succeed.
-2. Use one test/build job on a suitable GitHub runner with Node 24, lockfile installation and Playwright browser/system dependency installation. Use compatible official checkout/setup-node action versions from the sources linked in the plan.
-3. Run `npm ci`, `npm test`, `npm run build`, `npm run test:e2e`, `npm run test:e2e:prod` and `npm run verify:all` in the required order. Build once; artifact tests reuse that build.
+2. Use one test/build job on a suitable GitHub runner with Node 24, the pinned pnpm version, frozen-lockfile installation and Playwright browser/system dependency installation. Install pnpm with `pnpm/action-setup`, reading its version from `package.json`, before `actions/setup-node` enables `cache: pnpm` with `cache-dependency-path: pnpm-lock.yaml`. Use compatible official action versions from the sources linked in the plan and [pnpm setup documentation](https://github.com/pnpm/action-setup).
+3. Run `pnpm install --frozen-lockfile`, `pnpm test`, `pnpm run build`, `pnpm run test:e2e`, `pnpm run test:e2e:prod` and `pnpm run verify:all` in the required order. Build once; artifact tests reuse that build.
 4. Configure Pages for deployment runs, then upload the exact tested `dist/` with the official Pages artifact action. No branch-generated Jekyll site or build inside the deploy job.
 5. Make deployment depend on successful build/checks, use the `github-pages` environment and output URL, and scope `pages: write`/`id-token: write` to deployment. Keep build repository permissions read-only. Serialize Pages deployments so they cannot publish out of order.
 6. Guard deployment/upload/configuration steps appropriately for pull requests. Document selecting GitHub Actions as the Pages source; T14 applies it on the public target repository.
@@ -31,12 +31,12 @@ Create `.github/workflows/pages.yml` and document its triggers/permissions/setup
 If application/configuration changes require a fresh build, run the release sequence:
 
 ```bash
-npm ci
-npm test
-npm run build
-npm run test:e2e
-npm run test:e2e:prod
-npm run verify:all
+pnpm install --frozen-lockfile
+pnpm test
+pnpm run build
+pnpm run test:e2e
+pnpm run test:e2e:prod
+pnpm run verify:all
 ```
 
 For workflow-only edits, reuse current local application evidence and inspect that each workflow command matches an existing runnable script. Validate YAML through available tooling without adding a runtime dependency just for this ticket. Check that failed tests prevent upload/deployment and PR conditions cannot enter the deploy job.

@@ -19,8 +19,8 @@ Add `playwright.production.config.ts`, `e2e/production.spec.ts` and `test:e2e:pr
 ## Implementation steps
 
 1. Configure two preview servers for the same existing `dist/`:
-   - `npm run preview` at `http://127.0.0.1:4173/`.
-   - `npm run preview -- --port 4174 --base /rollmino/` at `http://127.0.0.1:4174/rollmino/`.
+   - `pnpm run preview` at `http://127.0.0.1:4173/`.
+   - `pnpm run preview --port 4174 --base /rollmino/` at `http://127.0.0.1:4174/rollmino/`.
 2. Create Chromium root/Pages projects with these base URLs. Navigate relative to the project base rather than hardcoding `/`. Neither configuration/test rebuilds; it must consume the preceding build.
 3. Verify title/heading, hidden ready, deterministic Start/blockers, R/F/placement, full fixture completion, frozen time, practice exclusion and saved-record reload through public controls.
 4. Fail on page exceptions, unexpected error logs and missing required JS/CSS/favicon assets. Inspect requests and exclude runtime API, external font, analytics and development-HMR dependencies from the artifact.
@@ -30,12 +30,12 @@ Add `playwright.production.config.ts`, `e2e/production.spec.ts` and `test:e2e:pr
 ## Verification
 
 ```bash
-npm ci
-npm test
-npm run build
-npm run test:e2e
-npm run test:e2e:prod
-npm run verify:all
+pnpm install --frozen-lockfile
+pnpm test
+pnpm run build
+pnpm run test:e2e
+pnpm run test:e2e:prod
+pnpm run verify:all
 ```
 
 Open both mounts with available browser tools and check Start/placement/assets. A development-server pass is not a production-artifact pass. Record a code reference and optional artifact hash/path so later release work can identify what was checked; a commit is not required merely to attach evidence.

@@ -29,12 +29,12 @@ Add small pure helpers to `engine/core.ts` and `tests/transforms.test.mjs`; add 
 ## Verification
 
 ```bash
-npm run test:transforms
-npm test
-npm run typecheck
+pnpm run test:transforms
+pnpm test
+pnpm run typecheck
 ```
 
-Add `test:transforms` as `node --experimental-strip-types --test tests/transforms.test.mjs`. Review that existing orientation indices and fixture data did not move. If changing orientation generation/solver logic proves necessary, document why and also run `npm run verify:all`; ordinary helper additions should preserve both.
+Add `test:transforms` as `node --experimental-strip-types --test tests/transforms.test.mjs`. Review that existing orientation indices and fixture data did not move. If changing orientation generation/solver logic proves necessary, document why and also run `pnpm run verify:all`; ordinary helper additions should preserve both.
 
 ## Done when
 

@@ -6,7 +6,7 @@ Implement Rollmino V1 according to `IMPLEMENTATION_PLAN.md`. Read `AGENTS.md`, `
 
 The product is a free English-only always-timed solo puzzle, with a phone-first dark UI and the same centered layout on desktop. Start reveals the hidden puzzle. Background time and Undo count. Fresh rolls can rank; deliberate Replay is timed practice and returns to hidden ready before Start. Completion freezes the run. Reload abandons unfinished play.
 
-Use the agreed plain TypeScript/Vite/SVG/CSS stack with native HTML controls, Node tests and Playwright. Preserve the literal physical dice, nine-piece geometry, 28 orientations and five contact-rule groups. Repair the documented malformed-state defects before relying on completion. Reuse the canonical engine and deterministic fixtures; archives are provenance only.
+Use the agreed plain TypeScript/Vite/SVG/CSS stack with native HTML controls, Node tests and Playwright. Use the pinned pnpm version, `pnpm-lock.yaml` and `pnpm install --frozen-lockfile` for repeatable setup. Preserve the literal physical dice, nine-piece geometry, 28 orientations and five contact-rule groups. Repair the documented malformed-state defects before relying on completion. Reuse the canonical engine and deterministic fixtures; archives are provenance only.
 
 Deliver immediate tap placement, required touch/mouse dragging, real Rotate/Flip transforms with occupied anchors, keyboard play, removal/own-slot return and unlimited active-run Undo without Redo. Implement the confirmed abandonment/replay/level-change behavior and best-five local records per difficulty. Store only elapsed milliseconds and completion timestamps. Handle unavailable storage without preventing play.
 

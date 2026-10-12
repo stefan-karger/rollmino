@@ -31,9 +31,9 @@ Add `src/session.ts`, `tests/session.test.mjs` and `test:state`. Use the repaire
 ## Verification
 
 ```bash
-npm run test:state
-npm test
-npm run typecheck
+pnpm run test:state
+pnpm test
+pnpm run typecheck
 ```
 
 Use fixed timestamps and an injected RNG, never real-duration waits. Verify all three fixtures complete from successive commits. Include delayed/background periods, a long confirmation interval represented by advancing time, repeated completion events, invalid commits, exact no-ops, editing later drafts without changing snapshots, full-history Undo and abandoning practice for a fresh ranked run.

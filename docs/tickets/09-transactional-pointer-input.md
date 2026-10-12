@@ -30,9 +30,9 @@ Extend pointer wiring/rendering in `src/app.ts` and targeted `src/styles.css` ru
 ## Verification
 
 ```bash
-npm test
-npm run build
-npm run test:e2e -- e2e/input.spec.ts
+pnpm test
+pnpm run build
+pnpm run test:e2e e2e/input.spec.ts
 ```
 
 Use native mouse down/move/up for geometry/capture. In mobile Chromium use CDP `Input.dispatchTouchEvent`: stable touch IDs on touchStart/touchMove, no touch points on touchEnd/touchCancel. Include a second touch. Playwright touchscreen taps alone do not prove dragging. Cross-engine mobile tap cases remain required; label synthetic cleanup cases separately.

@@ -33,9 +33,9 @@ Extend `src/app.ts`, `src/styles.css` and `index.html`. Consume the existing cor
 ## Verification
 
 ```bash
-npm test
-npm run build
-npm run test:e2e -- --project=desktop-chromium --project=mobile-chromium
+pnpm test
+pnpm run build
+pnpm run test:e2e --project=desktop-chromium --project=mobile-chromium
 ```
 
 Install Playwright's clock before navigation for timing cases. Complete all three fixtures through controls, with at least one complete keyboard-only run. Test illegal taps, own-footprint movement, chiral flips, placement/removal Undo to empty, ready secrecy, repeated Start/solve events, active confirmation cancel/confirm, practice replay, fresh level changes and reload abandonment. Include a deterministic changed second roll and a coincidental repeated fresh roll. A legal Wizard B6 dead end must be accepted.

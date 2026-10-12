@@ -1,5 +1,7 @@
 # T03. Establish the strict web build and browser test setup
 
+Package-manager migration on 2026-10-12: commands in historical results below are current pnpm equivalents. Those earlier runs used the previous package manager; their original commands are preserved in commit `df3e241`. [Actual pnpm verification](../TEST-RESULTS.md#pnpm-migration-verification).
+
 [Tracker](README.md) | [Product specification](../../IMPLEMENTATION_PLAN.md) | [Coding guidelines](../../CODING_GUIDELINES.md)
 
 ## Blockers
@@ -20,16 +22,16 @@ Create `index.html`, the minimal `src/app.ts`/`src/styles.css` entry, `tsconfig.
 
 1. Use Node 24 and retain the existing TypeScript compiler. Install and lock compatible Vite 8, Playwright Test, axe and Node 24 types:
    ```bash
-   npm install --save-dev --save-exact vite@8 @playwright/test @axe-core/playwright @types/node@24
-   npx playwright install chromium firefox webkit
+   pnpm add -D --save-exact vite@8 @playwright/test @axe-core/playwright @types/node@24
+   pnpm exec playwright install chromium firefox webkit
    ```
-2. Update package name/description to Rollmino and retain `private: true` for npm publication protection. Ignore Playwright reports/results. Keep archives outside the browser entry and `public/`.
+2. Update package name/description to Rollmino and retain `private: true` for package publication protection. Ignore Playwright reports/results. Keep archives outside the browser entry and `public/`.
 3. Add strict no-emit TypeScript configuration: ES2022, ESNext modules, Bundler resolution, TypeScript import extensions, DOM libraries and configuration-file Node types. Include engine/src/browser tests/configs and exclude provenance directories.
 4. Configure Vite with `base: './'` and an explicit ES2022 build target. Add a semantic Rollmino heading/title and minimal dark stylesheet with a real TypeScript entry. No router, framework, placeholder game state or runtime service.
 5. Add these scripts, preserving existing pure test/verification commands. Add feature-test scripts when their test files exist; no no-op suites:
    - `typecheck`: `tsc --noEmit`
    - `dev`: `vite --host 127.0.0.1 --port 5173 --strictPort`
-   - `build`: `npm run typecheck && vite build`
+   - `build`: `pnpm run typecheck && vite build`
    - `preview`: `vite preview --host 127.0.0.1 --port 4173 --strictPort`
    - `test:e2e`: `playwright test`
 6. Configure desktop Chromium/Firefox/WebKit and mobile Chromium/WebKit projects. Enable touch in mobile projects. Start the dev server through Playwright `webServer`; CI must not reuse an unrelated process.
@@ -38,13 +40,13 @@ Create `index.html`, the minimal `src/app.ts`/`src/styles.css` entry, `tsconfig.
 ## Verification
 
 ```bash
-npm ci
-npm test
-npm run build
-npm run test:e2e -- --project=desktop-chromium
+pnpm install --frozen-lockfile
+pnpm test
+pnpm run build
+pnpm run test:e2e --project=desktop-chromium
 ```
 
-Open the entry with `npm run dev` and the built entry with `npm run preview`. Inspect loaded JS/CSS and `dist/`. Do not claim a game or mobile-input pass from a startup smoke test. On Linux browser installation uses `--with-deps`.
+Open the entry with `pnpm run dev` and the built entry with `pnpm run preview`. Inspect loaded JS/CSS and `dist/`. Do not claim a game or mobile-input pass from a startup smoke test. On Linux browser installation uses `--with-deps`.
 
 ## Done when
 
@@ -56,12 +58,12 @@ Open the entry with `npm run dev` and the built entry with `npm run preview`. In
 
 ## Completion evidence
 
-Completed checks on 2026-10-12 in Windows, Node 24.15.0 and npm 11.12.1. [Detailed results](../TEST-RESULTS.md#t03-implementation-verification).
+Completed checks on 2026-10-12 in Windows, Node 24.15.0 and the pre-migration package manager 11.12.1. [Detailed results](../TEST-RESULTS.md#t03-implementation-verification).
 
 - [package.json](../../package.json) and its lockfile use the Rollmino name and retain `private: true`. They lock Vite 8.3.4, Playwright Test 1.64.0, axe Playwright 4.13.0 and Node types 24.19.2 while retaining TypeScript 5.8.3. The added development/build/preview/browser-test scripts execute real tooling; pure tests remain separate.
 - [tsconfig.json](../../tsconfig.json) strictly checks the engine, browser entry, browser tests and both configuration files with ES2022/ESNext, Bundler resolution, DOM/Node types and no emit. [vite.config.ts](../../vite.config.ts) produces relative assets with the ES2022 target. [index.html](../../index.html) and [src/app.ts](../../src/app.ts) provide a semantic heading/title, actual loaded TypeScript behavior and a minimal dark stylesheet.
 - [playwright.config.ts](../../playwright.config.ts) configures all five named projects with touch-enabled mobile emulation. It starts its own server with reuse disabled. [e2e/play.spec.ts](../../e2e/play.spec.ts) checks loaded entry text/title/styles and fails on page/console errors, request failures or HTTP error responses. Reports/results are ignored.
-- `npm ci`, `npm test` and `npm run build` passed. All 44 pure tests passed. The required Chromium startup command passed, followed by all five projects passing `npm run test:e2e` with no skips. Installed browsers are Chromium 156.0.8078.4, Firefox 157.0 and WebKit 27.2.
+- `pnpm install --frozen-lockfile`, `pnpm test` and `pnpm run build` passed. All 44 pure tests passed. The required Chromium startup command passed, followed by all five projects passing `pnpm run test:e2e` with no skips. Installed browsers are Chromium 156.0.8078.4, Firefox 157.0 and WebKit 27.2.
 - Opened both dev and built entries in the collaborative browser and confirmed the heading, runtime text, dark background and JS/CSS resource loads. `dist/` contains only the original entry HTML/JS/CSS with relative references. No oracle, provenance or official assets ship. `git diff --check` passed.
 
 The first browser download failed with `UNABLE_TO_VERIFY_LEAF_SIGNATURE`. This retry used the installed system certificate store and restored the previous environment setting afterwards:
@@ -70,7 +72,7 @@ The first browser download failed with `UNABLE_TO_VERIFY_LEAF_SIGNATURE`. This r
 $rollminoNodeOptions = $env:NODE_OPTIONS
 try {
   $env:NODE_OPTIONS = "$rollminoNodeOptions --use-system-ca"
-  npx playwright install chromium firefox webkit
+  pnpm exec playwright install chromium firefox webkit
 } finally {
   $env:NODE_OPTIONS = $rollminoNodeOptions
 }

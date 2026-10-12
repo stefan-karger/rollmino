@@ -6,6 +6,8 @@ These guidelines apply to planning and implementation in Rollmino. They adopt th
 
 Choose the simplest implementation that clearly meets the current requirements.
 
+Use pnpm for this web project's dependencies and scripts. Respect the version pinned in `package.json` and commit `pnpm-lock.yaml`. Verification and CI use `pnpm install --frozen-lockfile`; use `pnpm add` when intentionally changing dependencies.
+
 - Keep code direct and locally understandable. Wrappers, helper chains, layers and delegation need a concrete readability or maintenance benefit.
 - Keep cohesive logic together. Short functions and small files are useful when they clarify the operation. Splitting one simple operation across several places solely to shorten them adds work for the reader.
 - Extract a function or module when its boundary represents a meaningful concept, contains real complexity or makes current code easier to change. A single consumer can justify extraction. Inline abstractions that add more confusion than they remove.
