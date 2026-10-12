@@ -1,0 +1,209 @@
+[
+  {
+    "id": "opening-seed",
+    "level": "WIZARD",
+    "dice": [
+      "A1",
+      "B2",
+      "C3",
+      "F2",
+      "D6",
+      "E5",
+      "A6"
+    ],
+    "solution": [
+      {
+        "id": "navy",
+        "orientation": 0,
+        "x": 4,
+        "y": 5
+      },
+      {
+        "id": "grey",
+        "orientation": 1,
+        "x": 5,
+        "y": 2
+      },
+      {
+        "id": "brown",
+        "orientation": 0,
+        "x": 1,
+        "y": 0
+      },
+      {
+        "id": "cyan",
+        "orientation": 6,
+        "x": 4,
+        "y": 0
+      },
+      {
+        "id": "yellow",
+        "orientation": 3,
+        "x": 2,
+        "y": 0
+      },
+      {
+        "id": "purple",
+        "orientation": 0,
+        "x": 0,
+        "y": 1
+      },
+      {
+        "id": "orange",
+        "orientation": 0,
+        "x": 2,
+        "y": 3
+      },
+      {
+        "id": "red",
+        "orientation": 0,
+        "x": 1,
+        "y": 4
+      },
+      {
+        "id": "green",
+        "orientation": 0,
+        "x": 0,
+        "y": 3
+      }
+    ]
+  },
+  {
+    "id": "F1-and-B6",
+    "level": "WIZARD",
+    "dice": [
+      "D2",
+      "B3",
+      "E3",
+      "B6",
+      "A4",
+      "F5",
+      "F1"
+    ],
+    "solution": [
+      {
+        "id": "navy",
+        "orientation": 0,
+        "x": 0,
+        "y": 5
+      },
+      {
+        "id": "yellow",
+        "orientation": 0,
+        "x": 0,
+        "y": 3
+      },
+      {
+        "id": "brown",
+        "orientation": 1,
+        "x": 0,
+        "y": 1
+      },
+      {
+        "id": "red",
+        "orientation": 2,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "id": "orange",
+        "orientation": 0,
+        "x": 2,
+        "y": 0
+      },
+      {
+        "id": "cyan",
+        "orientation": 2,
+        "x": 4,
+        "y": 1
+      },
+      {
+        "id": "grey",
+        "orientation": 0,
+        "x": 2,
+        "y": 5
+      },
+      {
+        "id": "purple",
+        "orientation": 1,
+        "x": 2,
+        "y": 2
+      },
+      {
+        "id": "green",
+        "orientation": 0,
+        "x": 3,
+        "y": 3
+      }
+    ]
+  },
+  {
+    "id": "A5-and-A6",
+    "level": "WIZARD",
+    "dice": [
+      "F3",
+      "A3",
+      "D4",
+      "A5",
+      "C5",
+      "E4",
+      "A6"
+    ],
+    "solution": [
+      {
+        "id": "navy",
+        "orientation": 0,
+        "x": 5,
+        "y": 3
+      },
+      {
+        "id": "cyan",
+        "orientation": 7,
+        "x": 3,
+        "y": 4
+      },
+      {
+        "id": "grey",
+        "orientation": 0,
+        "x": 1,
+        "y": 5
+      },
+      {
+        "id": "yellow",
+        "orientation": 2,
+        "x": 0,
+        "y": 3
+      },
+      {
+        "id": "brown",
+        "orientation": 1,
+        "x": 0,
+        "y": 0
+      },
+      {
+        "id": "green",
+        "orientation": 0,
+        "x": 1,
+        "y": 0
+      },
+      {
+        "id": "orange",
+        "orientation": 0,
+        "x": 1,
+        "y": 2
+      },
+      {
+        "id": "red",
+        "orientation": 1,
+        "x": 3,
+        "y": 0
+      },
+      {
+        "id": "purple",
+        "orientation": 2,
+        "x": 4,
+        "y": 0
+      }
+    ]
+  }
+]

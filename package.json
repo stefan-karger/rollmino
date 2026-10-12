@@ -1,0 +1,14 @@
+{
+  "name": "genius-square-v1-agent-kickstart",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Research and tested rules engine for planning a web V1 (not yet a playable app)",
+  "engines": { "node": ">=22.16.0" },
+  "scripts": {
+    "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "verify:all": "node --experimental-strip-types scripts/verify-all.mjs",
+    "typecheck": "tsc --noEmit --strict --target ES2022 --module ESNext engine/core.ts"
+  },
+  "devDependencies": { "typescript": "~5.8.3" }
+}
