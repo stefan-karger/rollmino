@@ -9,9 +9,9 @@ Read the table top to bottom. Pick the first `todo` ticket whose listed blockers
 | State | Ticket | Blockers | Quick completion check / work note |
 | --- | --- | --- | --- |
 | `done` | [T00. Create the GitHub repository and synchronize the local workspace](00-repository-setup.md) | None | Public repo/description and main upstream verified on 2026-10-12; baseline 9188f0b |
-| `todo` | [T01. Harden rules and committed-state validation](01-rule-validation.md) | None | Malformed-state regressions, exact model and engine tests |
-| `todo` | [T02. Validate every exhaustive solver answer independently](02-independent-solution-verification.md) | [T01](01-rule-validation.md) | Independent oracle and 62,208 checked Wizard answers |
-| `todo` | [T03. Establish the strict web build and browser test setup](03-web-tooling.md) | None | Strict build, lockfile and browser startup setup |
+| `done` | [T01. Harden rules and committed-state validation](01-rule-validation.md) | None | 30 fast tests, strict check and 62,208-board existence sweep passed; [evidence](01-rule-validation.md#completion-evidence) |
+| `done` | [T02. Validate every exhaustive solver answer independently](02-independent-solution-verification.md) | [T01](01-rule-validation.md) | 44 fast tests and 62,208 independently checked Wizard answers passed; [evidence](02-independent-solution-verification.md#completion-evidence) |
+| `done` | [T03. Establish the strict web build and browser test setup](03-web-tooling.md) | None | Clean install, 44 pure tests, strict build and all five browser startup cases passed; [evidence](03-web-tooling.md#completion-evidence) |
 | `todo` | [T04. Implement geometric transforms with occupied-cell anchors](04-geometric-transforms.md) | None | Real R/F geometry and every occupied anchor |
 | `todo` | [T05. Implement pure run lifecycle, wall-clock timing and Undo](05-session-timing-undo.md) | [T01](01-rule-validation.md), [T03](03-web-tooling.md) | Pure phases, wall time, terminal completion and full Undo |
 | `todo` | [T06. Implement top-five ranking and resilient local storage](06-record-ranking-storage.md) | [T03](03-web-tooling.md) | Top-five ranking, payload validation and storage failures |

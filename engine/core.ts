@@ -88,19 +88,55 @@ export interface Game {
   placed: Partial<Record<PieceId, Placement>>;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  if (value === null || typeof value !== 'object') return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function isLevel(value: unknown): value is Level {
+  return typeof value === 'string' && Object.hasOwn(RESTRICTED, value);
+}
+
+function isPieceId(value: unknown): value is PieceId {
+  return typeof value === 'string' && Object.hasOwn(SHAPES, value);
+}
+
+function validDice(dice: unknown): dice is readonly string[] {
+  if (!Array.isArray(dice) || dice.length !== 7) return false;
+  for (let i = 0; i < 7; i++) {
+    if (!Object.hasOwn(dice, i) || typeof dice[i] !== 'string' || !DICE[i].includes(dice[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function validSetup(game: unknown): game is Game {
+  return isRecord(game) && Object.hasOwn(game, 'dice') && validDice(game.dice)
+    && Object.hasOwn(game, 'level') && isLevel(game.level);
+}
+
 /** Throws on invalid dice data rather than silently producing bad puzzles. */
 export function validateDice(dice: readonly string[]): void {
-  if (dice.length !== 7 || dice.some((face, i) => !DICE[i].includes(face))) {
+  if (!validDice(dice)) {
     throw new Error('Expected exactly one valid face in physical dice order.');
   }
 }
 
 export function rollDice(random: () => number = Math.random): string[] {
-  return DICE.map(faces => faces[Math.floor(random() * 6)]);
+  return DICE.map(faces => {
+    const value = random();
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value >= 1) {
+      throw new Error('Expected a finite random number in [0, 1).');
+    }
+    return faces[Math.floor(value * 6)];
+  });
 }
 
 export function newGame(dice: readonly string[], level: Level = 'STARTER'): Game {
   validateDice(dice);
+  if (!isLevel(level)) throw new Error('Expected a known level.');
   return { dice: [...dice], level, placed: {} };
 }
 
@@ -111,8 +147,11 @@ function position(coord: string): number {
 }
 
 function cellsOf(p: Placement): number[] | null {
-  const shape = ORIENTATIONS[p.id]?.[p.orientation];
-  if (!shape || !Number.isInteger(p.x) || !Number.isInteger(p.y)) return null;
+  if (!isRecord(p) || !['id', 'orientation', 'x', 'y'].every(key => Object.hasOwn(p, key))
+    || !isPieceId(p.id) || !Number.isInteger(p.orientation)
+    || p.orientation < 0 || p.orientation >= ORIENTATIONS[p.id].length
+    || !Number.isInteger(p.x) || !Number.isInteger(p.y)) return null;
+  const shape = ORIENTATIONS[p.id][p.orientation];
   const result: number[] = [];
   for (const [dx, dy] of shape) {
     const x = p.x + dx, y = p.y + dy;
@@ -140,42 +179,62 @@ function cellMask(indices: readonly number[]): bigint {
   return mask;
 }
 
-/** Check a proposed placement against blockers and all *other* placed pieces. */
+/** Fail closed for malformed committed state; ignore only a validated old footprint. */
 export function canPlace(game: Game, p: Placement): boolean {
+  if (!validSetup(game)) return false;
+  const state = committedState(game);
+  if (!state) return false;
   const a = cellsOf(p);
-  if (!a || a.length !== SHAPES[p.id]?.length) return false;
+  if (!a) return false;
   const myMask = cellMask(a);
   for (const face of game.dice) if ((myMask & bit(position(face))) !== 0n) return false;
   const restricted = RESTRICTED[game.level];
   const myNeighbors = restricted.includes(p.id) ? neighborMask(a) : 0n;
-  for (const id of PIECE_IDS) {
-    if (id === p.id) continue; // Move an existing piece transactionally.
-    const other = game.placed[id];
-    if (!other) continue;
-    const b = cellsOf(other);
-    if (!b) return false;
-    const theirMask = cellMask(b);
-    if ((myMask & theirMask) !== 0n) return false;
-    if (restricted.includes(id) && (myNeighbors & theirMask) !== 0n) return false;
+  for (const other of state.selected) {
+    if (other.id === p.id) continue;
+    if ((myMask & other.mask) !== 0n) return false;
+    if (restricted.includes(other.id) && (myNeighbors & other.mask) !== 0n) return false;
   }
   return true;
 }
 
 export function isSolved(game: Game): boolean {
-  if (PIECE_IDS.some(id => !game.placed[id])) return false;
-  const placed: Game = { ...game, placed: {} };
-  for (const id of PIECE_IDS) {
-    const p = game.placed[id]!;
-    if (!canPlace(placed, p)) return false;
-    placed.placed[id] = p;
-  }
-  return true; // 29 uniquely occupied cells + 7 distinct blockers = 36.
+  if (!validSetup(game)) return false;
+  const state = committedState(game);
+  return state !== null && state.used === ALL_PIECES && state.occupied === FULL
+    && state.selected.reduce((sum, p) => sum + SHAPES[p.id].length, 0) === 29;
 }
 
 interface Candidate extends Placement {
   i: number;
   mask: bigint;
   neighbors: bigint;
+}
+
+/** Validate keys, geometry, occupancy and contacts once for each committed piece. */
+function committedState(game: Game): { occupied: bigint; used: number; selected: Candidate[] } | null {
+  if (!Object.hasOwn(game, 'placed') || !isRecord(game.placed)) return null;
+  if (Reflect.ownKeys(game.placed).some(key => !isPieceId(key))) return null;
+  let occupied = cellMask(game.dice.map(position));
+  let used = 0;
+  const selected: Candidate[] = [];
+  const restricted = RESTRICTED[game.level];
+  for (let i = 0; i < PIECE_IDS.length; i++) {
+    const id = PIECE_IDS[i];
+    if (!Object.hasOwn(game.placed, id)) continue;
+    const p = game.placed[id];
+    if (!p) return null;
+    const cells = cellsOf(p);
+    if (!cells || p.id !== id) return null;
+    const mask = cellMask(cells), neighbors = neighborMask(cells);
+    if ((occupied & mask) !== 0n) return null;
+    if (restricted.includes(id) && selected.some(other =>
+      restricted.includes(other.id) && (neighbors & other.mask) !== 0n)) return null;
+    occupied |= mask;
+    used |= 1 << i;
+    selected.push({ id: p.id, orientation: p.orientation, x: p.x, y: p.y, i, mask, neighbors });
+  }
+  return { occupied, used, selected };
 }
 const BY_CELL: Candidate[][] = Array.from({ length: 36 }, () => []);
 for (let i = 0; i < PIECE_IDS.length; i++) {
@@ -196,29 +255,19 @@ for (let i = 0; i < PIECE_IDS.length; i++) {
   });
 }
 const FULL = (1n << 36n) - 1n;
+const ALL_PIECES = (1 << PIECE_IDS.length) - 1;
 
-/** Find a solution consistent with the pieces the player has already placed.
- *  Returns null if that partial board cannot be completed. */
+/** Preserve fixed pieces without mutating input. Throws for malformed dice/level;
+ *  returns null for invalid fixed placements or a legal dead end. */
 export function solve(game: Game): Placement[] | null {
-  validateDice(game.dice);
+  if (!validSetup(game)) throw new Error('Expected valid physical dice and a known level.');
+  const state = committedState(game);
+  if (!state) return null;
   const restricted = new Set(RESTRICTED[game.level]);
-  let occupied = cellMask(game.dice.map(position));
-  let used = 0;
-  const selected: Candidate[] = [];
-
-  for (const id of PIECE_IDS) {
-    const placement = game.placed[id];
-    if (!placement) continue;
-    if (!canPlace(game, placement)) return null;
-    const cells = cellsOf(placement)!;
-    const i = PIECE_IDS.indexOf(id);
-    occupied |= cellMask(cells);
-    used |= 1 << i;
-    selected.push({ ...placement, i, mask: cellMask(cells), neighbors: neighborMask(cells) });
-  }
+  const { occupied, used, selected } = state;
 
   function visit(mask: bigint, usedBits: number): boolean {
-    if (mask === FULL) return true;
+    if (mask === FULL) return usedBits === ALL_PIECES;
     // Choose the empty square with the fewest legal candidate placements.
     let options: Candidate[] | null = null;
     for (let cell = 0; cell < 36; cell++) {

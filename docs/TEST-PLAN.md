@@ -5,12 +5,18 @@
 ## Executable now
 
 ```bash
+npm ci
 npm test
+npm run test:rules
 npm run verify:all
-npm install && npm run typecheck
+npm run typecheck
+npm run build
+npm run test:e2e
 ```
 
-These are reference-engine checks only. The current exhaustive loop checks non-null solutions for 62,208 boards, with engine-based replay validation of one example. Slice 0 adds a maintained independent legality oracle for every answer and repairs the documented false-win/malformed-state defects. [Current evidence](TEST-RESULTS.md)
+The fast pure suite has 44 tests covering T01's validation repairs, the literal model and T02's independent oracle. The separate exhaustive loop requires a non-null answer for each of 62,208 Wizard boards and checks every answer with the cell-array oracle. It reuses canonical orientation data but does not call the engine's legality checks or use their masks. [Current evidence](TEST-RESULTS.md)
+
+T03 adds a strict Vite build and one browser startup case in all five configured projects. Browser binaries must be installed with `npx playwright install chromium firefox webkit`; Linux uses `--with-deps`. The startup case checks the title/heading, loaded TypeScript entry and CSS, page errors and failed requests. It does not test gameplay, dragging, records or accessibility. `npm run dev` and `npm run preview` serve the source entry and built artifact for inspection.
 
 ## Required coverage during implementation
 
@@ -30,11 +36,11 @@ These are reference-engine checks only. The current exhaustive loop checks non-n
 
 Reuse `fixtures/rolls.json`. Seed physical random face indices before app startup; do not add a production cheat panel or inject placements into a mutable global. Wizard `opening-seed` with navy at B6 is a legal dead end. A fair second roll may repeat the first; changed-board tests use predetermined different rolls.
 
-Development projects are desktop Chromium/Firefox/WebKit and mobile Chromium/WebKit emulation. Native Chromium touch sequences use CDP because Playwright's touchscreen API only provides taps. Cross-engine tap/keyboard/mouse checks and touch-specific cases have explicit coverage; synthetic events alone do not establish touch dragging.
+Development projects are desktop Chromium/Firefox/WebKit and mobile Chromium/WebKit emulation. All five currently pass startup checks. Future native Chromium touch sequences use CDP because Playwright's touchscreen API only provides taps. Cross-engine tap/keyboard/mouse checks and touch-specific cases require explicit coverage; synthetic events alone do not establish touch dragging.
 
-## Commands to add
+## Remaining release checks
 
-The following become executable after their plan slices introduce tooling and files:
+The full release sequence below includes `test:e2e:prod`, which becomes executable in T11. Other commands are available now with the current limited feature coverage:
 
 ```bash
 npm ci

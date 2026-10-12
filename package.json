@@ -1,14 +1,27 @@
 {
-  "name": "genius-square-v1-agent-kickstart",
+  "name": "rollmino",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "Research and tested rules engine for planning a web V1 (not yet a playable app)",
-  "engines": { "node": ">=22.16.0" },
+  "description": "Rollmino, a timed solo puzzle website in development",
+  "engines": {
+    "node": ">=22.16.0"
+  },
   "scripts": {
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "test:rules": "node --experimental-strip-types --test tests/core.test.mjs tests/oracle.test.mjs",
     "verify:all": "node --experimental-strip-types scripts/verify-all.mjs",
-    "typecheck": "tsc --noEmit --strict --target ES2022 --module ESNext engine/core.ts"
+    "typecheck": "tsc --noEmit",
+    "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "test:e2e": "playwright test"
   },
-  "devDependencies": { "typescript": "~5.8.3" }
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.64.0",
+    "@types/node": "24.19.2",
+    "typescript": "~5.8.3",
+    "vite": "8.3.4"
+  }
 }

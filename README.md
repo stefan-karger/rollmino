@@ -2,7 +2,7 @@
 
 Rollmino is a planned free, always-timed solo puzzle website. The requirements interview is complete. [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) is the agreed, executable specification; [docs/DECISIONS.md](docs/DECISIONS.md) records the user's choices.
 
-This folder contains research, a TypeScript reference engine and deterministic tests. It is not yet a playable web application. The browser app, records, controls and deployment workflow still need implementation.
+This folder contains research, a TypeScript rules engine, deterministic tests and a minimal Rollmino web entry. Vite and browser startup tests are configured. It is not yet playable; game controls, sessions, records and deployment still need implementation.
 
 Source repository: [stefan-karger/rollmino](https://github.com/stefan-karger/rollmino). The existing local workspace is initialized on `main` and connected to `origin/main`. [T00's setup evidence](docs/tickets/00-repository-setup.md#completion-evidence) records the baseline and synchronization checks. Website deployment remains T14.
 
@@ -15,20 +15,25 @@ Source repository: [stefan-karger/rollmino](https://github.com/stefan-karger/rol
 
 [PROMPT_FOR_AGENT.md](PROMPT_FOR_AGENT.md) is a future implementation handoff prompt. Creating this plan does not implement or publish the website.
 
-## Current reference commands
+## Setup and current commands
 
-Node 22.16+ runs the reference tests through native TypeScript type stripping. The review used Node 24.15.0. Install the local compiler for strict checking.
+Use Node 24 for development. The current checks ran on Node 24.15.0. Node 22.16+ can also run the pure tests through native TypeScript type stripping. Strict checking includes the engine, browser entry, browser tests and configuration files.
 
 ```bash
+npm ci
+npx playwright install chromium firefox webkit
 npm test
-npm run verify:all
-npm install
-npm run typecheck
+npm run test:rules
+npm run build
+npm run test:e2e
+npm run dev
 ```
 
-The current fast suite has 13 tests. The current exhaustive script checks solution existence for 62,208 Wizard boards and validates one example through the engine. The plan first repairs known validation gaps and makes independent validation of every answer a maintained check. [Recorded evidence and limits](docs/TEST-RESULTS.md)
+`npm run dev` serves the entry at `http://127.0.0.1:5173/`. After building, `npm run preview` serves `dist/` at `http://127.0.0.1:4173/`. `npm run typecheck` checks TypeScript without building. On Linux, browser installation uses `npx playwright install --with-deps chromium firefox webkit`. The Windows certificate-store retry used here is recorded in [T03's evidence](docs/tickets/03-web-tooling.md#completion-evidence).
 
-Vite, Playwright and the browser commands in the plan have not been added yet. Do not mistake planned commands or reference results for a tested web app.
+The current fast suite has 44 tests, including the repaired malformed-state regressions, exact model/contact checks and independent oracle tests. The separate `npm run verify:all` command validates every returned solution for all 62,208 Wizard boards with a cell-array oracle. The oracle reuses canonical orientation data. [Recorded evidence and limits](docs/TEST-RESULTS.md)
+
+The browser startup case passes in desktop Chromium/Firefox/WebKit and mobile Chromium/WebKit emulation. It checks the entry/title, loaded TypeScript behavior and CSS, page errors and failed asset requests. This establishes startup tooling; gameplay, mobile input and accessibility acceptance remain future tickets. Production root/subpath tests are added in T11.
 
 ## Agreed V1
 
@@ -56,8 +61,10 @@ Vite, Playwright and the browser commands in the plan have not been added yet. D
 | `docs/TEST-PLAN.md` | Current versus planned checks and acceptance summary |
 | `docs/SOURCES-AND-RISKS.md` | Sources, fidelity boundaries and original-art policy |
 | `docs/REFERENCE-VERIFICATION.md` / `docs/TEST-RESULTS.md` | Reference evidence, audit results and their limits |
-| `engine/core.ts` | Canonical pure engine; known repairs are planned |
-| `tests/core.test.mjs` / `scripts/verify-all.mjs` | Existing maintained reference checks |
+| `engine/core.ts` | Canonical pure engine with validated setup, committed placements and solved coverage |
+| `index.html` / `src/` | Minimal semantic web entry and dark stylesheet; gameplay comes in T07 |
+| `tsconfig.json` / `vite.config.ts` / `playwright.config.ts` / `e2e/play.spec.ts` | Strict browser build and five-project startup checks |
+| `tests/core.test.mjs` / `tests/oracle.mjs` / `tests/oracle.test.mjs` / `scripts/verify-all.mjs` | Literal rules tests, independent answer checks and exhaustive Wizard sweep |
 | `fixtures/rolls.json` | Three reproducible rolls and Wizard solutions |
 | `PLAN.md` / `docs/RESEARCH.md` | Historical analysis and source research |
 | `original-handoff/` / `research-archive/` | Preserved provenance; never runtime imports |

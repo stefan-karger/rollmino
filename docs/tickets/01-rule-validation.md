@@ -46,12 +46,19 @@ Also cover null/missing values, sparse arrays, unknown/prototype-derived IDs, ex
 
 ## Done when
 
-- [ ] The four reproduced defects have regression tests that failed before repair and pass afterwards.
-- [ ] Failure behavior follows the contracts above without incidental crashes or false wins.
-- [ ] Exact model and contact cases pass; fixture orientation order and fair-roll probabilities are unchanged.
-- [ ] Fixed-placement, dead-end and input-immutability tests pass.
-- [ ] Fast tests, strict check and the existing exhaustive sweep pass; evidence distinguishes existence checks from independent answer validation.
+- [x] The four reproduced defects have regression tests that failed before repair and pass afterwards.
+- [x] Failure behavior follows the contracts above without incidental crashes or false wins.
+- [x] Exact model and contact cases pass; fixture orientation order and fair-roll probabilities are unchanged.
+- [x] Fixed-placement, dead-end and input-immutability tests pass.
+- [x] Fast tests, strict check and the existing exhaustive sweep pass; evidence distinguishes existence checks from independent answer validation.
 
 ## Completion evidence
 
-Not yet recorded. Add the actual changes, command results, checks and code reference here before setting this ticket to `done` in the tracker. Follow the [completion rules](README.md#working-and-completing-tickets).
+Completed checks on 2026-10-12, Windows, Node 24.15.0, npm 11.12.1 and TypeScript 5.8.3. [Detailed results](../TEST-RESULTS.md#t01-implementation-verification).
+
+- [engine/core.ts](../../engine/core.ts) adds shared setup/placement guards and validates committed occupancy/contact before placement, completion or fixed-piece solving. Invalid setup throws only through the documented constructor/dice/solver contracts; predicate checks return false. Winning and solver termination require all nine IDs and full coverage. RNG injection rejects invalid numbers.
+- [tests/core.test.mjs](../../tests/core.test.mjs) expands the fast suite from 13 to 30 tests. The four required regressions failed before repair and pass afterwards. Literal model tests, all six restricted pairs at five levels in both orders, diagonal/blocker/boundary/unrestricted contacts, malformed state, self-overlap moves, all fixtures, frozen solver input and the legal B6 dead end pass.
+- `npm install`, `npm test`, `npm run typecheck` and `git diff --check` passed. The final `npm run verify:all` returned answers for all 62,208 Wizard boards in 27.11 seconds and replay-validated one example through the engine.
+- Dice order, orientation generation, fixtures and provenance copies remain unchanged. README and the active test summaries now describe the repaired validation and current test count.
+
+The exhaustive loop still checks answer existence. It does not independently validate every returned answer; that is T02. This ticket has no browser UI, and no browser/device/screen-reader checks are claimed.

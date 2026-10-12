@@ -48,12 +48,32 @@ Open the entry with `npm run dev` and the built entry with `npm run preview`. In
 
 ## Done when
 
-- [ ] A clean lockfile installation runs the commands above.
-- [ ] Strict checking includes new browser/configuration TypeScript, not only the old core.
-- [ ] Vite produces a static relative-asset build without archive/official content.
-- [ ] All five named projects are configured and the initial Chromium startup case passes.
-- [ ] Runtime/build dependencies serve the agreed stack; no speculative application architecture or unavailable test scripts are added.
+- [x] A clean lockfile installation runs the commands above.
+- [x] Strict checking includes new browser/configuration TypeScript, not only the old core.
+- [x] Vite produces a static relative-asset build without archive/official content.
+- [x] All five named projects are configured and the initial Chromium startup case passes.
+- [x] Runtime/build dependencies serve the agreed stack; no speculative application architecture or unavailable test scripts are added.
 
 ## Completion evidence
 
-Not yet recorded. Add the actual changes, command results, checks and code reference here before setting this ticket to `done` in the tracker. Follow the [completion rules](README.md#working-and-completing-tickets).
+Completed checks on 2026-10-12 in Windows, Node 24.15.0 and npm 11.12.1. [Detailed results](../TEST-RESULTS.md#t03-implementation-verification).
+
+- [package.json](../../package.json) and its lockfile use the Rollmino name and retain `private: true`. They lock Vite 8.3.4, Playwright Test 1.64.0, axe Playwright 4.13.0 and Node types 24.19.2 while retaining TypeScript 5.8.3. The added development/build/preview/browser-test scripts execute real tooling; pure tests remain separate.
+- [tsconfig.json](../../tsconfig.json) strictly checks the engine, browser entry, browser tests and both configuration files with ES2022/ESNext, Bundler resolution, DOM/Node types and no emit. [vite.config.ts](../../vite.config.ts) produces relative assets with the ES2022 target. [index.html](../../index.html) and [src/app.ts](../../src/app.ts) provide a semantic heading/title, actual loaded TypeScript behavior and a minimal dark stylesheet.
+- [playwright.config.ts](../../playwright.config.ts) configures all five named projects with touch-enabled mobile emulation. It starts its own server with reuse disabled. [e2e/play.spec.ts](../../e2e/play.spec.ts) checks loaded entry text/title/styles and fails on page/console errors, request failures or HTTP error responses. Reports/results are ignored.
+- `npm ci`, `npm test` and `npm run build` passed. All 44 pure tests passed. The required Chromium startup command passed, followed by all five projects passing `npm run test:e2e` with no skips. Installed browsers are Chromium 156.0.8078.4, Firefox 157.0 and WebKit 27.2.
+- Opened both dev and built entries in the collaborative browser and confirmed the heading, runtime text, dark background and JS/CSS resource loads. `dist/` contains only the original entry HTML/JS/CSS with relative references. No oracle, provenance or official assets ship. `git diff --check` passed.
+
+The first browser download failed with `UNABLE_TO_VERIFY_LEAF_SIGNATURE`. This retry used the installed system certificate store and restored the previous environment setting afterwards:
+
+```powershell
+$rollminoNodeOptions = $env:NODE_OPTIONS
+try {
+  $env:NODE_OPTIONS = "$rollminoNodeOptions --use-system-ca"
+  npx playwright install chromium firefox webkit
+} finally {
+  $env:NODE_OPTIONS = $rollminoNodeOptions
+}
+```
+
+Configuration follows the official [Vite build documentation](https://vite.dev/guide/build.html) and [Playwright web-server/project documentation](https://playwright.dev/docs/test-webserver). The collaborative preview contained earlier Electron preload errors from blank-tab initialization; separate Playwright page/console checks passed. This is startup tooling, not a game, mobile-input or accessibility pass. Production configuration/testing remains T11; no deployment or physical-device checks were performed.

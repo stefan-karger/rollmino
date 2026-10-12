@@ -38,12 +38,20 @@ Inspect imports to confirm that the oracle does not delegate legality to the eng
 
 ## Done when
 
-- [ ] Deliberately invalid answers fail the oracle and valid fixtures pass.
-- [ ] Every exhaustive answer receives an independent occupancy/contact check.
-- [ ] The sweep passes for exactly 62,208 boards without changing the physical model.
-- [ ] Evidence states the oracle's limits, including reuse of orientation data.
-- [ ] No oracle/archive code enters the runtime and the fast default test does not run the exhaustive sweep.
+- [x] Deliberately invalid answers fail the oracle and valid fixtures pass.
+- [x] Every exhaustive answer receives an independent occupancy/contact check.
+- [x] The sweep passes for exactly 62,208 boards without changing the physical model.
+- [x] Evidence states the oracle's limits, including reuse of orientation data.
+- [x] No oracle/archive code enters the runtime and the fast default test does not run the exhaustive sweep.
 
 ## Completion evidence
 
-Not yet recorded. Add the actual changes, command results, checks and code reference here before setting this ticket to `done` in the tracker. Follow the [completion rules](README.md#working-and-completing-tickets).
+Completed checks on 2026-10-12, Windows, Node 24.15.0, npm 11.12.1 and TypeScript 5.8.3. [Detailed results](../TEST-RESULTS.md#t02-implementation-verification) and [verification method/limits](../REFERENCE-VERIFICATION.md).
+
+- [tests/oracle.mjs](../../tests/oracle.mjs) independently validates answer IDs, geometry, bounds, blockers, overlap, coverage, restricted contacts and fixed-placement preservation with direct coordinates and a cell array. Failures name the roll and condition. Its only engine import is canonical orientation data.
+- [tests/oracle.test.mjs](../../tests/oracle.test.mjs) adds 14 tests for valid fixtures, solver answers with fixed placements, deliberately invalid answers, forbidden contacts, allowed diagonal/unrestricted contact and coverage-gap fault injection. The shared geometry fault is restored immediately in `finally`.
+- [scripts/verify-all.mjs](../../scripts/verify-all.mjs) validates every returned answer before counting the board, retains deterministic per-die enumeration and asserts 62,208 checks. [package.json](../../package.json) adds `test:rules`; the fast default suite remains separate from exhaustive verification.
+- `npm run test:rules` and `npm test` each passed all 44 tests without skips. `npm run typecheck` and `git diff --check` passed. `npm run verify:all` independently validated all 62,208 Wizard answers in 29.17 seconds.
+- README and the active reference/test documents now describe the maintained independent checks. The physical model, roll sampling, orientation indices, fixtures and archives remain unchanged.
+
+The oracle reuses canonical orientations guarded by T01's literal tests. The sweep establishes one valid returned answer per encoded board, not counts, human difficulty, all partial-state behavior or independent physical-source certification. Other levels follow from Wizard's stronger contact restrictions; separate exhaustive lower-level sweeps were not run. No browser/runtime imports of the oracle exist, and no browser/device/screen-reader testing is claimed.
