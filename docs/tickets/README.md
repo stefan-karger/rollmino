@@ -8,7 +8,7 @@ Read the table top to bottom. Pick the first `todo` ticket whose listed blockers
 
 | State | Ticket | Blockers | Quick completion check / work note |
 | --- | --- | --- | --- |
-| `doing` | [T00. Create the GitHub repository and synchronize the local workspace](00-repository-setup.md) | None | Implementing local baseline and GitHub setup; CLI authentication is not configured yet |
+| `done` | [T00. Create the GitHub repository and synchronize the local workspace](00-repository-setup.md) | None | Public repo/description and main upstream verified on 2026-10-12; baseline 9188f0b |
 | `todo` | [T01. Harden rules and committed-state validation](01-rule-validation.md) | None | Malformed-state regressions, exact model and engine tests |
 | `todo` | [T02. Validate every exhaustive solver answer independently](02-independent-solution-verification.md) | [T01](01-rule-validation.md) | Independent oracle and 62,208 checked Wizard answers |
 | `todo` | [T03. Establish the strict web build and browser test setup](03-web-tooling.md) | None | Strict build, lockfile and browser startup setup |

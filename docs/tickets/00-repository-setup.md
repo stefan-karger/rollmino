@@ -16,7 +16,7 @@ The existing local folder is a Git repository connected to public `stefan-karger
 
 ## Scope and files
 
-Use the existing `genius-square` workspace. Its directory name may stay unchanged; do not replace it with a new clone. Review `.gitignore`, the files to be committed, Git configuration and repository metadata. Record evidence here and update the tracker. No app implementation or Pages activation in this ticket.
+Use the existing `genius-square` workspace. Its directory name may stay unchanged; do not replace it with a new clone. Review `.gitignore`, `.gitattributes`, the files to be committed, Git configuration and repository metadata. Record evidence here and update the tracker. No app implementation or Pages activation in this ticket.
 
 Repository settings:
 
@@ -72,13 +72,26 @@ The root must be the current workspace, owner/name must match, `isPrivate` must 
 
 ## Done when
 
-- [ ] The existing workspace has a reviewed committed Git baseline without losing existing work.
-- [ ] The intended GitHub repository exists, is public and has the specified description/default branch.
-- [ ] `origin` identifies that target and local main tracks `origin/main`.
-- [ ] Initial source is pushed; local/tracking/remote main commit references match and remaining worktree changes are explained.
-- [ ] Repo metadata, commit and synchronization checks are recorded; no credentials are included.
-- [ ] Pages publication remains assigned to T14 and no app-release claim is made from repository creation.
+- [x] The existing workspace has a reviewed committed Git baseline without losing existing work.
+- [x] The intended GitHub repository exists, is public and has the specified description/default branch.
+- [x] `origin` identifies that target and local main tracks `origin/main`.
+- [x] Initial source is pushed; local/tracking/remote main commit references match and remaining worktree changes are explained.
+- [x] Repo metadata, commit and synchronization checks are recorded; no credentials are included.
+- [x] Pages publication remains assigned to T14 and no app-release claim is made from repository creation.
 
 ## Completion evidence
 
-Not yet recorded. Record local progress separately if remote access is blocked, and keep the central state `blocked` until the whole ticket passes. Add actual metadata, commit and sync results before setting this ticket to `done`. Follow the [completion rules](README.md#working-and-completing-tickets).
+Implemented on 2026-10-12; initial synchronization verified at 14:29 UTC.
+
+- Repository: [stefan-karger/rollmino](https://github.com/stefan-karger/rollmino), verified public through `isPrivate: false`.
+- Description: `A free, phone-first timed block puzzle with five difficulty levels and local personal records.`
+- Default branch: `main`; origin is `https://github.com/stefan-karger/rollmino.git`; local main tracks `origin/main`.
+- Initial baseline: [9188f0b](https://github.com/stefan-karger/rollmino/commit/9188f0b6ef4d26b336cfa5f1eafe9bde2e626527), `chore: initialize Rollmino handoff`, with 49 reviewed files.
+- `git rev-parse HEAD`, `git rev-parse origin/main` and `git ls-remote origin refs/heads/main` all returned `9188f0b6ef4d26b336cfa5f1eafe9bde2e626527` after fetch; `git status --short` was empty.
+- Git 2.54.0.windows.1 and GitHub CLI 2.91.0 used the existing GitHub credential helper for the intended owner. No new browser/CLI login or repository credential file was needed; credentials were not recorded.
+- `npm test` passed all 13 existing reference tests. No rule fixes or browser app work were included.
+- An independent byte/hash check verified all 15 original reference/archive code and provenance files against `SHA256SUMS.txt`, in both the workspace and committed Git objects. Dependencies/build/test artifacts are absent from tracked files.
+- Added `.gitattributes` to keep text at LF under the existing Windows Git configuration and preserve archive bytes. Removed extra EOF blank lines in ticket Markdown. The two preserved research documents retain intentional Markdown hard-break spaces; whitespace checks on other staged files passed.
+- README and the tracker now record the setup. Their completion bookkeeping is committed and synchronized separately from the original baseline.
+
+The repository homepage remains empty and Pages activation/deployment remains T14. This is a source handoff, not a playable-site release.

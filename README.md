@@ -4,6 +4,8 @@ Rollmino is a planned free, always-timed solo puzzle website. The requirements i
 
 This folder contains research, a TypeScript reference engine and deterministic tests. It is not yet a playable web application. The browser app, records, controls and deployment workflow still need implementation.
 
+Source repository: [stefan-karger/rollmino](https://github.com/stefan-karger/rollmino). The existing local workspace is initialized on `main` and connected to `origin/main`. [T00's setup evidence](docs/tickets/00-repository-setup.md#completion-evidence) records the baseline and synchronization checks. Website deployment remains T14.
+
 ## Start here
 
 1. Read [AGENTS.md](AGENTS.md), [CODING_GUIDELINES.md](CODING_GUIDELINES.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
