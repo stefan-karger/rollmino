@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { cell, complete, fixtures, openGame, seed, slot } from './helpers.ts';
 
 test('loads the Rollmino entry and its styles without page or asset errors', async ({ page }) => {
   const errors: string[] = [];
@@ -14,7 +15,77 @@ test('loads the Rollmino entry and its styles without page or asset errors', asy
   await page.goto('./');
   await expect(page).toHaveTitle('Rollmino');
   await expect(page.getByRole('heading', { name: 'Rollmino', level: 1 })).toBeVisible();
-  await expect(page.getByText('A timed solo puzzle. Game controls are coming next.', { exact: true })).toBeVisible();
+  await expect(page.getByText('Puzzle hidden until Start.', { exact: true })).toBeVisible();
   await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(18, 22, 29)');
   expect(errors).toEqual([]);
+});
+
+for (const fixture of fixtures) {
+  test(`completes ${fixture.id} through public tap controls and freezes`, async ({ page }) => {
+    await page.clock.install({ time: new Date('2026-10-13T10:00:00Z') });
+    await page.clock.pauseAt(new Date('2026-10-13T10:00:00Z'));
+    await openGame(page, fixture);
+    await page.clock.fastForward(65432);
+    await complete(page, fixture);
+    await expect(page.locator('#timer')).toHaveText('01:05.43');
+    const frozen = await page.locator('#timer').textContent();
+    await page.clock.fastForward(20000);
+    await expect(page.locator('#timer')).toHaveText(frozen!);
+    await expect(slot(page, 'navy')).toBeDisabled();
+    await page.getByRole('button', { name: 'Replay', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Start practice' })).toBeFocused();
+    await expect(page.locator('[data-content="blocker"]')).toHaveCount(0);
+    await expect(page.locator('#board-art circle')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Start practice' }).click();
+    for (const face of fixture.dice) await expect(page.getByRole('button', { name: `${face}, blocker`, exact: true })).toBeVisible();
+    await expect(page.locator('#timer')).toHaveText('00:00.00');
+  });
+}
+
+test('active confirmations preserve time on cancel, replay is hidden, and level changes are fresh', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-10-13T10:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-10-13T10:00:00Z'));
+  await seed(page, [fixtures[0].dice, fixtures[1].dice]);
+  await page.goto('./');
+  await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
+  await page.getByRole('button', { name: 'Start', exact: true }).click();
+  await expect(cell(page, 0, 0)).toBeFocused();
+  await slot(page, 'navy').click();
+  await cell(page, 4, 5).click();
+  await page.getByRole('button', { name: 'New game', exact: true }).click();
+  await page.clock.fastForward(30000);
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(cell(page, 4, 5)).toHaveAttribute('data-content', 'navy');
+  await expect(page.locator('#timer')).toHaveText('00:30.00');
+  await expect(page.getByRole('button', { name: 'New game', exact: true })).toBeFocused();
+  await page.getByRole('button', { name: 'Replay', exact: true }).click();
+  await page.getByRole('button', { name: 'Confirm', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Start practice' })).toBeVisible();
+  await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
+  await page.getByRole('button', { name: 'Start practice' }).click();
+  await expect(cell(page, 0, 0)).toHaveAttribute('data-content', 'blocker');
+  await page.getByLabel('Level', { exact: true }).selectOption('MASTER');
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(page.getByLabel('Level', { exact: true })).toHaveValue('STARTER');
+  await page.getByLabel('Level', { exact: true }).selectOption('MASTER');
+  await page.getByRole('button', { name: 'Confirm', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Start', exact: true })).toBeFocused();
+  await page.getByRole('button', { name: 'Start', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'D2, blocker', exact: true })).toBeVisible();
+  await expect(page.locator('#mode')).toContainText('Fresh roll');
+  await page.reload();
+  await expect(page.getByLabel('Level', { exact: true })).toHaveValue('STARTER');
+  await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
+});
+
+test('a coincidental repeated fresh roll remains ranked and a legal dead end is accepted', async ({ page }) => {
+  await openGame(page);
+  await slot(page, 'navy').click();
+  await cell(page, 1, 5).click();
+  await expect(cell(page, 1, 5)).toHaveAttribute('data-content', 'navy');
+  await page.getByRole('button', { name: 'New game', exact: true }).click();
+  await page.getByRole('button', { name: 'Confirm', exact: true }).click();
+  await page.getByRole('button', { name: 'Start', exact: true }).click();
+  await expect(page.locator('#mode')).toContainText('Fresh roll');
+  await expect(page.getByRole('button', { name: 'A1, blocker', exact: true })).toBeVisible();
 });

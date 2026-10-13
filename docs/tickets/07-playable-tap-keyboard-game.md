@@ -42,12 +42,12 @@ Install Playwright's clock before navigation for timing cases. Complete all thre
 
 ## Done when
 
-- [ ] Full games complete through tap/click and keyboard, with real transforms and named stable controls.
-- [ ] Hidden Start, timing, confirmations, fresh/practice transitions and unlimited active Undo match the plan.
-- [ ] Completion freezes once and no later action edits/reopens it.
-- [ ] Invalid/no-op attempts do not change committed state/history.
-- [ ] The selected browser projects pass using public UI actions; there is no assistance UI, test cheat panel or duplicate writable board state.
+- [x] Full games complete through tap/click and keyboard, with real transforms and named stable controls.
+- [x] Hidden Start, timing, confirmations, fresh/practice transitions and unlimited active Undo match the plan.
+- [x] Completion freezes once and no later action edits/reopens it.
+- [x] Invalid/no-op attempts do not change committed state/history.
+- [x] The selected browser projects pass using public UI actions; there is no assistance UI, test cheat panel or duplicate writable board state.
 
 ## Completion evidence
 
-Not yet recorded. Add the actual changes, command results, checks and code reference here before setting this ticket to `done` in the tracker. Follow the [completion rules](README.md#working-and-completing-tickets).
+2026-10-13: Implemented stable HTML grid/tray controls with original SVG board, occupied-anchor previews, real draft transforms, tap placement, scoped keyboard navigation/actions, native abandonment confirmation, hidden fresh/practice ready, Undo and wall-clock display in `src/app.ts`, `src/styles.css` and `index.html`. Added public-control fixture helpers and lifecycle/input tests. `pnpm test` passed 59 tests; `pnpm run build` passed strict checking and Vite build; the desktop/mobile Chromium suite passed all 20 cases in 36.6 seconds. All three fixtures completed through controls, including native touchscreen taps on mobile emulation and a keyboard-only run through Tab and arrows. Controlled clock tests cover confirmation time and frozen completion. Illegal/no-op attempts, self-overlap movement, removal/Undo, hidden replay, changed and repeated fresh rolls, legal Wizard dead end and reload abandonment pass. Inspected hidden/active 390 by 844 CSS px layouts with the T3 shared preview. Windows, Node 24.15.0, pnpm 12.10.0, Playwright 1.64.0. Direct dragging, record UI and five-engine/accessibility acceptance remain their following tickets; no physical-phone or screen-reader testing is claimed.
