@@ -21,13 +21,22 @@ test('loads the Rollmino entry and its styles without page or asset errors', asy
 });
 
 for (const fixture of fixtures) {
-  test(`completes ${fixture.id} through public tap controls, freezes and retains records`, { tag: fixture === fixtures[0] ? [] : '@shared' }, async ({ page }) => {
+  test(`completes ${fixture.id} through public tap controls, shows completion and retains records`, { tag: fixture === fixtures[0] ? [] : '@shared' }, async ({ page }, testInfo) => {
+    const phone = Boolean(testInfo.project.use.isMobile);
+    if (phone) await page.setViewportSize({ width: 390, height: 844 });
     await page.clock.install({ time: new Date('2026-10-13T09:59:50Z') });
     await page.clock.pauseAt(new Date('2026-10-13T10:00:00Z'));
     await openGame(page, fixture);
     await page.clock.fastForward(65432);
     await complete(page, fixture);
     await expect(page.locator('#timer')).toHaveText('01:05.43');
+    await expect(page.locator('#preview')).toHaveText('Completed in 01:05.43. Ranked run.');
+    await expect(page.locator('#mode')).toHaveText('Ranked run complete.');
+    if (phone) {
+      const bounds = await page.locator('#preview').boundingBox();
+      expect(bounds!.y).toBeGreaterThanOrEqual(0);
+      expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(844);
+    }
     const frozen = await page.locator('#timer').textContent();
     await page.clock.fastForward(20000);
     await expect(page.locator('#timer')).toHaveText(frozen!);
@@ -39,6 +48,22 @@ for (const fixture of fixtures) {
     await page.getByRole('button', { name: 'Start practice' }).click();
     for (const face of fixture.dice) await expect(page.getByRole('button', { name: `${face}, blocker`, exact: true })).toBeVisible();
     await expect(page.locator('#timer')).toHaveText('00:00.00');
+    if (phone) {
+      await page.clock.fastForward(5000);
+      await complete(page, fixture);
+      await expect(page.locator('#preview')).toHaveText('Completed in 00:05.00. Practice run.');
+      await expect(page.locator('#mode')).toHaveText('Practice run complete. This run cannot rank.');
+      const bounds = await page.locator('#preview').boundingBox();
+      expect(bounds!.y).toBeGreaterThanOrEqual(0);
+      expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(844);
+      await expect(page.locator('#records-list li')).toHaveCount(1);
+      await expect(page.locator('[aria-live="polite"]')).toHaveCount(1);
+      await expect(page.getByRole('dialog')).not.toBeVisible();
+      await page.locator('#new-game').click();
+      await expect(page.locator('#start')).toBeFocused();
+      await expect(page.locator('#mode')).toHaveText('Fresh roll. Your time can rank.');
+      await expect(page.locator('#preview')).not.toContainText('Completed');
+    }
     await page.reload();
     await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
     await page.locator('#level').selectOption(fixture.level);

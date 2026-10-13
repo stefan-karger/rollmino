@@ -114,7 +114,7 @@ Visual SVG is `aria-hidden`, paired with six semantic HTML rows and named native
 | Delete | Remove selected committed piece; unplaced selection clears. |
 | Escape | Cancel draft/gesture/dialog; return draft focus to its slot. |
 
-Do not capture shortcuts in selects/dialogs/unrelated controls. Start focuses grid; keyboard placement keeps target focus. Completion announces once without a modal, forced scroll or focus jump. Use one polite atomic status region; timer ticks/pointer motion are not live announcements. Preserve visible focus, contrast, readable disabled controls and reduced-motion support.
+Do not capture shortcuts in selects/dialogs/unrelated controls. Start focuses grid; keyboard placement keeps target focus. Completion shows frozen time and ranked/practice feedback beside the board, replacing placement instructions. It announces once without a modal, forced scroll or focus jump. Use one polite atomic status region; timer ticks/pointer motion are not live announcements. Preserve visible focus, contrast, readable disabled controls and reduced-motion support.
 
 Use one native confirmation with specific text and Confirm/Cancel. Cancel restores initiating focus; confirmed run transitions focus Start; confirmed clearing returns to Clear records. Do not add an unload prompt.
 
@@ -158,7 +158,7 @@ Untagged scenarios run in all five projects. `@shared` runs only in desktop Chro
 | Native CDP touch/move/return/secondary input/cancel and scrolling | Mobile Chromium |
 | Built assets/errors, full first fixture, frozen time, practice exclusion and reload retention | Both artifact mounts; filesystem inspection once |
 
-The development suite currently selects 93 cases, with 21 completed games. Production selects five cases and four completed games. Fixture completion supplies representative persistence checks; non-color glyph coverage uses only restricted pieces. Additional fixtures/shared permutations do not repeat for every unrelated assertion. Mobile projects remain emulation.
+The development suite currently selects 93 cases, with 23 completed games including phone practice-completion feedback. Production selects five cases and four completed games. Fixture completion supplies representative persistence checks; non-color glyph coverage uses only restricted pieces. Additional fixtures/shared permutations do not repeat for every unrelated assertion. Mobile projects remain emulation.
 
 The [cell-array oracle](tests/oracle.mjs) checks unique IDs, integer geometry, bounds, blockers, overlap, 29 piece cells, coverage, contacts and fixed placements. It imports only canonical orientations, has separate literal IDs/groups and uses no engine legality calls/masks. Test deliberately broken answers. The [exhaustive verifier](scripts/verify-all.mjs) requires a non-null answer and oracle pass for each of 62,208 Wizard boards before counting. Keep it separate from fast tests.
 

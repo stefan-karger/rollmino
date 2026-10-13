@@ -16,11 +16,15 @@ Run pnpm test, pnpm run build and focused gameplay/accessibility checks in mobil
 
 ## Acceptance
 
-- [ ] Completion feedback and frozen time are visible beside the board on the tested phone viewport.
-- [ ] Finished play displays no instruction to keep placing pieces.
-- [ ] Completion stays terminal, saves at most once and announces without a forced modal.
-- [ ] The viewport assertion passes and transition/focus behavior is preserved.
+- [x] Completion feedback and frozen time are visible beside the board on the tested phone viewport.
+- [x] Finished play displays no instruction to keep placing pieces.
+- [x] Completion stays terminal, saves at most once and announces without a forced modal.
+- [x] The viewport assertion passes and transition/focus behavior is preserved.
 
 ## Completion evidence
 
-Add dated implementation and verification results before marking the tracker done.
+2026-10-13. `src/app.ts` now replaces the existing preview instruction with frozen completion time and ranked/practice text. Mode text also says the run is complete instead of describing future ranking. The existing polite status announces completion once; no new live region, modal, scrolling or focus handler was added. The contract reflects the accepted feedback change.
+
+Extended the existing first-fixture gameplay regression rather than adding another scenario matrix. Before repair, both mobile projects failed because the preview still instructed placement. After repair, native tap completion at 390x844 checks that the entire feedback rectangle remains within the current viewport, without scrolling it into view. It checks ranked and practice frozen times, one unchanged saved record, one polite region, no dialog, Replay/hidden practice and New game/Start focus. Both focused phone cases passed in 24.7 seconds. Phone practice completion adds two full games to the maintained matrix; its case count stays 93.
+
+Frozen installation, all 60 pure tests and strict build passed. All 93 development cases passed in 2.4 minutes, including four-state axe, narrow layout, native inputs and terminal completion. All five root/subpath artifact cases passed in 12.0 seconds. All 62,208 answers passed independent verification in 31.18 seconds. Documentation checks and `git diff --check` passed. Evidence is automated phone emulation, not physical-phone or screen-reader testing.

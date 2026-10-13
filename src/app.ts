@@ -110,7 +110,9 @@ function render(): void {
   levelControl.value = session.level;
   element('ready').hidden = session.phase !== 'ready';
   startButton.textContent = session.mode === 'practice' ? 'Start practice' : 'Start';
-  element('mode').textContent = session.mode === 'practice' ? 'Practice replay. This run cannot rank.' : 'Fresh roll. Your time can rank.';
+  element('mode').textContent = session.phase === 'completed'
+    ? session.mode === 'practice' ? 'Practice run complete. This run cannot rank.' : 'Ranked run complete.'
+    : session.mode === 'practice' ? 'Practice replay. This run cannot rank.' : 'Fresh roll. Your time can rank.';
   const restricted = RESTRICTED[session.level];
   element('rule').textContent = restricted.length
     ? `Pieces ${restricted.map(id => numbers[id]).join(', ')} cannot share an edge. Corners may touch.`
@@ -137,7 +139,9 @@ function render(): void {
     }
   });
   const p = candidate();
-  let feedback = 'Select a piece, then a board cell.';
+  let feedback = session.phase === 'completed'
+    ? `Completed in ${formatTime(session.elapsedMs)}. ${session.mode === 'practice' ? 'Practice' : 'Ranked'} run.`
+    : 'Select a piece, then a board cell.';
   if (p && draft && session.phase === 'running') {
     const legal = canPlace(session.game, p);
     boardSvg += `<g class="ghost">${shape(p.id, p.orientation, p.x, p.y, `stroke="${legal ? '#fff' : '#ffb7b7'}" stroke-width=".055" stroke-dasharray="${legal ? '0' : '.13 .08'}"`)}<text x="${draft.target[0] + .5}" y="${draft.target[1] + .65}" text-anchor="middle">${legal ? '+' : '×'}</text></g>`;
