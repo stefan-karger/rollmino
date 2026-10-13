@@ -37,12 +37,12 @@ Test empty data, more than five entries, all five independent levels, exact-dura
 
 ## Done when
 
-- [ ] Top-five limits/order/tie behavior use raw milliseconds and preserve independent levels.
-- [ ] Serialization contains only the agreed level lists and two entry fields.
-- [ ] Invalid data recovers without crashing; unavailable storage preserves usable in-memory records with a notice.
-- [ ] Clearing and insertion preserve unrelated keys/levels and use the latest valid stored data.
-- [ ] Tests/strict checks pass without a database, synchronization service or generalized persistence layer.
+- [x] Top-five limits/order/tie behavior use raw milliseconds and preserve independent levels.
+- [x] Serialization contains only the agreed level lists and two entry fields.
+- [x] Invalid data recovers without crashing; unavailable storage preserves usable in-memory records with a notice.
+- [x] Clearing and insertion preserve unrelated keys/levels and use the latest valid stored data.
+- [x] Tests/strict checks pass without a database, synchronization service or generalized persistence layer.
 
 ## Completion evidence
 
-Not yet recorded. Add the actual changes, command results, checks and code reference here before setting this ticket to `done` in the tracker. Follow the [completion rules](README.md#working-and-completing-tickets).
+2026-10-13: Added `src/records.ts` and six record tests. All five lists rank/cap by raw milliseconds and completion date with stable exact ties. Validation discards malformed entries, strips unused fields and recovers invalid payloads. Insert/clear refresh current storage; failures retain page records and expose a notice. Sentinel-key and other-level preservation pass. `pnpm run test:records` passed 6 tests; `pnpm test` passed 59 tests; `pnpm run typecheck` passed. Windows, Node 24.15.0, pnpm 12.10.0. Browser getter handling and ranked/practice wiring remain T08.
