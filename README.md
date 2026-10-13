@@ -1,6 +1,6 @@
 # Rollmino
 
-Play [Rollmino](https://stefan-karger.github.io/rollmino/), a free, always-timed solo block puzzle with five levels and personal records in this browser. It runs on a static website without an account or backend.
+Play [Rollmino](https://stefan-karger.github.io/rollmino/), a free timed solo block puzzle with five levels and personal records in this browser. It runs on a static website without an account or backend. The locally implemented Home/tutorial revision is described below; its publication remains separate from the dated V1 release.
 
 [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) is the single current contract. [AGENTS.md](AGENTS.md) explains maintenance and [CODING_GUIDELINES.md](CODING_GUIDELINES.md) supplies KISS/YAGNI policy. Choose ready work from the [tracker](docs/tickets/README.md). Status lives only there; tickets record actual results.
 

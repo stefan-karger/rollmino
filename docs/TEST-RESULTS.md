@@ -2,6 +2,35 @@
 
 The [contract](../IMPLEMENTATION_PLAN.md#verification) defines current checks. This file records performed results and their limits; ticket evidence supplies implementation details. Local checks do not establish a new deployment.
 
+## Home and tutorial local readiness
+
+Executed on 2026-10-13 in the Windows workspace with Node 24.15.0, pnpm 12.10.0 and the existing pinned browser/tool versions. Runtime revision `0c80425` contains the complete Home/history, separate records, six-panel tutorial, Starter exercise and handled-offer flow. T35 changes verification and documentation only. [T30–T34 evidence](tickets/README.md) retains the implementation checks, repairs/retries and rendered observations. The new revision is locally ready; the dated public releases below do not establish its publication.
+
+| Check | Final local evidence |
+| --- | --- |
+| Frozen installation | `pnpm install --frozen-lockfile` passed without dependency/lock changes |
+| Pure and strict build | T35 `pnpm test` passed all 75; `pnpm run build` passed strict TypeScript/Vite |
+| Complete development matrix | T34 `pnpm run test:e2e --max-failures=1` passed all 136 selected cases without skips in 4.2 minutes for the unchanged final runtime |
+| Expanded magnified layouts | T35 `pnpm run test:e2e --grep "200 percent CSS zoom" --workers=1 --max-failures=1` passed the three updated desktop cases in 25.4 seconds, adding Home, all panels, exercise alignment/tap/Undo and reachable Home to existing game/records reflow |
+| Both artifact mounts | T35 `pnpm run test:e2e:prod` passed all five expanded cases in 18.6 seconds against the preceding build at `/` and `/rollmino/` |
+| Independent reference | T34 `pnpm run verify:all` independently validated 62,208 Wizard answers in 50.07 seconds for the unchanged model/oracle/runtime |
+| Selection | Final development listing remains 136 cases in eight files, with 23 ordinary and nine exercise completions; production remains five cases, with four ordinary and two exercise completions |
+
+The two-mount persistence scenario now continues from ordinary ranked/practice completion through records/reload, every panel, the intended exercise Undo/Rotate/Flip completion, time passage without a record write, review, direct repeat exercise, Redo, Home and clean hidden ordinary Play/Start. Requests remain local static GETs with no runtime services/errors. Artifact inspection rejects test instrumentation, oracle/fixture collection markers and provenance; teaching ships only intentional data. Browser/history cancellation, timed replay, fixed baseline/independent teaching answer, off-step/terminal solving, record faults and flag/clear isolation retain their earlier meaningful regressions.
+
+T35's changed-path selector chose pure/build/UI/artifact, without a new exhaustive requirement. Its explicit unchanged-code rule reuses the complete T34 matrix and exhaustive result, while running the newly expanded cases. Every rebuilt file's SHA-256 matched the T34 build:
+
+| Artifact | SHA-256 |
+| --- | --- |
+| `index.html` | `58c141c492fdb77c0626404ccaa49521655ca7aaf273252c8c4f1e1ca28bb066` |
+| `favicon.svg` | `896ba7e0ad6aa5df68614160a44f16de23a9a1762be6490f63d98c884e1002cc` |
+| `assets/index-aQ_UVemO.js` | `3c709ad818b5961f5f8bd50610f5bc6773fe0350bf221a0ead84b6ff3c11d940` |
+| `assets/index-CvODy6fN.css` | `526327e9f3c27cc259e1b066fe23b4650f9ccc14e52762d1a6a5a523651b73f3` |
+
+Collaborative-browser reviews in T30–T34 inspected Home, records, tutorial coverage/contact/transform art and actual exercise placement/Undo/completion at 320px and short landscape sizes. The user's shape/name centering correction is implemented and tested. Axe covers Home first/returning offers, panels, exercise/completion, records/dialog and ordinary states; native keyboard, mouse/capture and Chromium CDP touch/cancel/scroll remain in the reduced matrix. Phone projects are emulation. Reset during a held exercise drag uses explicitly synthetic cleanup; CSS zoom checks reflow/rendered alignment and tap play, not browser-chrome zoom or zoomed native dragging. No physical phone, pen, physical set, screen-reader or learner-observation pass is claimed.
+
+The contract is consolidated around the implemented behavior, with untimed teaching and the sole handled-offer persistence exception explicit. `pnpm run check:docs`, local/staged `git diff --check` and acceptance review precede the final commit. CI/deployment files, permissions, main/manual full gates, dependent tested-artifact deployment and non-cancelling serialized publication are unchanged. Nothing was pushed or deployed; publication remains a separate authorized release action.
+
 ## Follow-up local verification
 
 Executed on 2026-10-13 in the Windows workspace with Node 24.15.0, pnpm 12.10.0, TypeScript 5.8.3, Vite 8.3.4 and Playwright 1.64.0. Browser projects use the previously verified bundled Chromium 156, Firefox 157 and WebKit 27.2, including phone emulation.

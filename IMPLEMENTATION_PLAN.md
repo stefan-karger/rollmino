@@ -1,26 +1,12 @@
 # Rollmino maintenance contract
 
-The user confirmed V1 on 2026-10-12. V1 is implemented and [published](https://stefan-karger.github.io/rollmino/). This is the single behavior and engineering contract, including the accepted next revision below. [Tickets](docs/tickets/README.md) own implementation status and evidence. Change user-visible decisions explicitly; historical proposals do not override this contract.
+The user confirmed V1 on 2026-10-12. Its [dated publication](docs/TEST-RESULTS.md#public-pages-release-verification) is separate from the Home/tutorial revision implemented locally on 2026-10-13. This is the single behavior and engineering contract for the current worktree. [Tickets](docs/tickets/README.md) own status and evidence. Change user-visible decisions explicitly; historical proposals do not override this contract.
 
 ## Accepted Home and tutorial revision
 
-On 2026-10-13, the user requested analysis and a questioning session, confirmed the following choices, then requested implementation tickets. [T29](docs/tickets/T29-onboarding-and-home.md) records the current-UI audit and answers; T30 through T35 in the [tracker](docs/tickets/README.md) implement this revision. Creating these tickets does not implement or publish it. The remaining sections describe the implemented V1 baseline; this section explicitly revises only the behavior listed here for the next batch.
+The user accepted this revision on 2026-10-13 after [T29's analysis](docs/tickets/T29-onboarding-and-home.md), then authorized sequential implementation and one commit per ticket. T30 through T34 implement Home/history, separate records, the illustrated tutorial, the Starter exercise and the handled-offer flag. The sections below describe the implemented behavior; [T35](docs/tickets/T35-integrated-verification.md) and [maintained evidence](docs/TEST-RESULTS.md#home-and-tutorial-local-readiness) record combined local checks. Publication remains a separate action through the existing release gates.
 
-- Show a separate Home screen on every load/reload, with an original logo/name and Play, Tutorial and Personal bests. Prepare fresh hidden Starter internally. Restore no run, layout, timer, lesson progress or level preference.
-- Play opens the hidden game board with level selection. Start still reveals the puzzle and starts timing together. Home/tutorial navigation draws no RNG. Retain ordinary level selection within the current page; a reload resets it to Starter.
-- Provide Home from the game. Ready/completed return without confirmation and discard the prior layout. A running return cancels gestures and confirms abandonment before Home is exposed. Cancel preserves committed play, eligibility and wall time and restores initiating focus. A subsequent Play prepares a fresh roll.
-- Browser Back navigates within the app, including confirmed running-game abandonment. Cancel reconciles history without restarting the run; Forward cannot restore abandoned play. Returning to root Home lets Back leave the site without duplicate Home loops. Actual navigation away retains the no-unload-prompt policy.
-- Move full record lists, level filtering, storage explanation and selected-level clearing to Personal bests, reached from Home. Keep frozen completion time, ranked/practice feedback and any save-failure notice in the game. Preserve the existing record schema and ranking/storage behavior.
-- Tutorial is available only from Home, never from ready, running or completed game screens. No ordinary running game survives behind it. Learning is untimed and never records a result.
-- Begin with short self-paced illustrated panels and optional Replay example buttons. Teach the objective, tap anchor, moving, geometric Rotate/Flip, rejection, Undo/Remove, ordinary timing/practice and a small level comparison. All levels remain available; Master is not a superset of Expert. Retain exact groups and edge/corner rules.
-- Follow with a short Starter exercise using six fixed prepared pieces and three learner-controlled pieces. Explain that fixed pieces are specific to the exercise. Teach placement, Rotate, Flip and Undo, then finish the board. Canonical legality and exact solved-state validation apply. Tutorial history begins after the prepared baseline.
-- Accept legal off-step moves and equivalent transformation sequences. Explain the current task and offer Reset step, which restores its board/history checkpoint and clears draft/gesture. Invalid/no-op attempts remain transactional. A legal full-board solve completes the exercise even when steps occurred out of order.
-- Permit tutorial exit at any point, repeated review and direct exercise entry from the tutorial screen. Redo exercise restores the prepared baseline. Tutorial Play opens fresh hidden ordinary ready, with no lesson placements, targets or history. Start remains necessary.
-- Highlight Tutorial once per browser/site origin, stopping after Play or Tutorial is chosen. Personal bests alone does not dismiss it. Persist only this handled-offer flag in a separate versioned local key. Do not infer it from records; selected clearing cannot reset it. Missing, invalid, cleared or unavailable storage may repeat the offer and must not block play. Restore no lesson progress.
-
-The teaching diagrams and fixed exercise guidance are narrow exceptions to deferred tutorials and no assistance; no reference solver call or hint/solution assistance enters ordinary games. Ranked and replay-practice runs remain timed. Retain complete tap/keyboard/native pointer play, focus, notices, original art, reduced motion and narrow-screen scrolling/reflow. No backend, global leaderboard, native app, splash-delay requirement, router framework, generic lesson engine or additional persisted preferences are introduced.
-
-Implement scoped tickets with their own regressions and affected checks. Add menu actions only when their destinations work; do not publish a partial batch as the completed accepted flow. Update baseline sections as each behavior is implemented, without inventing publication evidence. [Verification](#verification) remains the single policy; new/unknown paths retain its conservative full scope. T35 consolidates the final contract and local readiness evidence. Publication requires the existing release gates and is outside this ticket-creation request.
+The teaching diagrams and fixed exercise guidance are scoped exceptions to deferred tutorials and ordinary-game assistance. No reference solver call or hint/solution assistance enters ordinary play, previews or completion. Ranked and replay-practice runs remain timed. New/unknown paths retain the conservative [verification policy](#verification).
 
 ## Product and rules
 
@@ -88,7 +74,7 @@ The pure session has `ready`, `running` and `completed` phases, with `ranked` or
 
 | Action | Required behavior |
 | --- | --- |
-| Load/reload | Show Home with the original logo/name, Play, Tutorial and Personal bests. Prepare hidden fresh Starter internally; retain only completed records. Restore no run, layout, preferences, timer or Undo history. |
+| Load/reload | Show Home with the original logo/name, Play, Tutorial and Personal bests. Prepare hidden fresh Starter internally; retain only completed records and the handled-offer flag. Restore no run, layout, preferences, timer or Undo history. |
 | Home / Play | Play opens hidden ready at the ordinary level selected in this page and focuses Start. Home discards prior play; running return confirms abandonment and cancellation preserves play/time/focus. Browser Back uses the same confirmation, reconciles cancellation and returns to one root Home entry. Forward opens fresh hidden play. Navigation draws no RNG; actual departure has no unload prompt. |
 | Start | Ranked rolls seven faces; practice uses replay dice without RNG. Reveal and start timing together. Ignore repeated Start after transition. |
 | Legal placement/move/removal | Commit once, retain prior placement snapshot for Undo, then validate solved state. |
@@ -111,7 +97,7 @@ Display `mm:ss.ss`, flooring to centiseconds. Minutes have at least two digits a
 
 ## Input and layout
 
-Keep nine persistent named slots. Placed shapes remain dimmed/selectable with committed orientation; labels remain readable. Unplaced slots show base orientation. Fit every orientation and occupied HTML hit region inside its SVG area, clear of labels.
+Ordinary play keeps nine persistent named slots. Placed shapes remain dimmed/selectable with committed orientation; labels remain readable. Unplaced slots show base orientation. Fit every orientation and occupied HTML hit region inside its SVG area, clear of labels.
 
 Selection copies a placed orientation or starts at zero. Tap/keyboard uses the first occupied row-major square as marked anchor. Select a piece, then tap a cell to commit immediately, without a Place button. With no selection a board tap selects its piece; with selection it attempts placement. Success clears selection; rejection retains the draft and announces it.
 
@@ -137,9 +123,30 @@ Visual SVG is `aria-hidden`, paired with six semantic HTML rows and named native
 | Delete | Remove selected committed piece; unplaced selection clears. |
 | Escape | Cancel draft/gesture/dialog; return draft focus to its slot. |
 
-Do not capture shortcuts in selects/dialogs/unrelated controls. Start focuses grid; keyboard placement keeps target focus. Completion shows frozen time and ranked/practice feedback beside the board, replacing placement instructions. It announces once without a modal, forced scroll or focus jump. Use one polite atomic status region; timer ticks/pointer motion are not live announcements. Preserve visible focus, contrast, readable disabled controls and reduced-motion support.
+Do not capture shortcuts in selects/dialogs/unrelated controls. Start focuses grid; keyboard placement keeps target focus. Ordinary completion shows frozen time and ranked/practice feedback beside the board, replacing placement instructions. It announces once without a modal, forced scroll or focus jump. Use one polite atomic status region; timer ticks/pointer motion are not live announcements. Preserve visible focus, contrast, readable disabled controls and reduced-motion support.
 
 Use one native confirmation with specific text and Confirm/Cancel. Cancel restores initiating focus; confirmed run transitions focus Start; confirmed clearing returns to Clear records. Do not add an unload prompt.
+
+## Tutorial
+
+Tutorial is reached only from Home. It has six self-paced illustrated panels: objective, tap placement/movement, geometric Rotate/Flip, rejection/Undo/Remove, exact level comparison and ordinary timing/practice. Native Next/Back, progress, Home and direct Try the exercise remain available as appropriate. Replay example highlights existing diagrams only on request, retains keyboard focus and cancels on departure; reduced motion supplies equivalent static text/art. Shape artwork is centered beside its text name in the level table. No ordinary run remains active behind learning; teaching has no clock, RNG draw or record consideration.
+
+The untimed Starter exercise moves the persistent board/tray/input widget to a separate controller. Its intentional blockers are A1, B2, C3, F2, D6, E5 and A6 in physical-die order. These fixed prepared placements cover 19 squares and leave ten cells for three learner pieces:
+
+| Fixed ID | Orientation | x | y |
+| --- | ---: | ---: | ---: |
+| navy | 0 | 4 | 5 |
+| yellow | 3 | 2 | 0 |
+| purple | 0 | 0 | 1 |
+| orange | 0 | 2 | 3 |
+| red | 0 | 1 | 4 |
+| green | 0 | 0 | 3 |
+
+The guided path places Brown domino at B1/C1, Undoes it, then places it again; rotates Grey line once and taps F3 to cover F3–F6; and flips Cyan L once, rotates twice and taps E3 to cover E1/F1/E2/E3. Use actual geometric cell/anchor transforms and accept equivalent sequences. Dashed cyan targets and named coordinates identify the task without imitating white restriction marks. Starter has no restricted-piece marks. Fixed cells remain keyboard navigable and explicitly named, and fixed tray slots remain readable. Only the learner's pieces may move/remove or enter Undo history.
+
+One controller owns committed lesson placements and uses canonical legality/exact solved-state validation. Successful learner actions commit once. Invalid/no-op/cancelled attempts preserve board/history; legal off-step moves commit and retain the requested instruction. Reset step restores the task's board/history checkpoint and clears draft/gesture. Redo exercise restores the initial baseline. Any legal full-board finish completes successfully, including early or reordered work; terminal editing freezes, the exercise heading receives focus, and Play, Review tutorial and Redo exercise are available. Review begins at the first panel. Exit/re-entry restores clean teaching state. Tutorial Play prepares fresh hidden ordinary ready at the page's selected level and clears teaching placements, targets, draft and history; Start remains the first ordinary roll/time transition. No fixture collection, oracle, solver or mutable test API is imported into teaching runtime.
+
+Home keeps Play, Tutorial and Personal bests in stable positions. With no valid handled-offer flag, it emphasizes the optional Tutorial and explains it briefly. Choosing Play or Tutorial handles the offer in current-page memory and writes only the literal `handled` under the separate versioned `rollmino.onboarding.v1` key. Personal bests and record clearing neither handle nor reset it. Missing/invalid flags and unavailable/failed storage may repeat the invitation after reload, without blocking play; the flag does not represent completion or understanding. Persist no lesson progress, game, level preference, identity or teaching score/time.
 
 ## Records
 
@@ -157,7 +164,7 @@ Use TypeScript/Vite/SVG/plain CSS/native HTML, Node tests and Playwright/axe. Fo
 
 Use Node 24 and packageManager-pinned pnpm, one `pnpm-lock.yaml` and frozen verification/CI installs. Vite uses relative `base: './'`, ES2022 and no router/runtime service. Historical provenance/checksums stay in the [Git archive](docs/TEST-RESULTS.md#historical-archive), outside working-tree imports/dist. Never maintain another active engine copy.
 
-Exclude ordinary-game hints/solution UI and Redo, in-progress persistence, saved-layout inspection/replay, auth, synchronization, global leaderboard, multiplayer, analytics, PWA/service worker, install prompts, Android packages, physics, 3D, generic engines/stores and speculative APIs. Sound, elaborate animations and other polish are deferred. The accepted Home revision adds a self-paced six-panel tutorial, with requested example replay and static reduced-motion explanations. Its diagrams use canonical geometric transforms, exact contact groups and original shared artwork; no tutorial call or guidance participates in an ordinary game. The Starter exercise reuses the board/tray/input widget with a separate untimed controller, six fixed prepared pieces, three learner pieces, full learner Undo and per-step board/history checkpoints. Legal off-step moves commit, Reset step restores the checkpoint, and every legal complete board ends successfully. Completion offers fresh hidden ordinary Play, Review tutorial and Redo exercise. Home highlights the optional Tutorial until Play or Tutorial is chosen, preserving the positions of all three actions. The separate versioned key `rollmino.onboarding.v1` stores only the literal `handled` flag. Missing/invalid or inaccessible storage repeats the offer, while the current page still remembers a choice. Records and clearing cannot handle/reset it. Every panel offers direct exercise entry; review starts at panel one and Redo restores the baseline. Do not reopen decisions without a concrete conflict.
+Exclude ordinary-game hints/solution UI and Redo, in-progress persistence, saved-layout inspection/replay, auth, synchronization, global leaderboard, multiplayer, analytics, PWA/service worker, install prompts, Android packages, physics, 3D, generic engines/stores and speculative APIs. Sound, elaborate animations and other polish are deferred. The Home/tutorial behavior above is the accepted teaching exception; do not reopen decisions without a concrete conflict.
 
 ## Verification
 
@@ -193,12 +200,15 @@ Untagged scenarios run in all five projects. `@shared` runs only in desktop Chro
 | Hidden startup, first fixture/tap completion, frozen time, replay, reload/records and native confirmations | All five |
 | T15 first-click Start and T16 tray extents/hit regions/own-slot regression | All five |
 | 320px reachability/alignment and grid/modal focus | All five |
+| Home/history cancellation, walkthrough progress/requested replay, first/returning offer and intended tap exercise/clean Play | All five |
 | Full keyboard game, native mouse anchors/transforms/capture/collision/return, Escape/lost capture and CSS zoom alignment | Three desktop engines |
+| Keyboard panels/geometric anchors/exercise, fixed-piece native mouse protection and held-drag reset, magnified teaching layouts | Three desktop engines |
 | All three fixtures, ranking/storage fault permutations, shared transactions/synthetic cleanup, game/records/dialog axe and complete viewport matrix | Desktop Chromium |
+| Literal teaching level groups, offer faults/clear isolation, reduced-motion panel/Home axe and off-step/reordered exercise recovery/completion | Desktop Chromium |
 | Native CDP touch/move/return/secondary input/cancel and scrolling | Mobile Chromium |
-| Built assets/errors, full first fixture, frozen time, practice exclusion and reload retention | Both artifact mounts; filesystem inspection once |
+| Built assets/errors, full first fixture, frozen time, practice exclusion, records/reload, tutorial/exercise/review/redo and clean Play | Both artifact mounts; filesystem inspection once |
 
-After T34, the development suite selects 136 cases, with nine exercise completions and 23 completed ordinary games including phone practice-completion feedback. Shared DOM-stability, queued-dialog-close and five-level marking regressions do not complete another game. The dialog regression forces rapid cancellation/reopening through DOM events in desktop Chromium; the native confirmation scenario remains in all five projects. Home/history regressions cover running cancellation/time/focus, fresh Forward, root exit after repeated returns/reload, rapid dialog/history events and discarded practice ready. The marking regression checks literal level groups, transformed previews, committed/tray marks and cancellation. Production selects five cases and four completed games. Fixture completion supplies representative persistence checks; non-color marking coverage uses only restricted pieces. Additional fixtures/shared permutations do not repeat for every unrelated assertion. Mobile projects remain emulation.
+The final development suite selects 136 cases, with nine exercise completions and 23 completed ordinary games including phone practice-completion feedback. Shared DOM-stability, queued-dialog-close and five-level marking regressions do not complete another game. The dialog regression forces rapid cancellation/reopening through DOM events in desktop Chromium; the native confirmation scenario remains in all five projects. Home/history regressions cover running cancellation/time/focus, fresh Forward, root exit after repeated returns/reload, rapid dialog/history events and discarded practice ready. The marking regression checks literal level groups, transformed previews, committed/tray marks and cancellation. Production selects five cases, four ordinary game completions and two exercise completions. Its existing persistence scenario includes reload, records, walkthrough, exercise, review/redo and clean subsequent Play at both mounts. Fixture completion supplies representative persistence checks; non-color marking coverage uses only restricted pieces. Additional fixtures/shared permutations do not repeat for every unrelated assertion. Mobile projects remain emulation.
 
 The [cell-array oracle](tests/oracle.mjs) checks unique IDs, integer geometry, bounds, blockers, overlap, 29 piece cells, coverage, contacts and fixed placements. It imports only canonical orientations, has separate literal IDs/groups and uses no engine legality calls/masks. Test deliberately broken answers. The [exhaustive verifier](scripts/verify-all.mjs) requires a non-null answer and oracle pass for each of 62,208 Wizard boards before counting. Keep it separate from fast tests.
 

@@ -112,6 +112,25 @@ test('200 percent CSS zoom reflows and keeps board geometry aligned', { tag: '@d
   await openRecords(page);
   await page.locator('#clear-records').scrollIntoViewIfNeeded();
   await expect(page.locator('#clear-records')).toBeInViewport();
+  await page.locator('#records-home').click();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.locator('#tutorial').click();
+  for (let index = 0; index < 6; index++) {
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.locator('#try-exercise').scrollIntoViewIfNeeded();
+    await expect(page.locator('#try-exercise')).toBeInViewport();
+    if (index < 5) await page.locator('#tutorial-next').click();
+  }
+  await page.locator('#try-exercise').click();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  for (const [x, y] of [[0, 0], [5, 0], [0, 5], [5, 5], [3, 3]]) expect(await boardOffset(page, x, y)).toBeLessThan(1);
+  await slot(page, 'brown').click();
+  await cell(page, 1, 0).click();
+  await expect(cell(page, 1, 0)).toHaveAttribute('data-content', 'brown');
+  await page.locator('#undo').click();
+  await expect(cell(page, 1, 0)).toHaveAttribute('data-content', 'empty');
+  await page.locator('#tutorial-home').scrollIntoViewIfNeeded();
+  await expect(page.locator('#tutorial-home')).toBeInViewport();
 });
 
 test('visible focus and non-color identity remain usable with reduced motion requested', { tag: '@shared' }, async ({ page }) => {

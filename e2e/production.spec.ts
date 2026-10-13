@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { readFileSync, readdirSync } from 'node:fs';
-import { cell, complete, fixtures, openGame, openRecords, seed, slot } from './helpers.ts';
+import { cell, complete, enterExercise, finishExercise, fixtures, openGame, openRecords, seed, slot } from './helpers.ts';
 
 function productionErrors(page: Page, baseURL: string): string[] {
   const errors: string[] = [];
@@ -28,7 +28,7 @@ test('dist includes required app assets and excludes provenance and test content
   for (const file of files) {
     expect(file).not.toMatch(/(?:original-handoff|research-archive|fixtures|tests|e2e)(?:[/\\]|$)|SHA256SUMS|\.test\./);
     const text = readFileSync(`dist/${file}`, 'utf8');
-    for (const forbidden of ['original-handoff', 'research-archive', 'resetTestRandom', 'pointerEvidence', 'tests/oracle']) {
+    for (const forbidden of ['original-handoff', 'research-archive', 'resetTestRandom', 'pointerEvidence', 'tests/oracle', 'Invalid answer for roll', 'opening-seed', 'exerciseRandomCalls', 'tutorialRandomCalls']) {
       expect(text).not.toContain(forbidden);
     }
   }
@@ -97,5 +97,30 @@ test(`production completes ${fixture.id}, freezes, replays as practice and retai
   await openRecords(page, fixture.level);
   await expect(page.locator('#records-list li')).toHaveCount(1);
   await expect(page.locator('#records-list')).toContainText('00:54.32');
+  await page.locator('#records-home').click();
+  await expect(page.locator('#tutorial')).not.toHaveClass('offered');
+  await enterExercise(page);
+  await finishExercise(page);
+  await page.clock.fastForward(600000);
+  expect(await page.evaluate(() => localStorage.getItem('rollmino.records.v1'))).toBe(saved);
+  await page.locator('#review-tutorial').click();
+  await expect(page.locator('#tutorial-heading')).toHaveText('Fill the board');
+  await page.locator('#try-exercise').click();
+  await page.locator('[data-piece="brown"]').click();
+  await cell(page, 1, 0).click();
+  await page.locator('#redo-exercise').click();
+  await expect(page.locator('#grid [data-content="empty"]')).toHaveCount(10);
+  await expect(page.locator('#undo')).toBeDisabled();
+  await page.locator('#tutorial-home').click();
+  await page.locator('#play').click();
+  await expect(page.locator('#start')).toBeFocused();
+  await expect(page.locator('#level')).toHaveValue('STARTER');
+  await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
+  await expect(page.locator('#grid .lesson-target')).toHaveCount(0);
+  await expect(page.locator('#board-art circle')).toHaveCount(0);
+  await expect(page.locator('#timer')).toHaveText('00:00.00');
+  await page.locator('#start').click();
+  await expect(page.locator('#grid [data-content="empty"]')).toHaveCount(29);
+  expect(await page.evaluate(() => localStorage.getItem('rollmino.records.v1'))).toBe(saved);
   expect(errors).toEqual([]);
 });
