@@ -31,6 +31,27 @@ Collaborative-browser reviews in T30–T34 inspected Home, records, tutorial cov
 
 The contract is consolidated around the implemented behavior, with untimed teaching and the sole handled-offer persistence exception explicit. `pnpm run check:docs`, local/staged `git diff --check` and acceptance review precede the final commit. CI/deployment files, permissions, main/manual full gates, dependent tested-artifact deployment and non-cancelling serialized publication are unchanged. Nothing was pushed or deployed; publication remains a separate authorized release action.
 
+## Exercise drag test reflow repair
+
+On 2026-10-13, the reported GitHub Actions failure was traced to cached viewport coordinates in the native exercise mouse test. Undo changes the lesson text above the board and tray. When the initial instruction wraps onto an extra line, the later task moves both targets; the cached source point lands outside the occupied HTML grab square, so no drag starts and the expected two preview squares never appear.
+
+In the Windows workspace with Node 24.13.0 and pnpm 12.10.0, the original 800px scenario passed all three desktop engines. Setting its viewport to 320px reproduced the reported `#draft-art rect` count failure in Chromium, Firefox and WebKit. Shared-preview DOM-driven placement/Undo measurements at that width showed the instruction shrinking from 96px to 72px and the source moving up 24px; the stale point hit the SVG rather than a grab square. These measurements are separate from native mouse verification.
+
+The test now measures the source and destination before each drag, after any preceding transition, and retains the narrow viewport to exercise instruction reflow. Fixed-piece protection, successful native placement, held preview, synthetic Reset step during capture, late release rejection and subsequent native dragging remain asserted. Runtime, rules, workflow and timeouts are unchanged. All four rebuilt artifact hashes match the [Home/tutorial readiness artifact](#home-and-tutorial-local-readiness).
+
+| Check | Actual local evidence |
+| --- | --- |
+| Setup | `pnpm install --frozen-lockfile` passed without lock changes; the first browser attempt found missing executables, then `pnpm exec playwright install chromium firefox webkit` installed the pinned browsers |
+| Focused regression | `pnpm run test:e2e e2e/exercise.spec.ts --grep "native mouse" --workers=1` failed all three cases with stale coordinates at 320px, then passed all three after repair in 11.3 seconds |
+| Conservative scope | `node scripts/verification-scope.mjs pull_request e2e/exercise.spec.ts docs/TEST-RESULTS.md` selected pure/build/all browsers/artifact/exhaustive for the currently unclassified exercise test path |
+| Pure and build | `pnpm test` passed all 75 tests; `pnpm run build` passed strict TypeScript/Vite |
+| Complete development matrix | `pnpm run test:e2e` passed all 136 cases without skips in 1.8 minutes |
+| Both artifact mounts | `pnpm run test:e2e:prod` passed all five cases in 8.4 seconds against the preceding build at `/` and `/rollmino/` |
+| Independent reference | `pnpm run verify:all` independently validated all 62,208 Wizard answers in 51.94 seconds |
+| Documentation and whitespace | `pnpm run check:docs` and `git diff --check` passed |
+
+Playwright invocations ran sequentially. Desktop mouse input is browser automation; phone projects remain emulation and held-drag Reset remains synthetic cleanup. These are local results, with no new hosted run or deployment claimed.
+
 ## Follow-up local verification
 
 Executed on 2026-10-13 in the Windows workspace with Node 24.15.0, pnpm 12.10.0, TypeScript 5.8.3, Vite 8.3.4 and Playwright 1.64.0. Browser projects use the previously verified bundled Chromium 156, Firefox 157 and WebKit 27.2, including phone emulation.

@@ -110,17 +110,19 @@ test('legal off-step recovery, reordered completion and review preserve the fixe
 });
 
 test('native mouse cannot move prepared pieces and reset cancels a held learner drag', { tag: '@desktop' }, async ({ page }) => {
-  await page.setViewportSize({ width: 800, height: 1400 });
+  // Narrow layout makes the initial instruction wrap more than the post-Undo task.
+  await page.setViewportSize({ width: 320, height: 1400 });
   await page.goto('./');
   await enterExercise(page);
   await mouseDrag(page, await center(cell(page, 4, 5)), await center(cell(page, 1, 0)));
   await expect(cell(page, 4, 5)).toHaveAttribute('data-content', 'navy');
   await expect(page.locator('#undo')).toBeDisabled();
-  const from = await trayPoint(page, 'brown', [0, 0]);
-  const to = await center(cell(page, 1, 0));
-  await mouseDrag(page, from, to);
+  await mouseDrag(page, await trayPoint(page, 'brown', [0, 0]), await center(cell(page, 1, 0)));
   await expect(cell(page, 1, 0)).toHaveAttribute('data-content', 'brown');
   await page.locator('#undo').click();
+  // Step text can reflow the board and tray; measure each drag after the transition.
+  const from = await trayPoint(page, 'brown', [0, 0]);
+  const to = await center(cell(page, 1, 0));
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
   await page.mouse.move(to.x, to.y, { steps: 5 });
@@ -130,6 +132,6 @@ test('native mouse cannot move prepared pieces and reset cancels a held learner 
   await expect(page.locator('#undo')).toBeDisabled();
   await expect(page.locator('#draft-art rect')).toHaveCount(0);
   await expect(page.locator('#grid [data-content="brown"]')).toHaveCount(0);
-  await mouseDrag(page, from, to);
+  await mouseDrag(page, await trayPoint(page, 'brown', [0, 0]), await center(cell(page, 1, 0)));
   await expect(cell(page, 1, 0)).toHaveAttribute('data-content', 'brown');
 });
