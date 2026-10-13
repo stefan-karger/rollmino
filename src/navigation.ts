@@ -69,6 +69,12 @@ export function navigation(enter: (screen: Screen) => void,
     home() {
       if (!restoring && !deciding && !approved && current.screen !== 'home') history.go(-current.index);
     },
+    play() {
+      if (restoring || deciding || approved || current.screen !== 'tutorial') return;
+      current = { ...current, screen: 'game' };
+      history.replaceState(current, '');
+      enter('game');
+    },
     cancel() { deciding = false; },
   };
 }

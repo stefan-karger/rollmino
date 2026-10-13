@@ -22,7 +22,7 @@
           <span id="timer" role="timer" aria-label="Elapsed time" aria-live="off">00:00.00</span>
         </div>
         <p id="rule"></p><p id="mode"></p>
-        <section id="game" aria-label="Puzzle controls">
+        <div id="ordinary-board"><section id="game" aria-label="Puzzle controls">
           <div class="board-frame">
             <svg id="board-art" viewBox="-0.45 -0.45 6.5 6.5" aria-hidden="true"></svg>
             <div id="grid" role="grid" aria-label="Puzzle board"></div>
@@ -35,7 +35,7 @@
           <p id="preview">Select a piece, then a board cell.</p>
           <p id="game-storage-notice" class="help" hidden></p>
           <div id="tray" aria-label="Piece tray"></div>
-        </section>
+        </section></div>
         <div id="game-status"><p id="status" role="status" aria-live="polite" aria-atomic="true">Press Start to reveal your puzzle.</p></div>
         <div class="run-actions"><button id="new-game">New game</button><button id="replay">Replay</button></div>
         <p class="help">Tap a piece, then a cell. Rotate clockwise or flip left/right. Keyboard: arrows, R, F, Delete and Escape.</p>
@@ -53,10 +53,20 @@
       <section id="tutorial-screen" aria-label="Tutorial" hidden>
         <div class="screen-heading"><h1>Tutorial</h1><button id="tutorial-home">Home</button></div>
         <p class="help">Learn at your own pace. No clock or records.</p>
-        <p id="tutorial-progress" class="help"></p>
+        <div id="tutorial-explanation"><p id="tutorial-progress" class="help"></p>
         <div id="tutorial-panel"></div>
         <button id="replay-example">Replay example</button>
         <div class="tutorial-actions"><button id="tutorial-back">Back</button><button id="tutorial-next">Next</button></div>
+        <button id="try-exercise" hidden>Try the exercise</button></div>
+        <section id="exercise" aria-labelledby="exercise-title" hidden>
+          <h2 id="exercise-title" tabindex="-1">Starter exercise</h2>
+          <p class="help">Untimed. Six prepared pieces are fixed for this lesson. Move Brown domino, Grey line and Cyan L. In ordinary games every piece can move.</p>
+          <p id="exercise-step"></p>
+          <div id="exercise-board"></div>
+          <button id="reset-step">Reset step</button>
+          <div id="exercise-completion" hidden><button id="exercise-play">Play</button><button id="review-tutorial">Review tutorial</button></div>
+          <button id="redo-exercise">Redo exercise</button>
+        </section>
         <div id="tutorial-status"></div>
       </section>
     </main>

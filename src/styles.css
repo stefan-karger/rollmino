@@ -29,6 +29,10 @@ button:focus-visible, select:focus-visible { outline: 3px solid #f3da85; outline
 .level-comparison th, .level-comparison td { padding: 10px 4px; text-align: left; vertical-align: top; border-bottom: 1px solid #445367; }
 .level-pieces > span { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .level-pieces svg { width: 48px; height: 36px; flex-shrink: 0; }
+#exercise-step { min-height: 4.5em; line-height: 1.5; }
+#exercise-completion { display: flex; gap: 8px; margin: 12px 0; }
+#redo-exercise { margin-top: 12px; }
+#grid button.lesson-target { background: #65c8df33; outline: 2px dashed #65c8df; outline-offset: -5px; }
 .run-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .level-picker { display: flex; align-items: center; gap: 8px; }
 #timer { font-size: 1.5rem; font-variant-numeric: tabular-nums; white-space: nowrap; }

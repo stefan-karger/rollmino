@@ -118,6 +118,34 @@ export async function center(locator: import('@playwright/test').Locator): Promi
   if (!bounds) throw Error('Missing pointer target');
   return { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
 }
+
+export async function enterExercise(page: Page, keyboard = false): Promise<void> {
+  await activate(page, '#tutorial', keyboard);
+  for (let i = 0; i < 5; i++) await activate(page, '#tutorial-next', keyboard);
+  await activate(page, '#try-exercise', keyboard);
+  await expect(page.locator('#exercise-title')).toBeFocused();
+}
+export async function finishExercise(page: Page, keyboard = false): Promise<void> {
+  const brown: Placement = { id: 'brown', orientation: 0, x: 1, y: 0 };
+  await placePieces(page, [brown], keyboard);
+  await expect(page.locator('#exercise-step')).toContainText('Undo your Brown');
+  await activate(page, '#undo', keyboard);
+  await placePieces(page, [brown, { id: 'grey', orientation: 1, x: 5, y: 2 }], keyboard);
+  await activate(page, '[data-piece="cyan"]', keyboard);
+  for (const action of ['flip', 'rotate', 'rotate']) {
+    if (keyboard) await page.keyboard.press(action === 'rotate' ? 'r' : 'f');
+    else await activate(page, `#${action}`, false);
+  }
+  if (keyboard) {
+    for (let i = 0; i < 20 && !await page.locator('#grid button:focus').count(); i++) await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Control+Home');
+    for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowRight');
+    for (let i = 0; i < 2; i++) await page.keyboard.press('ArrowDown');
+    await expect(cell(page, 4, 2)).toBeFocused();
+    await page.keyboard.press('Enter');
+  } else await activate(page, '[data-cell="16"]', false);
+  await expect(page.locator('#exercise-step')).toContainText('Exercise complete!');
+}
 export async function trayPoint(page: Page, id: PieceId, anchor: Cell) {
   return center(slot(page, id).locator(`[data-anchor="${anchor.join(',')}"]`));
 }

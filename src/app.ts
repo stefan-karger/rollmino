@@ -9,6 +9,8 @@ import { navigation } from './navigation.ts';
 import type { Screen } from './navigation.ts';
 import { colors, names, rect, pieceArt, restrictionMark as mark } from './piece-art.ts';
 import { tutorialPanels } from './tutorial.ts';
+import { beginExercise, exercisePlace, exerciseRemove, exerciseUndo, resetStep, fixedPiece, exerciseInstruction, exerciseTarget } from './exercise.ts';
+import type { Exercise } from './exercise.ts';
 
 function element<T extends HTMLElement>(id: string): T {
   const found = document.getElementById(id);
@@ -29,6 +31,7 @@ try { storage = window.localStorage; } catch { /* The records module supplies th
 const records = new Records(storage);
 const dateFormat = new Intl.DateTimeFormat('en', { year: 'numeric', month: 'short', day: 'numeric' });
 let session: Session = freshSession();
+let exercise: Exercise | undefined;
 type Draft = { id: PieceId; orientation: number; anchor: Cell; target: Cell };
 let draft: Draft | undefined;
 type Gesture = {
@@ -82,10 +85,13 @@ for (const id of PIECE_IDS) {
   tray.append(button);
 }
 
+function boardLevel(): Level { return exercise ? 'STARTER' : session.level; }
+function activeBoard(): boolean { return (exercise ?? session).phase === 'running'; }
 function coordinate(x: number, y: number): string { return `${String.fromCharCode(65 + x)}${y + 1}`; }
 function owner(x: number, y: number): PieceId | undefined {
-  if (session.phase === 'ready') return;
-  const game = session.game;
+  const current = exercise ?? session;
+  if (current.phase === 'ready') return;
+  const game = current.game;
   return PIECE_IDS.find(id => {
     const p = game.placed[id];
     return p && ORIENTATIONS[id][p.orientation].some(([dx, dy]) => p.x + dx === x && p.y + dy === y);
@@ -96,10 +102,10 @@ function candidate(): Placement | undefined {
   return { id: draft.id, orientation: draft.orientation, x: draft.target[0] - draft.anchor[0], y: draft.target[1] - draft.anchor[1] };
 }
 function restrictionMark(id: PieceId, x: number, y: number): string {
-  return mark(id, x, y, session.level);
+  return mark(id, x, y, boardLevel());
 }
 function shape(id: PieceId, orientation: number, x = 0, y = 0, extra = ''): string {
-  return pieceArt(id, orientation, x, y, session.level, extra);
+  return pieceArt(id, orientation, x, y, boardLevel(), extra);
 }
 function announce(message: string): void { status.textContent = message; }
 function updateTimer(): void { timer.textContent = formatTime(elapsed(session, Date.now())); }
@@ -114,26 +120,29 @@ const committedArt = art.querySelector<SVGGElement>('#committed-art')!;
 const draftArt = art.querySelector<SVGGElement>('#draft-art')!;
 
 function renderGame(): void {
-  const active = session.phase === 'running';
+  const current = exercise ?? session;
+  const active = current.phase === 'running';
   levelControl.value = session.level;
-  element('ready').hidden = session.phase !== 'ready';
+  element('ready').hidden = current.phase !== 'ready';
   startButton.textContent = session.mode === 'practice' ? 'Start practice' : 'Start';
   element('mode').textContent = session.phase === 'completed'
     ? session.mode === 'practice' ? 'Practice run complete. This run cannot rank.' : 'Ranked run complete.'
     : session.mode === 'practice' ? 'Practice replay. This run cannot rank.' : 'Fresh roll. Your time can rank.';
-  const restricted = RESTRICTED[session.level];
+  const restricted = RESTRICTED[boardLevel()];
   element('rule').textContent = restricted.length
     ? 'White-marked pieces cannot share an edge. Corners may touch.'
     : 'Cover every empty cell with the nine pieces.';
   let boardSvg = '';
+  const target = exercise ? exerciseTarget(exercise) : undefined;
   cells.forEach((button, i) => {
     const x = i % 6, y = Math.floor(i / 6);
     const id = owner(x, y);
-    const blocker = session.phase !== 'ready' && session.game.dice.includes(coordinate(x, y));
+    const blocker = current.phase !== 'ready' && current.game.dice.includes(coordinate(x, y));
     button.disabled = !active;
-    button.setAttribute('aria-label', `${coordinate(x, y)}, ${session.phase === 'ready' ? 'hidden' : blocker ? 'blocker' : id ? `${id} piece${restricted.includes(id) ? ', restricted' : ''}` : 'empty'}`);
+    button.setAttribute('aria-label', `${coordinate(x, y)}, ${current.phase === 'ready' ? 'hidden' : blocker ? 'blocker' : id ? `${id} piece${restricted.includes(id) ? ', restricted' : ''}${exercise && fixedPiece(id) ? ', fixed prepared piece' : ''}` : 'empty'}${target === coordinate(x, y) ? ', lesson target' : ''}`);
+    button.classList.toggle('lesson-target', target === coordinate(x, y));
     button.dataset.content = blocker ? 'blocker' : id ?? 'empty';
-    button.classList.toggle('draggable-source', active && Boolean(id));
+    button.classList.toggle('draggable-source', active && Boolean(id) && !(exercise && fixedPiece(id!)));
     if (blocker) boardSvg += `<circle cx="${x + .5}" cy="${y + .5}" r=".32" fill="#0c1118" stroke="#95a7bc" stroke-width=".045"/>`;
     if (id) {
       boardSvg += rect(x, y, colors[id]) + restrictionMark(id, x, y);
@@ -141,11 +150,11 @@ function renderGame(): void {
   });
   committedArt.innerHTML = boardSvg;
   for (const [id, button] of slots) {
-    const placed = session.phase !== 'ready' ? session.game.placed[id] : undefined;
+    const placed = current.phase !== 'ready' ? current.game.placed[id] : undefined;
     const orientation = placed?.orientation ?? 0;
-    button.disabled = !active;
+    button.disabled = !active || Boolean(exercise && fixedPiece(id));
     button.classList.toggle('placed', Boolean(placed));
-    button.setAttribute('aria-label', `${names[id]}${restricted.includes(id) ? ', restricted' : ''}, ${placed ? 'placed' : 'in tray'}`);
+    button.setAttribute('aria-label', `${names[id]}${restricted.includes(id) ? ', restricted' : ''}, ${placed ? 'placed' : 'in tray'}${exercise && fixedPiece(id) ? ', fixed prepared piece' : ''}`);
     const anchor = firstAnchor(id, orientation);
     // Committed updates happen after gesture cleanup. Draft movement keeps capture sources mounted.
     const cells = ORIENTATIONS[id][orientation];
@@ -154,27 +163,34 @@ function renderGame(): void {
     svg.setAttribute('viewBox', `-0.15 -0.15 ${bounds.width} ${bounds.height}`);
     svg.innerHTML = `${shape(id, orientation)}<text x="${anchor[0] + .5}" y="${anchor[1] + .65}" text-anchor="middle" class="anchor-mark">+</text>`;
     button.querySelector('.grab-regions')!.innerHTML = cells.map(([x, y]) =>
-      `<span data-anchor="${x},${y}" class="grab-square ${active ? 'draggable-source' : ''}" style="left:${(x + .19) / bounds.width * 100}%;top:${(y + .19) / bounds.height * 100}%;width:${.92 / bounds.width * 100}%;height:${.92 / bounds.height * 100}%"></span>`).join('');
+      `<span data-anchor="${x},${y}" class="grab-square ${active && !(exercise && fixedPiece(id)) ? 'draggable-source' : ''}" style="left:${(x + .19) / bounds.width * 100}%;top:${(y + .19) / bounds.height * 100}%;width:${.92 / bounds.width * 100}%;height:${.92 / bounds.height * 100}%"></span>`).join('');
   }
-  element<HTMLButtonElement>('undo').disabled = session.phase !== 'running' || session.history.length === 0;
+  element<HTMLButtonElement>('undo').disabled = current.phase !== 'running' || current.history.length === 0;
   element<HTMLButtonElement>('replay').disabled = session.phase === 'ready';
+  element('game-storage-notice').hidden = Boolean(exercise) || !records.notice;
+  if (exercise) {
+    element('exercise-step').textContent = exerciseInstruction(exercise);
+    element('exercise-completion').hidden = exercise.phase !== 'completed';
+    element<HTMLButtonElement>('reset-step').disabled = exercise.phase === 'completed';
+  }
   renderDraft();
   updateTimer();
 }
 
 function renderDraft(): void {
-  const active = session.phase === 'running';
+  const current = exercise ?? session;
+  const active = current.phase === 'running';
   cells.forEach((button, i) => { button.tabIndex = i === focusedCell ? 0 : -1; });
   for (const [id, button] of slots) button.setAttribute('aria-pressed', String(draft?.id === id));
   for (const id of ['rotate', 'flip', 'remove']) element<HTMLButtonElement>(id).disabled = !active || !draft;
   for (const id of ['rotate', 'flip']) element<HTMLButtonElement>(id).disabled ||= Boolean(gesture);
   const p = candidate();
   let ghost = '';
-  let feedback = session.phase === 'completed'
-    ? `Completed in ${formatTime(session.elapsedMs)}. ${session.mode === 'practice' ? 'Practice' : 'Ranked'} run.`
+  let feedback = exercise?.phase === 'completed' ? 'Exercise complete! All nine pieces fit.' : current.phase === 'completed'
+    ? `Completed in ${formatTime(session.phase === 'completed' ? session.elapsedMs : 0)}. ${session.mode === 'practice' ? 'Practice' : 'Ranked'} run.`
     : 'Select a piece, then a board cell.';
-  if (p && draft && session.phase === 'running') {
-    const legal = canPlace(session.game, p);
+  if (p && draft && current.phase === 'running') {
+    const legal = canPlace(current.game, p);
     ghost = `${shape(p.id, p.orientation, p.x, p.y, `stroke="${legal ? '#fff' : '#ffb7b7'}" stroke-width=".055" stroke-dasharray="${legal ? '0' : '.13 .08'}"`)}<text x="${draft.target[0] + .5}" y="${draft.target[1] + .65}" text-anchor="middle">${legal ? '+' : '×'}</text>`;
     feedback = `${names[p.id]} at ${coordinate(draft.target[0], draft.target[1])}: ${legal ? 'valid placement' : 'cannot place here'}. Anchor marked +.`;
   }
@@ -201,12 +217,28 @@ function renderRecords(): void {
 }
 
 function selectPiece(id: PieceId): void {
-  if (session.phase !== 'running' || gesture) return;
-  const orientation = session.game.placed[id]?.orientation ?? 0;
+  const current = exercise ?? session;
+  if (current.phase !== 'running' || gesture) return;
+  if (exercise && fixedPiece(id)) { announce('This prepared piece is fixed for the exercise.'); return; }
+  const orientation = current.game.placed[id]?.orientation ?? 0;
   draft = { id, orientation, anchor: firstAnchor(id, orientation), target: [focusedCell % 6, Math.floor(focusedCell / 6)] };
   renderDraft();
 }
 function acceptPlacement(p: Placement): void {
+  if (exercise) {
+    const previous = exercise;
+    exercise = exercisePlace(exercise, p);
+    if (previous === exercise) {
+      announce(canPlace(exercise.game, p) ? 'Piece is already there.' : 'Cannot place here. ' + exerciseInstruction(exercise));
+      renderDraft();
+    } else {
+      draft = undefined;
+      announce(exercise.phase === 'completed' ? exerciseInstruction(exercise) : `${names[p.id]} placed. ${exerciseInstruction(exercise)}`);
+      renderGame();
+      if (exercise.phase === 'completed') element('exercise-title').focus();
+    }
+    return;
+  }
   const previous = session;
   session = place(session, p, Date.now());
   if (session === previous) {
@@ -223,7 +255,8 @@ function acceptPlacement(p: Placement): void {
   }
 }
 function activateCell(x: number, y: number): void {
-  if (session.phase !== 'running' || gesture) return;
+  const current = exercise ?? session;
+  if (current.phase !== 'running' || gesture) return;
   focusedCell = y * 6 + x;
   if (draft) {
     draft.target = [x, y];
@@ -234,7 +267,8 @@ function activateCell(x: number, y: number): void {
   }
 }
 function transform(action: 'rotate' | 'flip'): void {
-  if (!draft || session.phase !== 'running') return;
+  const current = exercise ?? session;
+  if (!draft || current.phase !== 'running') return;
   draft = { ...draft, ...transformPiece(draft.id, draft.orientation, draft.anchor, action) };
   if (gesture?.phase === 'dragging') draft.target = boardCell(gesture.clientX, gesture.clientY);
   renderDraft();
@@ -243,6 +277,15 @@ function removeSelected(): void {
   cancelGesture();
   if (!draft) return;
   const id = draft.id;
+  if (exercise) {
+    const previous = exercise;
+    exercise = exerciseRemove(exercise, id);
+    draft = undefined;
+    announce((previous === exercise ? 'Selection cleared. ' : `${names[id]} removed. `) + exerciseInstruction(exercise));
+    renderGame();
+    slots.get(id)!.focus();
+    return;
+  }
   const previous = session;
   session = remove(session, id, Date.now());
   draft = undefined;
@@ -314,6 +357,13 @@ element('remove').addEventListener('click', removeSelected);
 element('undo').addEventListener('click', () => {
   cancelGesture();
   draft = undefined;
+  if (exercise) {
+    const previous = exercise;
+    exercise = exerciseUndo(exercise);
+    if (previous !== exercise) announce('Last action undone. ' + exerciseInstruction(exercise));
+    renderGame();
+    return;
+  }
   const previous = session;
   session = undo(session);
   if (previous !== session) announce('Last action undone.');
@@ -345,7 +395,7 @@ levelControl.addEventListener('change', () => {
   transition(`Change to ${chosen[0] + chosen.slice(1).toLowerCase()} and abandon this unfinished run?`, levelControl, () => freshSession(chosen));
 });
 gameWidget.addEventListener('keydown', event => {
-  if (dialog.open || session.phase !== 'running') return;
+  if (dialog.open || !activeBoard()) return;
   if (event.key === 'Escape' && gesture) {
     event.preventDefault();
     cancelGesture();
@@ -404,7 +454,8 @@ gameWidget.addEventListener('pointerdown', event => {
   if (!event.isPrimary || event.button !== 0 || gesture) return;
   // A new primary interaction cannot be the previous drag's trailing click.
   suppressClick = false;
-  if (session.phase !== 'running' || dialog.open) return;
+  const current = exercise ?? session;
+  if (current.phase !== 'running' || dialog.open) return;
   const target = event.target as Element;
   const slotButton = target.closest<HTMLButtonElement>('[data-piece]');
   let id: PieceId | undefined;
@@ -417,7 +468,7 @@ gameWidget.addEventListener('pointerdown', event => {
     id = slotButton.dataset.piece as PieceId;
     const [x, y] = square.dataset.anchor!.split(',');
     anchor = [Number(x), Number(y)];
-    orientation = session.game.placed[id]?.orientation ?? 0;
+    orientation = current.game.placed[id]?.orientation ?? 0;
   } else {
     const button = target.closest<HTMLButtonElement>('[data-cell]');
     if (!button) return;
@@ -425,10 +476,11 @@ gameWidget.addEventListener('pointerdown', event => {
     world = [index % 6, Math.floor(index / 6)];
     id = owner(...world);
     if (!id) return;
-    const placement = session.game.placed[id]!;
+    const placement = current.game.placed[id]!;
     orientation = placement.orientation;
     anchor = [world[0] - placement.x, world[1] - placement.y];
   }
+  if (exercise && fixedPiece(id)) return;
   gesture = {
     pointerId: event.pointerId, phase: 'armed', source: { id, orientation, anchor, target: world },
     startX: event.clientX, startY: event.clientY, clientX: event.clientX, clientY: event.clientY,
@@ -462,7 +514,8 @@ window.addEventListener('pointerup', event => {
     return;
   }
   suppressClick = true;
-  if (!draft || session.phase !== 'running') return;
+  const current = exercise ?? session;
+  if (!draft || current.phase !== 'running') return;
   draft.target = boardCell(event.clientX, event.clientY);
   const pointed = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>('[data-piece]');
   if (pointed?.dataset.piece === held.source.id) {
@@ -471,7 +524,7 @@ window.addEventListener('pointerup', event => {
   }
   const [x, y] = draft.target;
   const proposal = candidate()!;
-  if (x >= 0 && x < 6 && y >= 0 && y < 6 && canPlace(session.game, proposal)) {
+  if (x >= 0 && x < 6 && y >= 0 && y < 6 && canPlace(current.game, proposal)) {
     acceptPlacement(proposal);
   } else {
     draft = { ...held.source };
@@ -505,6 +558,10 @@ const nav = navigation(next => {
   homeTrigger = undefined;
   cancelGesture();
   tutorial.close();
+  exercise = undefined;
+  element('ordinary-board').append(gameWidget);
+  element('tutorial-explanation').hidden = false;
+  element('exercise').hidden = true;
   session = freshSession(session.level);
   draft = undefined;
   focusedCell = 0;
@@ -536,6 +593,40 @@ element('play').addEventListener('click', () => nav.open('game'));
 element('personal-bests').addEventListener('click', () => nav.open('records'));
 element('tutorial').addEventListener('click', () => nav.open('tutorial'));
 element('tutorial-home').addEventListener('click', () => nav.home());
+function openExercise(): void {
+  cancelGesture();
+  tutorial.close();
+  exercise = beginExercise();
+  draft = undefined;
+  focusedCell = 0;
+  element('tutorial-explanation').hidden = true;
+  element('exercise').hidden = false;
+  element('exercise-board').append(gameWidget);
+  renderGame();
+  announce(exerciseInstruction(exercise));
+  element('exercise-title').focus();
+}
+element('try-exercise').addEventListener('click', openExercise);
+element('redo-exercise').addEventListener('click', openExercise);
+element('reset-step').addEventListener('click', () => {
+  if (!exercise) return;
+  cancelGesture();
+  draft = undefined;
+  exercise = resetStep(exercise);
+  announce('Step reset. ' + exerciseInstruction(exercise));
+  renderGame();
+});
+element('review-tutorial').addEventListener('click', () => {
+  cancelGesture();
+  exercise = undefined;
+  draft = undefined;
+  element('ordinary-board').append(gameWidget);
+  element('exercise').hidden = true;
+  element('tutorial-explanation').hidden = false;
+  renderGame();
+  tutorial.open();
+});
+element('exercise-play').addEventListener('click', () => nav.play());
 element('records-home').addEventListener('click', () => nav.home());
 element('game-home').addEventListener('click', event => {
   homeTrigger = event.currentTarget as HTMLElement;

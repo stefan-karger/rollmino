@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { newGame, isSolved } from '../engine/core.ts';
-import { tutorialExample } from '../src/tutorial.ts';
+import { tutorialExample } from '../src/teaching-data.ts';
 import { assertSolution } from './oracle.mjs';
 
 test('the intentional complete tutorial illustration covers a legal physical Starter board', () => {
