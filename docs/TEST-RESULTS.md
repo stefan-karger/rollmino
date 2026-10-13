@@ -1,10 +1,10 @@
 # Verification evidence
 
-The [contract](../IMPLEMENTATION_PLAN.md#verification) defines current checks. This file records performed results and their limits; ticket evidence supplies implementation details. Local checks do not establish a new deployment.
+The [contract](../IMPLEMENTATION_PLAN.md#verification) defines current checks. This file records performed results and their limits; [archived ticket evidence](#historical-archive) supplies implementation details. Local checks do not establish a new deployment.
 
 ## Home and tutorial local readiness
 
-Executed on 2026-10-13 in the Windows workspace with Node 24.15.0, pnpm 12.10.0 and the existing pinned browser/tool versions. Runtime revision `0c80425` contains the complete Home/history, separate records, six-panel tutorial, Starter exercise and handled-offer flow. T35 changes verification and documentation only. [T30–T34 evidence](tickets/README.md) retains the implementation checks, repairs/retries and rendered observations. The new revision is locally ready; the dated public releases below do not establish its publication.
+Executed on 2026-10-13 in the Windows workspace with Node 24.15.0, pnpm 12.10.0 and the existing pinned browser/tool versions. Runtime revision `0c80425` contains the complete Home/history, separate records, six-panel tutorial, Starter exercise and handled-offer flow. T35 changes verification and documentation only. [Archived T30 through T34 evidence](#historical-archive) retains the implementation checks, repairs/retries and rendered observations. The new revision is locally ready; the dated public releases below do not establish its publication.
 
 | Check | Final local evidence |
 | --- | --- |
@@ -88,6 +88,10 @@ The maintained cell-array oracle uses separate literal IDs/contact groups and no
 Native mouse/CDP touch tests are browser automation; phone projects are emulation. Synthetic blur/visibility/cancellation branches remain labeled as such. CSS zoom tests check reflow, rendered alignment and tap play, not browser-chrome zoom or zoomed native dragging. Physical phones, pen, a current physical set and screen-reader tests were not performed and are not hidden release gates. Source/rights and record-storage limits remain in the contract.
 
 ## Historical archive
+
+The completed T29 through T35 tracker, analysis, acceptance and implementation evidence remain in local Git commit `ba45457fe49dc746af5cbcf1de975802771e5e19`. On 2026-10-13, all seven tracker rows were marked done. Before removing the tracker and seven ticket files at the user's request, each working file matched that commit and all eight archived blobs were retrieved. For example, use `git show ba45457fe49dc746af5cbcf1de975802771e5e19:docs/tickets/README.md` or `git show ba45457fe49dc746af5cbcf1de975802771e5e19:docs/tickets/T35-integrated-verification.md`. The current contract and readiness evidence stay in the working tree. The cleanup selected documentation-only verification. `pnpm run check:docs` passed for five Markdown files and 35 local links, and local/staged `git diff --check` passed before commit. No app, model or verification-script changes required another runtime suite.
+
+Earlier completed tickets remain in the [V1 archive](https://github.com/stefan-karger/rollmino/tree/61454115b4cf1310ec0f72e50b3fc5e0ec38dd03/docs/tickets) and the [T15 through T26 archive](https://github.com/stefan-karger/rollmino/tree/757746a0b7652cf311b43b0392bfbeadfec7c452/docs/tickets). T27 and T28's maintained verification evidence appears above.
 
 Superseded plans/research, copied engines/verifiers, exploratory scripts, incremental setup/package-manager narratives and the original checksum manifest remain retrievable at [archive commit 46880c4e32f5cdb9a243133b580893cbb6bb29d9](https://github.com/stefan-karger/rollmino/tree/46880c4e32f5cdb9a243133b580893cbb6bb29d9). Every T26 removal target and the old results document matched that commit and its blob was retrieved before removal. Earlier deleted decision/scope/handoff files remain in its ancestry. No new archive directory replaces them.
 

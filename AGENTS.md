@@ -4,9 +4,9 @@ V1 is implemented and published. [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md
 
 ## Read and choose work
 
-Read [README.md](README.md), the contract and [CODING_GUIDELINES.md](CODING_GUIDELINES.md), then the [tracker](docs/tickets/README.md), current ticket and completed blocker evidence. Consult [dated live evidence](docs/TEST-RESULTS.md#public-pages-release-verification) for hosting work. Read relevant code/tests/fixtures before edits; run fast tests before reference changes.
+Read [README.md](README.md), the contract and [CODING_GUIDELINES.md](CODING_GUIDELINES.md). If an active `docs/tickets/README.md` exists, read that tracker, the current ticket and completed blocker evidence. Completed ticket files remain in the [Git archive](docs/TEST-RESULTS.md#historical-archive). Consult [dated live evidence](docs/TEST-RESULTS.md#public-pages-release-verification) for hosting work. Read relevant code/tests/fixtures before edits; run fast tests before reference changes.
 
-Choose the first todo ticket whose blockers are done. Keep status only in the tracker. Record dated behavior, actual commands/results and limits before checking acceptance and marking done. Do not implement without a current user request or repeat completed slices. Shared-file overlap alone is not a blocker.
+For newly authorized ticketed work, create or update `docs/tickets/README.md` and choose the first todo ticket whose blockers are done. Keep status only in that tracker. Record dated behavior, actual commands/results and limits before checking acceptance and marking done. Do not implement without a current user request or repeat completed slices. Shared-file overlap alone is not a blocker.
 
 ## Correctness and engineering
 
