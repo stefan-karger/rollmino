@@ -96,7 +96,6 @@ export function tutorialPanels(announce: (text: string) => void) {
     document.getElementById('tutorial-progress')!.textContent = `Panel ${index + 1} of ${panels.length}`;
     back.disabled = index === 0;
     next.disabled = index === panels.length - 1;
-    document.getElementById('try-exercise')!.hidden = index !== panels.length - 1;
     document.getElementById('tutorial-heading')!.focus();
     announce('');
   }

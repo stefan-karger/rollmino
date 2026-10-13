@@ -11,6 +11,7 @@ import { colors, names, rect, pieceArt, restrictionMark as mark } from './piece-
 import { tutorialPanels } from './tutorial.ts';
 import { beginExercise, exercisePlace, exerciseRemove, exerciseUndo, resetStep, fixedPiece, exerciseInstruction, exerciseTarget } from './exercise.ts';
 import type { Exercise } from './exercise.ts';
+import { tutorialOffer } from './onboarding.ts';
 
 function element<T extends HTMLElement>(id: string): T {
   const found = document.getElementById(id);
@@ -29,6 +30,12 @@ const timer = element('timer');
 let storage: Storage | undefined;
 try { storage = window.localStorage; } catch { /* The records module supplies the page-only notice. */ }
 const records = new Records(storage);
+const offer = tutorialOffer(storage);
+function renderOffer(): void {
+  element('tutorial').classList.toggle('offered', offer.offered);
+  element('tutorial-offer').style.visibility = offer.offered ? 'visible' : 'hidden';
+}
+renderOffer();
 const dateFormat = new Intl.DateTimeFormat('en', { year: 'numeric', month: 'short', day: 'numeric' });
 let session: Session = freshSession();
 let exercise: Exercise | undefined;
@@ -589,9 +596,9 @@ const nav = navigation(next => {
   element<HTMLButtonElement>('personal-bests').disabled = false;
   element<HTMLButtonElement>('tutorial').disabled = false;
 });
-element('play').addEventListener('click', () => nav.open('game'));
+element('play').addEventListener('click', () => { offer.handle(); renderOffer(); nav.open('game'); });
 element('personal-bests').addEventListener('click', () => nav.open('records'));
-element('tutorial').addEventListener('click', () => nav.open('tutorial'));
+element('tutorial').addEventListener('click', () => { offer.handle(); renderOffer(); nav.open('tutorial'); });
 element('tutorial-home').addEventListener('click', () => nav.home());
 function openExercise(): void {
   cancelGesture();

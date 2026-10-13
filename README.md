@@ -6,7 +6,9 @@ Play [Rollmino](https://stefan-karger.github.io/rollmino/), a free, always-timed
 
 ## Playing
 
-Tutorial on Home offers six self-paced illustrated panels, with optional example replay and a level comparison. The explanation is untimed and never records a result. Try the exercise at the end to use the real controls without a clock. Six prepared pieces stay fixed while you place Brown domino, Grey line and Cyan L. Undo and Reset step help you recover; any legal full-board finish succeeds. Exercise completion offers Play, Review tutorial and Redo exercise.
+Tutorial on Home offers six self-paced illustrated panels, with optional example replay and a level comparison. The explanation is untimed and never records a result. Try the exercise from any panel to use the real controls without a clock. Six prepared pieces stay fixed while you place Brown domino, Grey line and Cyan L. Undo and Reset step help you recover; any legal full-board finish succeeds. Exercise completion offers Play, Review tutorial and Redo exercise.
+
+On a new visit, Home highlights the optional Tutorial. Choosing Play or Tutorial remembers only that the offer was handled; Personal bests does not dismiss it. Cleared or unavailable browser storage can repeat the invitation. Tutorial always opens at the first panel, with direct exercise access and no saved progress.
 
 Choose Play on Home, choose a level, then Start to reveal seven blockers and begin timing. Select a piece and tap a cell to place immediately, or drag from an occupied square. Rotate turns clockwise; Flip mirrors left/right. The marked square is the tap anchor; dragging preserves the square grabbed.
 
@@ -46,7 +48,7 @@ Focused scripts are `test:rules`, `test:transforms`, `test:state`, `test:records
 | `engine/core.ts` | Canonical dice/shapes/contacts, validation, transforms and reference solver |
 | `src/session.ts` | Committed run, transactions, time and Undo |
 | `src/navigation.ts` | Screen-only history, root returns and reconciled abandonment |
-| `src/records.ts` | Top-five ranking and resilient storage |
+| `src/records.ts`, `src/onboarding.ts` | Top-five ranking and the independent handled-offer flag |
 | `src/app.ts`, `src/styles.css`, `index.html` | Stable HTML/SVG, input, dialogs and compact layout |
 | `src/tutorial.ts`, `src/exercise.ts`, `src/teaching-data.ts`, `src/piece-art.ts` | Self-paced teaching examples and shared original piece artwork |
 | `src/tray-geometry.ts` | Matching tray artwork/hit-region bounds |

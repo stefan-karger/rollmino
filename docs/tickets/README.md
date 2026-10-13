@@ -9,7 +9,7 @@ T15 through T26 are complete, with one verified commit per ticket. Their accepta
 | [T31](T31-personal-bests-screen.md) | Separate Personal bests screen and preserve completion/storage feedback | T30 | done |
 | [T32](T32-visual-tutorial.md) | Self-paced illustrated tutorial and exact level comparison | T30 | done |
 | [T33](T33-starter-exercise.md) | Untimed three-piece Starter exercise with Undo and Reset step | T32 | done |
-| [T34](T34-first-visit-and-repeat.md) | First-visit tutorial offer, repeat review and redo exercise | T33 | todo |
+| [T34](T34-first-visit-and-repeat.md) | First-visit tutorial offer, repeat review and redo exercise | T33 | done |
 | [T35](T35-integrated-verification.md) | Final navigation/tutorial/records checks, contract consolidation and readiness evidence | T31, T34 | todo |
 
 [IMPLEMENTATION_PLAN.md](../../IMPLEMENTATION_PLAN.md) is the single current contract. Follow [CODING_GUIDELINES.md](../../CODING_GUIDELINES.md) and the contract's [verification scopes](../../IMPLEMENTATION_PLAN.md#verification). [Performed checks and limits](../TEST-RESULTS.md) distinguish local readiness from hosting.

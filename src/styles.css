@@ -14,6 +14,8 @@ button:focus-visible, select:focus-visible { outline: 3px solid #f3da85; outline
 #home-screen h1 { font-size: 2.6rem; margin-bottom: 12px; }
 .home-actions { display: grid; gap: 12px; margin: 28px auto 0; max-width: 280px; }
 #play { background: #e8edf3; color: #12161d; font-weight: 700; }
+#tutorial.offered { border-color: #65c8df; background: #25424e; }
+#tutorial-offer { margin: 16px 0 0; }
 .screen-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .screen-heading h1 { margin: 0; }
 .tutorial-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
