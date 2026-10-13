@@ -9,6 +9,7 @@ test.beforeEach(async ({ page }) => {
 test('full keyboard-only game uses Tab, real transforms and grid navigation', { tag: '@desktop' }, async ({ page }) => {
   await seed(page);
   await page.goto('./');
+  await activate(page, '#play', true);
   await resetRandom(page);
   // The default Starter accepts this Wizard fixture too.
   await activate(page, '#start', true);

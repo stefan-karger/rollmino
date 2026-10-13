@@ -6,7 +6,7 @@ Play [Rollmino](https://stefan-karger.github.io/rollmino/), a free, always-timed
 
 ## Playing
 
-Choose a level, then Start to reveal seven blockers and begin timing. Select a piece and tap a cell to place immediately, or drag from an occupied square. Rotate turns clockwise; Flip mirrors left/right. The marked square is the tap anchor; dragging preserves the square grabbed.
+Choose Play on Home, choose a level, then Start to reveal seven blockers and begin timing. Select a piece and tap a cell to place immediately, or drag from an occupied square. Rotate turns clockwise; Flip mirrors left/right. The marked square is the tap anchor; dragging preserves the square grabbed.
 
 Inset white square outlines identify the pieces that cannot share an edge at the selected level. Starter has no outlines. The small + marks the tap anchor inside its square.
 
@@ -14,7 +14,7 @@ Illegal attempts preserve committed play. Placed shapes stay dimmed and selectab
 
 Tab reaches grid/tray/controls. Arrows move without wrapping. Home/End reaches row ends; Ctrl+Home/End reaches board ends. Enter/Space activates, R/F transforms, Delete removes and Escape cancels.
 
-Timing includes background/lock, confirmations and Undo. Completion freezes board/time. New game, Replay and level changes confirm active abandonment. Replay retains a hidden layout as timed practice and never ranks. Fair fresh rolls can rank even when repeated. Reload abandons unfinished play and returns to hidden Starter ready.
+Timing includes background/lock, confirmations and Undo. Completion freezes board/time. New game, Replay and level changes confirm active abandonment. Replay retains a hidden layout as timed practice and never ranks. Fair fresh rolls can rank even when repeated. Home confirms running abandonment and discards the layout. Browser Back follows the same confirmation; Forward opens fresh hidden play. Reload returns Home with fresh hidden Starter internally.
 
 Records show five best times/dates per level. Selected clearing confirms and preserves active play. Records stay in this browser; private mode/site-data/storage policies can erase them. Storage failures retain page-memory records with a reload-loss notice. No hints, pause, Redo, sync, PWA or Android app.
 
@@ -43,6 +43,7 @@ Focused scripts are `test:rules`, `test:transforms`, `test:state`, `test:records
 | --- | --- |
 | `engine/core.ts` | Canonical dice/shapes/contacts, validation, transforms and reference solver |
 | `src/session.ts` | Committed run, transactions, time and Undo |
+| `src/navigation.ts` | Screen-only history, root returns and reconciled abandonment |
 | `src/records.ts` | Top-five ranking and resilient storage |
 | `src/app.ts`, `src/styles.css`, `index.html` | Stable HTML/SVG, input, dialogs and compact layout |
 | `src/tray-geometry.ts` | Matching tray artwork/hit-region bounds |

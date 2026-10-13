@@ -10,6 +10,7 @@ async function noAxeViolations(page: import('@playwright/test').Page) {
 test('ready, running, confirmation and completed states pass relevant axe checks', { tag: '@shared' }, async ({ page }) => {
   await seed(page);
   await page.goto('./');
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
   await noAxeViolations(page);
   await page.locator('#level').selectOption('WIZARD');
   await resetRandom(page);

@@ -13,9 +13,12 @@ test('loads the Rollmino entry and its styles without page or asset errors', asy
   });
 
   await page.goto('./');
+  await expect(page.locator('#home-screen')).toBeVisible();
+  await expect(page.getByRole('grid')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(page).toHaveTitle('Rollmino');
   await expect(page.getByRole('heading', { name: 'Rollmino', level: 1 })).toBeVisible();
-  await expect(page.getByText('Puzzle hidden until Start.', { exact: true })).toBeVisible();
+  await expect(page.locator('#ready')).toContainText('Puzzle hidden until Start.');
   await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(18, 22, 29)');
   expect(errors).toEqual([]);
 });
@@ -65,6 +68,8 @@ for (const fixture of fixtures) {
       await expect(page.locator('#preview')).not.toContainText('Completed');
     }
     await page.reload();
+    await expect(page.locator('#home-screen')).toBeVisible();
+    await page.getByRole('button', { name: 'Play', exact: true }).click();
     await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
     await page.locator('#level').selectOption(fixture.level);
     await expect(page.locator('#records-list li')).toHaveCount(1);
@@ -77,6 +82,7 @@ test('active confirmations preserve time on cancel, replay is hidden, and level 
   await page.clock.pauseAt(new Date('2026-10-13T10:00:00Z'));
   await seed(page, [fixtures[0].dice, fixtures[1].dice]);
   await page.goto('./');
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
   await resetRandom(page);
   await page.getByRole('button', { name: 'Start', exact: true }).click();
@@ -105,6 +111,8 @@ test('active confirmations preserve time on cancel, replay is hidden, and level 
   await expect(page.getByRole('button', { name: 'D2, blocker', exact: true })).toBeVisible();
   await expect(page.locator('#mode')).toContainText('Fresh roll');
   await page.reload();
+  await expect(page.locator('#home-screen')).toBeVisible();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(page.getByLabel('Level', { exact: true })).toHaveValue('STARTER');
   await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
 });

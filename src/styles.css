@@ -9,6 +9,13 @@ button { cursor: pointer; }
 button:disabled { cursor: default; color: #aab7c7; background: #1c2735; }
 button:focus-visible, select:focus-visible { outline: 3px solid #f3da85; outline-offset: 3px; }
 [hidden] { display: none !important; }
+.home-mark { display: block; margin: 0 auto 16px; }
+#home-screen { padding: 32px 0; text-align: center; }
+#home-screen h1 { font-size: 2.6rem; margin-bottom: 12px; }
+.home-actions { display: grid; gap: 12px; margin: 28px auto 0; max-width: 280px; }
+#play { background: #e8edf3; color: #12161d; font-weight: 700; }
+.screen-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.screen-heading h1 { margin: 0; }
 .run-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .level-picker { display: flex; align-items: center; gap: 8px; }
 #timer { font-size: 1.5rem; font-variant-numeric: tabular-nums; white-space: nowrap; }

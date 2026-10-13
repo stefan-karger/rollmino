@@ -29,6 +29,8 @@ test.describe('shared record scenarios', { tag: '@shared' }, () => {
     await complete(page);
     expect(await page.evaluate(key => localStorage.getItem(key), key)).toBe(stored);
     await page.reload();
+    await expect(page.locator('#home-screen')).toBeVisible();
+    await page.getByRole('button', { name: 'Play', exact: true }).click();
     await expect(page.locator('#level')).toHaveValue('STARTER');
     await expect(page.locator('#records-empty')).toBeVisible();
     await page.locator('#level').selectOption('WIZARD');
@@ -45,6 +47,7 @@ test.describe('shared record scenarios', { tag: '@shared' }, () => {
       { elapsedMs: 3000, finishedAt: 50 }, { elapsedMs: 4000, finishedAt: 60 },
     ] })), { key });
     await page.goto('./');
+    await page.getByRole('button', { name: 'Play', exact: true }).click();
     await page.locator('#level').selectOption('WIZARD');
     await resetRandom(page);
     await page.locator('#start').click();

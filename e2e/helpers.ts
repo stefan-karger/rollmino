@@ -35,6 +35,7 @@ export async function resetRandom(page: Page): Promise<void> {
 export async function openGame(page: Page, fixture = fixtures[0]): Promise<void> {
   await seed(page, [fixture.dice]);
   await page.goto('./');
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
   await page.getByLabel('Level', { exact: true }).selectOption(fixture.level);
   await resetRandom(page);
   await page.getByRole('button', { name: 'Start', exact: true }).click();

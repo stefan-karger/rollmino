@@ -5,6 +5,7 @@ import { elapsed, formatTime, freshSession, place, remove, replay, start, undo }
 import type { Session } from './session.ts';
 import { Records } from './records.ts';
 import { trayBounds } from './tray-geometry.ts';
+import { navigation } from './navigation.ts';
 
 function element<T extends HTMLElement>(id: string): T {
   const found = document.getElementById(id);
@@ -42,7 +43,9 @@ type Gesture = {
 let gesture: Gesture | undefined;
 let suppressClick = false;
 let focusedCell = 0;
-let pending: { accept: () => void; trigger: HTMLElement } | undefined;
+let pending: { accept: () => void; trigger: HTMLElement; cancel?: () => void } | undefined;
+let screen: 'home' | 'game' = 'home';
+let homeTrigger: HTMLElement | undefined;
 const cells: HTMLButtonElement[] = [];
 const slots = new Map<PieceId, HTMLButtonElement>();
 
@@ -266,9 +269,9 @@ function enterReady(next: Session): void {
   renderGame();
   startButton.focus();
 }
-function confirmAction(text: string, trigger: HTMLElement, accept: () => void, title = 'Abandon this run?'): void {
+function confirmAction(text: string, trigger: HTMLElement, accept: () => void, title = 'Abandon this run?', cancel?: () => void): void {
   cancelGesture();
-  pending = { trigger, accept };
+  pending = { trigger, accept, cancel };
   element('confirm-title').textContent = title;
   element('confirm-text').textContent = text;
   dialog.showModal();
@@ -284,7 +287,7 @@ function finishConfirmation(confirmed: boolean): void {
   dialog.close(confirmed ? 'confirm' : 'cancel');
   if (!action) return;
   if (confirmed) action.accept();
-  else { renderDraft(); action.trigger.focus(); }
+  else { action.cancel?.(); renderDraft(); action.trigger.focus(); }
 }
 // Resolve the choice before another confirmation can open. Native close events are queued.
 dialog.querySelector('form')!.addEventListener('submit', event => {
@@ -308,7 +311,7 @@ dialog.addEventListener('keydown', event => {
   }
 });
 startButton.addEventListener('click', () => {
-  if (session.phase !== 'ready') return;
+  if (screen !== 'game' || session.phase !== 'ready') return;
   session = start(session, Date.now());
   announce('Puzzle started. Select a piece.');
   renderGame();
@@ -498,3 +501,29 @@ window.addEventListener('resize', cancelGesture);
 setInterval(updateTimer, 100);
 renderRecords();
 renderGame();
+const nav = navigation(next => {
+  homeTrigger = undefined;
+  cancelGesture();
+  session = freshSession(session.level);
+  draft = undefined;
+  focusedCell = 0;
+  screen = next;
+  element('home-screen').hidden = next !== 'home';
+  element('game-screen').hidden = next !== 'game';
+  renderGame();
+  announce(next === 'home' ? '' : 'Puzzle hidden until Start.');
+  (next === 'home' ? element('play') : startButton).focus();
+}, accept => {
+  const trigger = homeTrigger ?? pending?.trigger ?? (document.activeElement instanceof HTMLElement ? document.activeElement : element('game-home'));
+  homeTrigger = undefined;
+  if (pending) finishConfirmation(false);
+  cancelGesture();
+  if (session.phase === 'running') {
+    confirmAction('Return Home and abandon this unfinished run?', trigger, accept, 'Abandon this run?', () => nav.cancel());
+  } else accept();
+}, () => { element<HTMLButtonElement>('play').disabled = false; });
+element('play').addEventListener('click', () => nav.play());
+element('game-home').addEventListener('click', event => {
+  homeTrigger = event.currentTarget as HTMLElement;
+  nav.home();
+});

@@ -38,6 +38,9 @@ test('production starts hidden and loads required assets without runtime service
   const errors = productionErrors(page, baseURL!);
   await seed(page);
   await page.goto('./');
+  await expect(page.locator('#home-screen')).toBeVisible();
+  await expect(page.getByRole('grid')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(page).toHaveTitle('Rollmino');
   await expect(page.getByRole('heading', { name: 'Rollmino', exact: true })).toBeVisible();
   await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
@@ -87,6 +90,8 @@ test(`production completes ${fixture.id}, freezes, replays as practice and retai
   await complete(page, fixture);
   await expect(page.locator('#records-list li')).toHaveCount(1);
   await page.reload();
+  await expect(page.locator('#home-screen')).toBeVisible();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(page.locator('#level')).toHaveValue('STARTER');
   await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
   await page.locator('#level').selectOption(fixture.level);
