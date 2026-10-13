@@ -4,6 +4,7 @@ import type { Cell, Level, PieceId, Placement } from '../engine/core.ts';
 import { elapsed, formatTime, freshSession, place, remove, replay, start, undo } from './session.ts';
 import type { Session } from './session.ts';
 import { Records } from './records.ts';
+import { trayBounds } from './tray-geometry.ts';
 
 function element<T extends HTMLElement>(id: string): T {
   const found = document.getElementById(id);
@@ -155,9 +156,13 @@ function render(): void {
     // HTML hit regions match only occupied SVG squares. SVG touch-action is inconsistent across engines.
     // Keep the implicit touch-capture source mounted while capture transfers to the game.
     if (!gesture) {
-      button.querySelector('svg')!.innerHTML = `${shape(id, orientation)}<text x="${anchor[0] + .5}" y="${anchor[1] + .66}" text-anchor="middle" class="anchor-mark">+</text>`;
-      button.querySelector('.grab-regions')!.innerHTML = ORIENTATIONS[id][orientation].map(([x, y]) =>
-        `<span data-anchor="${x},${y}" class="grab-square ${active ? 'draggable-source' : ''}" style="left:${(x + .19) / 4.3 * 100}%;top:${(y + .19) / 3.3 * 100}%;width:${.92 / 4.3 * 100}%;height:${.92 / 3.3 * 100}%"></span>`).join('');
+      const cells = ORIENTATIONS[id][orientation];
+      const bounds = trayBounds(cells);
+      const svg = button.querySelector('svg')!;
+      svg.setAttribute('viewBox', `-0.15 -0.15 ${bounds.width} ${bounds.height}`);
+      svg.innerHTML = `${shape(id, orientation)}<text x="${anchor[0] + .5}" y="${anchor[1] + .66}" text-anchor="middle" class="anchor-mark">+</text>`;
+      button.querySelector('.grab-regions')!.innerHTML = cells.map(([x, y]) =>
+        `<span data-anchor="${x},${y}" class="grab-square ${active ? 'draggable-source' : ''}" style="left:${(x + .19) / bounds.width * 100}%;top:${(y + .19) / bounds.height * 100}%;width:${.92 / bounds.width * 100}%;height:${.92 / bounds.height * 100}%"></span>`).join('');
     }
   }
   for (const id of ['rotate', 'flip', 'remove']) element<HTMLButtonElement>(id).disabled = !active || !draft;

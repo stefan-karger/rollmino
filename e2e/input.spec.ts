@@ -113,6 +113,43 @@ test('Start works on its first click after Escape and release outside the widget
   await expect(cell(page, 4, 5)).toHaveAttribute('data-content', 'navy');
 });
 
+test('vertical grey tray artwork and occupied drag regions fit above its label', async ({ page }) => {
+  await openGame(page);
+  for (const width of [320, 390, 800]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await slot(page, 'grey').click();
+    await page.locator('#rotate').click();
+    await cell(page, 0, 1).click();
+    const errors = await slot(page, 'grey').evaluate(button => {
+      const svg = button.querySelector('svg')!;
+      const art = svg.getBoundingClientRect();
+      const label = button.querySelector('.piece-label')!.getBoundingClientRect();
+      const regions = [...button.querySelectorAll('.grab-square')];
+      return [...svg.querySelectorAll('rect')].map((rect, i) => {
+        const visual = rect.getBoundingClientRect();
+        const hit = regions[i].getBoundingClientRect();
+        return {
+          visible: visual.top >= art.top && visual.bottom <= art.bottom && visual.bottom <= label.top,
+          hitFits: hit.top >= art.top && hit.bottom <= art.bottom && hit.bottom <= label.top,
+          offset: Math.max(Math.abs(hit.x - visual.x), Math.abs(hit.y - visual.y), Math.abs(hit.width - visual.width), Math.abs(hit.height - visual.height)),
+        };
+      });
+    });
+    expect(errors).toHaveLength(4);
+    for (const error of errors) {
+      expect(error.visible).toBe(true);
+      expect(error.hitFits).toBe(true);
+      expect(error.offset).toBeLessThan(1);
+    }
+    // The formerly clipped final cell remains a real occupied drag source.
+    await mouseDrag(page, await trayPoint(page, 'grey', [0, 3]), await center(slot(page, 'grey').locator('.piece-label')));
+    await expect(page.locator('[data-content="grey"]')).toHaveCount(0);
+    await page.locator('#undo').click();
+    await expect(page.locator('[data-content="grey"]')).toHaveCount(4);
+    await page.locator('#undo').click();
+  }
+});
+
 test('native mouse can transform a held anchor and commit only on release', async ({ page }) => {
   await openGame(page, { ...fixtures[0], level: 'STARTER' });
   const from = await trayPoint(page, 'cyan', [0, 0]);
