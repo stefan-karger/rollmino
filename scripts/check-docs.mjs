@@ -1,12 +1,10 @@
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
-const files = [
-  'README.md', 'AGENTS.md', 'CODING_GUIDELINES.md', 'IMPLEMENTATION_PLAN.md',
-  ...['PLAN.md', 'docs/RESEARCH.md', 'docs/REFERENCE-VERIFICATION.md', 'docs/TEST-RESULTS.md'].filter(file => existsSync(resolve(root, file))),
-  ...readdirSync(resolve(root, 'docs/tickets')).filter(file => file.endsWith('.md')).map(file => `docs/tickets/${file}`),
-];
+const files = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], { cwd: root, encoding: 'utf8' })
+  .split('\0').filter(file => file.endsWith('.md') && !/^(original-handoff|research-archive)\//.test(file) && existsSync(resolve(root, file)));
 const scripts = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')).scripts;
 const errors = [];
 let links = 0;

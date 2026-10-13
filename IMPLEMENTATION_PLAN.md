@@ -138,7 +138,24 @@ Exclude hints/solution UI, Redo, in-progress persistence, saved-layout inspectio
 
 ## Verification
 
-Current policy until T24: runtime/build edits require frozen installation, pure tests, strict build, all five development projects, both production mounts and exhaustive verification. Docs-only edits require local-file/anchor and command consistency plus `git diff --check`. Tickets add focused regressions. Run fast tests before reference changes. [Setup](README.md#development) lists current package scripts.
+Use the same change scopes locally and on PRs. [scripts/verification-scope.mjs](scripts/verification-scope.mjs) selects them from explicit changed paths or a PR base/head comparison. Every scope runs `pnpm run check:docs`; local work also runs `git diff --check`. Install dependencies with the frozen lockfile before pure/build/exhaustive checks, and install browsers when selected. Tickets add focused regressions. Run fast tests before reference changes. [Setup](README.md#development) lists current package scripts.
+
+| Changes | Required commands after documentation checks |
+| --- | --- |
+| Markdown, provenance and original checksum only | No app tests/build |
+| Pure test assertions only | `pnpm test` |
+| CSS, tray geometry, entry or original public assets | Pure tests, build, UI browser group and production tests |
+| App wiring or session code | Pure tests, build, complete reduced browser matrix and production tests |
+| Records implementation | Pure tests, build, records/gameplay browser group and production tests |
+| Browser test assertions | Pure tests, strict build and affected browser group; production assertions select artifact tests |
+| Rules/solver/fixtures | Full release sequence, including independent exhaustive verification |
+| Oracle or exhaustive verifier only | Pure tests and independent exhaustive verification |
+| Dependencies/configuration/CI or unknown paths | Full release sequence |
+| Main push or manual release | Full release sequence regardless of changed paths |
+
+UI browser group runs `pnpm run test:e2e e2e/play.spec.ts e2e/input.spec.ts e2e/accessibility.spec.ts`. Records group runs `pnpm run test:e2e e2e/play.spec.ts e2e/records.spec.ts`. The full group runs `pnpm run test:e2e`. Pure/build/artifact/exhaustive commands are `pnpm test`, `pnpm run build`, `pnpm run test:e2e:prod` and `pnpm run verify:all`. Mixed changes combine requirements; different browser groups become the full matrix. Renames include deletion/addition paths. Missing Git comparison information fails closed. Inspect a local selection with `node scripts/verification-scope.mjs pull_request README.md`, replacing paths with actual changes.
+
+The CI `Test and build` job always runs, including documentation-only PRs, so required checks do not disappear through path filtering. Main/manual checks retain all release gates. Only successful runs on main can configure/upload/deploy Pages; PR selection never authorizes publication. Manual runs on other branches check without publishing. Preserve T23's failure diagnostics and conditional PR cancellation. A policy-only local edit needs selector tests, documentation checks and workflow lint, without rerunning unchanged app suites.
 
 Production tests reuse preceding dist without rebuilding at `/` and `/rollmino/`. Build first. Never run concurrent Playwright invocations against the shared results directory. Seed physical face indices before startup and reset the test RNG before Start if tooling consumes it. Solve fixtures through public controls, without production cheats or mutable game test APIs.
 

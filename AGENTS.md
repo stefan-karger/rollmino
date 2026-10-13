@@ -23,7 +23,7 @@ Use original art; never publish official graphics or provenance assets. Correct 
 
 ## Verification and publication
 
-Follow the [verification policy](IMPLEMENTATION_PLAN.md#verification). Until T24 revises it, runtime/build edits require frozen installation, pure tests, strict build, five development projects, both production mounts and 62,208 independently checked answers. Docs-only edits require local-file/anchor/command consistency and `git diff --check`.
+Follow the single [verification policy](IMPLEMENTATION_PLAN.md#verification) and its conservative path selector for affected checks. Docs-only edits require consistency checks; app edits need pure/build and affected browser/artifact checks; model/oracle changes retain independent solving. Releases run the complete reduced native matrix, both artifact mounts and 62,208 independent answers. Local work also checks `git diff --check`.
 
 Build before production tests, which reuse dist. Run Playwright invocations sequentially. Executable checks here are the gate. Report emulation, synthetic cleanup and CSS reflow honestly; do not invent physical-device/pen/game/screen-reader passes or gates.
 
