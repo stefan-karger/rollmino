@@ -261,23 +261,30 @@ function committedState(game: Game): { occupied: bigint; used: number; selected:
   }
   return { occupied, used, selected };
 }
-const BY_CELL: Candidate[][] = Array.from({ length: 36 }, () => []);
-for (let i = 0; i < PIECE_IDS.length; i++) {
-  const id = PIECE_IDS[i];
-  ORIENTATIONS[id].forEach((shape, orientation) => {
-    const width = 1 + Math.max(...shape.map(([x]) => x));
-    const height = 1 + Math.max(...shape.map(([, y]) => y));
-    for (let y = 0; y <= 6 - height; y++) {
-      for (let x = 0; x <= 6 - width; x++) {
-        const cells = shape.map(([dx, dy]) => index(x + dx, y + dy));
-        const candidate = {
-          id, i, orientation, x, y,
-          mask: cellMask(cells), neighbors: neighborMask(cells),
-        };
-        for (const cell of cells) BY_CELL[cell].push(candidate);
+let solverCandidates: Candidate[][] | undefined;
+/** Solver-only data is built once on demand, never during normal game imports. */
+function candidatesByCell(): Candidate[][] {
+  if (solverCandidates) return solverCandidates;
+  const byCell: Candidate[][] = Array.from({ length: 36 }, () => []);
+  for (let i = 0; i < PIECE_IDS.length; i++) {
+    const id = PIECE_IDS[i];
+    ORIENTATIONS[id].forEach((shape, orientation) => {
+      const width = 1 + Math.max(...shape.map(([x]) => x));
+      const height = 1 + Math.max(...shape.map(([, y]) => y));
+      for (let y = 0; y <= 6 - height; y++) {
+        for (let x = 0; x <= 6 - width; x++) {
+          const cells = shape.map(([dx, dy]) => index(x + dx, y + dy));
+          const candidate = {
+            id, i, orientation, x, y,
+            mask: cellMask(cells), neighbors: neighborMask(cells),
+          };
+          for (const cell of cells) byCell[cell].push(candidate);
+        }
       }
-    }
-  });
+    });
+  }
+  solverCandidates = byCell;
+  return byCell;
 }
 const FULL = (1n << 36n) - 1n;
 const ALL_PIECES = (1 << PIECE_IDS.length) - 1;
@@ -290,6 +297,7 @@ export function solve(game: Game): Placement[] | null {
   if (!state) return null;
   const restricted = new Set(RESTRICTED[game.level]);
   const { occupied, used, selected } = state;
+  const byCell = candidatesByCell();
 
   function visit(mask: bigint, usedBits: number): boolean {
     if (mask === FULL) return usedBits === ALL_PIECES;
@@ -298,7 +306,7 @@ export function solve(game: Game): Placement[] | null {
     for (let cell = 0; cell < 36; cell++) {
       if ((mask & bit(cell)) !== 0n) continue;
       const valid: Candidate[] = [];
-      for (const p of BY_CELL[cell]) {
+      for (const p of byCell[cell]) {
         if ((usedBits & (1 << p.i)) !== 0 || (mask & p.mask) !== 0n) continue;
         if (restricted.has(p.id) && selected.some(other =>
           restricted.has(other.id) && (p.neighbors & other.mask) !== 0n)) continue;

@@ -18,7 +18,7 @@ P1 is next work, P2 is worthwhile follow-up, and P3 is optional cleanup. Small c
 | done | [T18. Reduce repeated browser-test executions](18-browser-test-coverage.md) | P1 | Faster checks with useful platform coverage | Medium | [T15](15-cancelled-drag-click-suppression.md), [T16](16-tray-orientation-geometry.md), [T19](19-meaningful-test-assertions.md) |
 | done | [T19. Repair weak and brittle test assertions](19-meaningful-test-assertions.md) | P2 | Better regressions and fewer incidental failures | Small | None |
 | done | [T20. Show completion feedback near the board](20-visible-completion-feedback.md) | P2 | Clear finished state on phones | Small | None |
-| todo | [T21. Remove solver initialization from normal play](21-solver-initialization.md) | P2 | Avoid unused 625-candidate construction | Small | None |
+| done | [T21. Remove solver initialization from normal play](21-solver-initialization.md) | P2 | Avoid unused 625-candidate construction | Small | None |
 | todo | [T22. Limit rendering to the state that changed](22-rendering-responsibilities.md) | P2 | Less unrelated DOM work and clearer ownership | Medium | [T15](15-cancelled-drag-click-suppression.md), [T16](16-tray-orientation-geometry.md) |
 | todo | [T23. Retain CI diagnostics and cancel stale PR checks](23-ci-diagnostics-concurrency.md) | P2 | Easier debugging and less wasted CI work | Small | None |
 | todo | [T24. Scope verification to changes and releases](24-verification-policy.md) | P2 | Avoid release checks for unrelated edits | Medium | [T17](17-maintenance-documentation.md), [T18](18-browser-test-coverage.md) |
