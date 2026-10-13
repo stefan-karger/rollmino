@@ -40,12 +40,12 @@ Use fixed timestamps and an injected RNG, never real-duration waits. Verify all 
 
 ## Done when
 
-- [ ] Phase transitions match the plan, including hidden ready and zero draws on practice Start.
-- [ ] Successful changes alone affect history; Undo restores exact placements through the entire active run.
-- [ ] Elapsed values include time without display callbacks and freeze once on completion.
-- [ ] Completion is terminal and transition data supports one later record consideration.
-- [ ] No session/layout/timer/history persistence or UI dependency is introduced; pure tests and strict checking pass.
+- [x] Phase transitions match the plan, including hidden ready and zero draws on practice Start.
+- [x] Successful changes alone affect history; Undo restores exact placements through the entire active run.
+- [x] Elapsed values include time without display callbacks and freeze once on completion.
+- [x] Completion is terminal and transition data supports one later record consideration.
+- [x] No session/layout/timer/history persistence or UI dependency is introduced; pure tests and strict checking pass.
 
 ## Completion evidence
 
-Not yet recorded. Add the actual changes, command results, checks and code reference here before setting this ticket to `done` in the tracker. Follow the [completion rules](README.md#working-and-completing-tickets).
+2026-10-13: Added `src/session.ts` with pure hidden-ready, ranked/practice Start, validated immutable transactions, unlimited Undo, terminal completion, accepted fresh/replay transitions and wall-clock formatting. `tests/session.test.mjs` covers all three fixture completions, 150-action Undo, no-ops, proposal copying, replay RNG exclusion and fixed-time background/confirmation intervals. `pnpm run test:state` passed 6 tests; `pnpm test` passed 53 tests; `pnpm run typecheck` passed on Windows with Node 24.15.0 and pnpm 12.10.0. Confirmation UI remains T07; no storage/DOM dependency was added.
