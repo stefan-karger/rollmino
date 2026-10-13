@@ -43,12 +43,14 @@ Test practice completion, coincidental fresh repeats, level-isolated lists, relo
 
 ## Done when
 
-- [ ] The selected difficulty displays only its best five time/date entries.
-- [ ] Ranked finish is considered once; practice is never inserted and fair repeat rolls remain eligible.
-- [ ] Confirmation/clearing preserves active state/time and other level/origin data.
-- [ ] Storage faults show a usable fallback without preventing play/completion.
-- [ ] Reload retains successful records only; integration tests pass in their applicable browser projects.
+- [x] The selected difficulty displays only its best five time/date entries.
+- [x] Ranked finish is considered once; practice is never inserted and fair repeat rolls remain eligible.
+- [x] Confirmation/clearing preserves active state/time and other level/origin data.
+- [x] Storage faults show a usable fallback without preventing play/completion.
+- [x] Reload retains successful records only; integration tests pass in their applicable browser projects.
 
 ## Completion evidence
 
-Not yet recorded. Add the actual changes, command results, checks and code reference here before setting this ticket to `done` in the tracker. Follow the [completion rules](README.md#working-and-completing-tickets).
+2026-10-13 work evidence, incomplete: Added selected-level record time/date UI, safe localStorage acquisition, ranked completion insertion on the single running-to-completed transition, confirmed clearing and notices. Added eight browser cases covering ranking, practice, persistence, clearing and getter/get/set/corrupt faults. `pnpm run test:records` passed 6 tests; `pnpm run test:state` passed 6 tests; `pnpm test` passed 59 tests; `pnpm run build` passed strict checking and Vite build. The five-project records suite did not pass: WebKit clock setup exposed a pause-at-install-time race, corrected to pause at a future timestamp; that correction still needs a clean rerun. Further cases failed in `browserContext.close` with `ENOSPC: no space left on device, write`. C: had 35,262,464 bytes free after stopping the run. Stopped the ticket loop at this concrete environment blocker. Free space on C: or relocate browser temporary files and test artifacts to a drive with space, then rerun all T08 verification and review the acceptance checklist before marking done/committing. T08 implementation remains uncommitted; T09 and later tickets have not started. Environment: Windows, Node 24.15.0, pnpm 12.10.0, Playwright 1.64.0.
+
+Resumed and completed on 2026-10-13 after the user freed disk space. C: had about 8 GiB free. The corrected clock setup pauses at a fixed future timestamp; multi-completion record cases have a 60-second allowance for the slower Windows browser engines. All required checks passed: `pnpm run test:records` 6 tests, `pnpm run test:state` 6 tests, `pnpm test` 59 tests, strict `pnpm run build`, and `pnpm run test:e2e e2e/records.spec.ts` all 40 cases across desktop Chromium/Firefox/WebKit and mobile Chromium/WebKit in 2.4 minutes. Verified ranked single insertion, practice exclusion, fair repeat eligibility, top-five millisecond/tie ordering, reload retention, active clearing with continuous timing/history, selected-level and sentinel-key preservation, completed clearing without resaving, and getter/get/set/corrupt storage recovery. Prior disk/clock failures above are historical failed attempts, superseded by this complete rerun. No physical-device or screen-reader audit is claimed.

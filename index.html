@@ -29,6 +29,14 @@
       </section>
       <p id="status" role="status" aria-live="polite" aria-atomic="true">Press Start to reveal your puzzle.</p>
       <div class="run-actions"><button id="new-game">New game</button><button id="replay">Replay</button></div>
+      <section class="records" aria-labelledby="records-title">
+        <h2 id="records-title">Personal bests</h2>
+        <p id="records-empty">No completed ranked runs for this level yet.</p>
+        <ol id="records-list"></ol>
+        <p id="storage-notice"></p>
+        <button id="clear-records">Clear records</button>
+        <p class="help">Best five for this level, saved in this browser. Records stay on your device.</p>
+      </section>
       <p class="help">Tap a piece, then a cell. Rotate clockwise or flip left/right. Keyboard: arrows, R, F, Delete and Escape.</p>
     </main>
     <dialog id="confirm-dialog" aria-labelledby="confirm-title">

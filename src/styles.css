@@ -39,6 +39,13 @@ button:focus-visible, select:focus-visible { outline: 3px solid #f3da85; outline
 #status { min-height: 2.9em; font-size: .9rem; }
 .run-actions { display: flex; gap: 8px; }
 .help { font-size: .8rem; }
+.records { margin-top: 24px; border-top: 1px solid #445367; padding-top: 16px; }
+.records h2 { margin: 0; font-size: 1.1rem; }
+.records p { font-size: .8rem; }
+#records-list { padding-left: 24px; }
+#records-list li { padding: 6px 0; }
+#records-list li span:first-child { display: inline-block; min-width: 115px; font-variant-numeric: tabular-nums; }
+#records-list li span:last-child { font-size: .85rem; color: #c0ccda; }
 dialog { max-width: min(380px, calc(100% - 32px)); padding: 24px; color: #e8edf3; background: #202c3b; border: 1px solid #607187; border-radius: 10px; }
 dialog::backdrop { background: #0009; }
 dialog h2 { margin: 0; font-size: 1.2rem; }

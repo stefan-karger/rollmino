@@ -3,6 +3,7 @@ import { ORIENTATIONS, PIECE_IDS, RESTRICTED, canPlace, firstAnchor, transformPi
 import type { Cell, Level, PieceId, Placement } from '../engine/core.ts';
 import { elapsed, formatTime, freshSession, place, remove, replay, start, undo } from './session.ts';
 import type { Session } from './session.ts';
+import { Records } from './records.ts';
 
 function element<T extends HTMLElement>(id: string): T {
   const found = document.getElementById(id);
@@ -18,6 +19,10 @@ const startButton = element<HTMLButtonElement>('start');
 const dialog = element<HTMLDialogElement>('confirm-dialog');
 const status = element('status');
 const timer = element('timer');
+let storage: Storage | undefined;
+try { storage = window.localStorage; } catch { /* The records module supplies the page-only notice. */ }
+const records = new Records(storage);
+const dateFormat = new Intl.DateTimeFormat('en', { year: 'numeric', month: 'short', day: 'numeric' });
 const colors: Record<PieceId, string> = {
   navy: '#4c78af', brown: '#b58a67', orange: '#ff9b48', purple: '#b891ee',
   grey: '#b7c2cc', green: '#76bc83', cyan: '#65c8df', yellow: '#efd46e', red: '#ec7c7f',
@@ -146,6 +151,19 @@ function render(): void {
   for (const id of ['rotate', 'flip', 'remove']) element<HTMLButtonElement>(id).disabled = !active || !draft;
   element<HTMLButtonElement>('undo').disabled = session.phase !== 'running' || session.history.length === 0;
   element<HTMLButtonElement>('replay').disabled = session.phase === 'ready';
+  const list = element('records-list');
+  list.replaceChildren(...records.lists[session.level].map(record => {
+    const item = document.createElement('li');
+    const time = document.createElement('span');
+    time.textContent = formatTime(record.elapsedMs);
+    const date = document.createElement('span');
+    date.textContent = dateFormat.format(record.finishedAt);
+    item.append(time, date);
+    return item;
+  }));
+  element('records-empty').hidden = records.lists[session.level].length > 0;
+  element('storage-notice').textContent = records.notice;
+  element('storage-notice').hidden = !records.notice;
   updateTimer();
 }
 
@@ -162,6 +180,9 @@ function acceptPlacement(p: Placement): void {
     announce(session.phase === 'running' && canPlace(session.game, p) ? 'Piece is already there.' : 'Cannot place here. Try another cell or transform.');
   } else {
     draft = undefined;
+    if (previous.phase === 'running' && session.phase === 'completed' && session.mode === 'ranked') {
+      records.insert(session.level, { elapsedMs: session.elapsedMs, finishedAt: session.finishedAt });
+    }
     announce(session.phase === 'completed' ? `Completed in ${formatTime(session.elapsedMs)}.` : `${names[p.id]} placed.`);
   }
   render();
@@ -200,8 +221,9 @@ function enterReady(next: Session): void {
   render();
   startButton.focus();
 }
-function confirmAction(text: string, trigger: HTMLElement, accept: () => void): void {
+function confirmAction(text: string, trigger: HTMLElement, accept: () => void, title = 'Abandon this run?'): void {
   pending = { trigger, accept };
+  element('confirm-title').textContent = title;
   element('confirm-text').textContent = text;
   dialog.showModal();
 }
@@ -237,6 +259,15 @@ element('undo').addEventListener('click', () => {
 });
 element('new-game').addEventListener('click', event => transition('Start a fresh game and abandon this unfinished run?', event.currentTarget as HTMLElement, () => freshSession(session.level)));
 element('replay').addEventListener('click', event => transition('Replay this layout as practice and abandon this unfinished run?', event.currentTarget as HTMLElement, () => replay(session)));
+element('clear-records').addEventListener('click', event => {
+  const trigger = event.currentTarget as HTMLElement;
+  confirmAction(`Clear the saved ${session.level[0] + session.level.slice(1).toLowerCase()} records in this browser?`, trigger, () => {
+    records.clear(session.level);
+    announce('Records cleared for this level.');
+    render();
+    trigger.focus();
+  }, 'Clear records?');
+});
 levelControl.addEventListener('change', () => {
   const chosen = levelControl.value as Level;
   if (chosen === session.level) return;

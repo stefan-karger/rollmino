@@ -22,7 +22,7 @@ test('loads the Rollmino entry and its styles without page or asset errors', asy
 
 for (const fixture of fixtures) {
   test(`completes ${fixture.id} through public tap controls and freezes`, async ({ page }) => {
-    await page.clock.install({ time: new Date('2026-10-13T10:00:00Z') });
+    await page.clock.install({ time: new Date('2026-10-13T09:59:50Z') });
     await page.clock.pauseAt(new Date('2026-10-13T10:00:00Z'));
     await openGame(page, fixture);
     await page.clock.fastForward(65432);
@@ -43,7 +43,7 @@ for (const fixture of fixtures) {
 }
 
 test('active confirmations preserve time on cancel, replay is hidden, and level changes are fresh', async ({ page }) => {
-  await page.clock.install({ time: new Date('2026-10-13T10:00:00Z') });
+  await page.clock.install({ time: new Date('2026-10-13T09:59:50Z') });
   await page.clock.pauseAt(new Date('2026-10-13T10:00:00Z'));
   await seed(page, [fixtures[0].dice, fixtures[1].dice]);
   await page.goto('./');
