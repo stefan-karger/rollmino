@@ -34,7 +34,7 @@ Compare implementations by how easily someone can locate the relevant behavior, 
 
 When the alternatives are otherwise comparable, choose fewer concepts, layers, public APIs and dependencies, with clearer control flow and less speculative flexibility. Apply judgment. Current requirements may justify additional complexity.
 
-For this game, pure rules, transactional placement validation, accessible non-drag input and tests of complete board coverage serve real requirements. Generic game engines, configurable board sizes and unused hint infrastructure do not. Follow the agreed stack in [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md). Its file tree names meaningful responsibilities; adjust module boundaries when actual code becomes easier to maintain under these rules.
+For this game, pure rules, transactional placement validation, accessible non-drag input and tests of complete board coverage serve real requirements. Generic game engines, configurable board sizes and unused hint infrastructure do not. Follow the agreed stack in [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md). The [code guide](README.md#code-guide) names current responsibilities; adjust module boundaries when actual code becomes easier to maintain under these rules.
 
 ## Source and project-specific scope
 

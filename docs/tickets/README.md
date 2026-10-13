@@ -23,7 +23,7 @@ P1 is next work, P2 is worthwhile follow-up, and P3 is optional cleanup. Small c
 | done | [T23. Retain CI diagnostics and cancel stale PR checks](23-ci-diagnostics-concurrency.md) | P2 | Easier debugging and less wasted CI work | Small | None |
 | done | [T24. Scope verification to changes and releases](24-verification-policy.md) | P2 | Avoid release checks for unrelated edits | Medium | [T17](17-maintenance-documentation.md), [T18](18-browser-test-coverage.md) |
 | done | [T25. Consolidate overlapping pure tests](25-pure-test-overlap.md) | P3 | Clearer tests with preserved coverage | Small | None |
-| todo | [T26. Remove obsolete research/provenance duplicates](26-historical-material.md) | P3 | Smaller tree with preserved source evidence | Small to medium | [T17](17-maintenance-documentation.md) |
+| done | [T26. Remove obsolete research/provenance duplicates](26-historical-material.md) | P3 | Smaller tree with preserved source evidence | Small to medium | [T17](17-maintenance-documentation.md) |
 
 ## Working rules
 

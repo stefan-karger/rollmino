@@ -17,11 +17,17 @@ Verify archived file retrieval, local files/anchors, documented commands and git
 
 ## Acceptance
 
-- [ ] Obsolete material leaves everyday navigation and remains retrievable by commit.
-- [ ] Source evidence, regression history and independent verification limits remain concise and accessible.
-- [ ] Canonical code/fixtures/tests and accepted behavior are preserved.
-- [ ] Evidence records removed paths, archive reference and actual size reduction.
+- [x] Obsolete material leaves everyday navigation and remains retrievable by commit.
+- [x] Source evidence, regression history and independent verification limits remain concise and accessible.
+- [x] Canonical code/fixtures/tests and accepted behavior are preserved.
+- [x] Evidence records removed paths, archive reference and actual size reduction.
 
 ## Completion evidence
 
-Add dated implementation and verification results before marking the tracker done.
+2026-10-13. Removed PLAN.md, docs/RESEARCH.md, docs/REFERENCE-VERIFICATION.md, SHA256SUMS.txt, the three original-handoff files and seven research-archive/experiments files. Before deleting, each physical file's Git blob hash matched archive commit `46880c4e32f5cdb9a243133b580893cbb6bb29d9`, and every archived blob was actually retrieved. The old TEST-RESULTS.md was also verified/retrieved before trimming. The two copied engines have identical SHA-256 hashes, as do the two verifier copies.
+
+Resolved every target under the intended workspace before deletion. Removed only named committed files, then removed the verified empty directories without recursive deletion. No unarchived file was removed. The deletion diff contains only the 14 scoped historical/provenance paths; canonical engine/src/fixtures/tests/scripts/configuration are preserved.
+
+Retained the contract's exact source/model tables/links, known validation regressions, independent verification method/limits and original-assets policy. The results document now separates recent performed checks, dated V1 integration/publication and honest emulation/measurement limits. Replaced retention instructions and checksum wording with [one historical archive reference](../TEST-RESULTS.md#historical-archive). Original interview documents removed in T17 remain in that commit's ancestry. No experimental result was relabeled as maintained, no new archive copy or feature ticket was created, and current setup remains complete.
+
+Across removed files and the trimmed results document, 2,338 lines/173,949 bytes became 47 lines/7,034 bytes, a reduction of 2,291 lines and 166,915 bytes in that material. Documentation checks passed all 18 remaining maintained Markdown files and their local files/anchors/script names; `git diff --check` passed. Runtime/browser/hardware gates were not repeated for this documentation/provenance-only change under T24. The last runtime release evidence remains T22, with T25's 68 passing pure tests.

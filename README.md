@@ -56,4 +56,4 @@ Public [stefan-karger/rollmino](https://github.com/stefan-karger/rollmino) uses 
 
 [Dated V1 release](IMPLEMENTATION_PLAN.md#static-hosting-and-release-reference) and [local/live evidence](docs/TEST-RESULTS.md) distinguish local checks from publication. New deployment claims require successful hosting and live checks. Completed V1 tickets remain in [Git history](https://github.com/stefan-karger/rollmino/tree/61454115b4cf1310ec0f72e50b3fc5e0ec38dd03/docs/tickets).
 
-`PLAN.md`, `docs/RESEARCH.md`, `docs/REFERENCE-VERIFICATION.md`, older results and provenance directories are historical. They do not choose features/stack/gates. T26 owns their cleanup.
+Superseded research/provenance and setup narratives remain in the [historical Git archive](docs/TEST-RESULTS.md#historical-archive). They do not choose features, stack or release gates. Only the canonical engine/fixtures/tests remain active; copied archives and the initial checksum manifest no longer occupy the working tree.

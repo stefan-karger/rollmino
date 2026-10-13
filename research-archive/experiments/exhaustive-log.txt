@@ -1,7 +1,0 @@
-Checked 10000 / 62208 in 3.8 sec; wizard failures: 0
-Checked 20000 / 62208 in 8.0 sec; wizard failures: 0
-Checked 30000 / 62208 in 12.7 sec; wizard failures: 0
-Checked 40000 / 62208 in 16.8 sec; wizard failures: 0
-Checked 50000 / 62208 in 21.5 sec; wizard failures: 0
-Checked 60000 / 62208 in 26.3 sec; wizard failures: 0
-{"checked":62208,"seconds":27.34382497,"failures":{"WIZARD":0,"MASTER":0,"EXPERT":0,"JUNIOR":0,"STARTER":0}}

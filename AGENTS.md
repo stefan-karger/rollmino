@@ -19,7 +19,7 @@ Choose the first todo ticket whose blockers are done. Keep status only in the tr
 
 Use TypeScript/Vite/SVG/CSS/native HTML, Node tests and Playwright. Follow KISS/YAGNI for readable cohesive responsibilities, not mechanical file/dependency minimums. Use pinned pnpm/frozen installs and only `pnpm-lock.yaml`. Avoid backend/auth/generic engines/stores/speculative APIs.
 
-Use original art; never publish official graphics or provenance assets. Correct verified discrepancies with model/tests/evidence. Provenance/checksums remain historical until T26's authorized cleanup.
+Use original art; never publish official graphics or provenance assets. Correct verified discrepancies with model/tests/evidence. Superseded provenance/checksums belong in the [Git archive](docs/TEST-RESULTS.md#historical-archive), without duplicate working-tree engines or experiment directories.
 
 ## Verification and publication
 
