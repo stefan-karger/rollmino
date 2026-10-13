@@ -6,7 +6,7 @@ The current integrated V1 evidence appears first. Later sections preserve the re
 
 ## Integrated V1 local release verification
 
-Executed on 2026-10-13 in this Windows workspace with Node 24.15.0, pnpm 12.10.0, TypeScript 5.8.3, Vite 8.3.4, Playwright 1.64.0 and axe Playwright 4.13.0. The bundled/tested browsers are Chromium 156.0.8078.4, Firefox 157.0 and WebKit 27.2. [T11's ordered release run](tickets/11-production-artifact-verification.md#completion-evidence) and [T12's workflow review](tickets/12-pages-workflow.md#completion-evidence) provide the detailed evidence.
+Executed on 2026-10-13 in this Windows workspace with Node 24.15.0, pnpm 12.10.0, TypeScript 5.8.3, Vite 8.3.4, Playwright 1.64.0 and axe Playwright 4.13.0. The bundled/tested browsers are Chromium 156.0.8078.4, Firefox 157.0 and WebKit 27.2. [T11's ordered release run](https://github.com/stefan-karger/rollmino/blob/61454115b4cf1310ec0f72e50b3fc5e0ec38dd03/docs/tickets/11-production-artifact-verification.md#completion-evidence) and [T12's workflow review](https://github.com/stefan-karger/rollmino/blob/61454115b4cf1310ec0f72e50b3fc5e0ec38dd03/docs/tickets/12-pages-workflow.md#completion-evidence) provide the detailed evidence.
 
 | Command/check | Actual result |
 | --- | --- |

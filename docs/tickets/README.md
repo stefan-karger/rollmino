@@ -1,51 +1,35 @@
-# Rollmino ticket tracker
+# Rollmino follow-up tickets
 
-This is the single source of ticket status. [IMPLEMENTATION_PLAN.md](../../IMPLEMENTATION_PLAN.md) remains the product specification; tickets divide its execution without changing the agreed scope. Each linked ticket contains its implementation steps, files, blockers, tests and definition of done.
+This is the only ticket status tracker. The user requested this batch on 2026-10-13 after the completed V1 review. Creating tickets does not implement their changes. Preserve the accepted contract in [IMPLEMENTATION_PLAN.md](../../IMPLEMENTATION_PLAN.md) and follow [CODING_GUIDELINES.md](../../CODING_GUIDELINES.md).
 
-## Pick the next task
+Completed T00 through T14 were removed from the working tree. Their instructions/evidence remain in the [V1 Git snapshot](https://github.com/stefan-karger/rollmino/tree/61454115b4cf1310ec0f72e50b3fc5e0ec38dd03/docs/tickets). [Integrated verification](../TEST-RESULTS.md#integrated-v1-local-release-verification) and [public release evidence](../TEST-RESULTS.md#public-pages-release-verification) remain current references.
 
-Read the table top to bottom. Pick the first `todo` ticket whose listed blockers are all `done`. Start with T00 for repository/local baseline setup. T01, T03 and T04 remain independent code branches; they can continue on the local baseline if T00's GitHub part is blocked. Check `doing` rows before claiming work. Actual readiness follows the table, not a separately maintained list.
+## Review basis
 
-| State | Ticket | Blockers | Quick completion check / work note |
-| --- | --- | --- | --- |
-| `done` | [T00. Create the GitHub repository and synchronize the local workspace](00-repository-setup.md) | None | Public repo/description and main upstream verified on 2026-10-12; baseline 9188f0b |
-| `done` | [T01. Harden rules and committed-state validation](01-rule-validation.md) | None | 30 fast tests, strict check and 62,208-board existence sweep passed; [evidence](01-rule-validation.md#completion-evidence) |
-| `done` | [T02. Validate every exhaustive solver answer independently](02-independent-solution-verification.md) | [T01](01-rule-validation.md) | 44 fast tests and 62,208 independently checked Wizard answers passed; [evidence](02-independent-solution-verification.md#completion-evidence) |
-| `done` | [T03. Establish the strict web build and browser test setup](03-web-tooling.md) | None | Clean install, 44 pure tests, strict build and all five browser startup cases passed; [evidence](03-web-tooling.md#completion-evidence) |
-| `done` | [T04. Implement geometric transforms with occupied-cell anchors](04-geometric-transforms.md) | None | 47 fast tests and strict check passed; [evidence](04-geometric-transforms.md#completion-evidence) |
-| `done` | [T05. Implement pure run lifecycle, wall-clock timing and Undo](05-session-timing-undo.md) | [T01](01-rule-validation.md), [T03](03-web-tooling.md) | 53 fast tests and strict check passed; [evidence](05-session-timing-undo.md#completion-evidence) |
-| `done` | [T06. Implement top-five ranking and resilient local storage](06-record-ranking-storage.md) | [T03](03-web-tooling.md) | 59 fast tests and strict check passed; [evidence](06-record-ranking-storage.md#completion-evidence) |
-| `done` | [T07. Deliver the complete timed game through tap and keyboard](07-playable-tap-keyboard-game.md) | [T02](02-independent-solution-verification.md), [T04](04-geometric-transforms.md), [T05](05-session-timing-undo.md) | 59 pure tests, build and 20 Chromium browser cases passed; [evidence](07-playable-tap-keyboard-game.md#completion-evidence) |
-| `done` | [T08. Connect ranked completion to personal records](08-records-ui-integration.md) | [T06](06-record-ranking-storage.md), [T07](07-playable-tap-keyboard-game.md) | 59 pure tests, build and all 40 record browser cases passed; [evidence](08-records-ui-integration.md#completion-evidence) |
-| `done` | [T09. Add transactional touch, mouse and pen dragging](09-transactional-pointer-input.md) | [T07](07-playable-tap-keyboard-game.md) | 59 pure tests, build and 92 applicable input cases passed; [evidence](09-transactional-pointer-input.md#completion-evidence) |
-| `done` | [T10. Finish phone layout, accessibility and browser compatibility](10-responsive-accessibility.md) | [T08](08-records-ui-integration.md), [T09](09-transactional-pointer-input.md) | 59 pure tests, build and 207 applicable browser cases passed; [evidence](10-responsive-accessibility.md#completion-evidence) |
-| `done` | [T11. Test the production artifact at root and Pages subpath](11-production-artifact-verification.md) | [T10](10-responsive-accessibility.md) | Full release sequence passed, including 10 artifact cases and 62,208 answers; [evidence](11-production-artifact-verification.md#completion-evidence) |
-| `done` | [T12. Add the checked-artifact GitHub Pages workflow](12-pages-workflow.md) | [T11](11-production-artifact-verification.md) | Actionlint and workflow review passed; [evidence](12-pages-workflow.md#completion-evidence) |
-| `done` | [T13. Close local release gates and update the implementation handoff](13-release-handoff.md) | [T12](12-pages-workflow.md) | Integrated gates mapped, clean contributor setup and docs checks passed; [evidence](13-release-handoff.md#completion-evidence) |
-| `done` | [T14. Deploy GitHub Pages and verify the live site](14-public-pages-deployment.md) | [T00](00-repository-setup.md), [T13](13-release-handoff.md) | Published and smoke-checked live; [run](https://github.com/stefan-karger/rollmino/actions/runs/38363711259) / [evidence](14-public-pages-deployment.md#completion-evidence) |
+Review of 6145411 passed 59 pure tests, strict build, 207 applicable browser cases with 8 intentional skips, 10 production cases and all 62,208 independent Wizard answer checks. Additional probes found the two bugs despite those passes. Tickets contain their own reproductions/evidence; the temporary review report is not a prerequisite.
 
-## Working and completing tickets
+P1 is next work, P2 is worthwhile follow-up, and P3 is optional cleanup. Small changes are local edits; medium changes affect several files or maintenance policy. Choose the first todo row whose blockers are done.
 
-1. Use `todo`, `doing`, `done` or `blocked` in the State cell. All tickets start as `todo`; existing reference tests do not complete the planned repairs/features. Dependency-waiting rows stay `todo`; use `blocked` for a concrete obstacle and record its cause/next action in the work-note cell.
-2. Before work, read the ticket, finished blocker outputs and [coding guidelines](../../CODING_GUIDELINES.md). Set its row to `doing`; add an owner only when coordinating concurrent work. Current pure checks need Node 22.16+; Node 24 is the planned development runtime. Use `pnpm install --frozen-lockfile` for existing dependencies. T03 adds web tooling; other new commands become runnable in the ticket that creates their files.
-3. Implement only that ticket's scope, keeping a playable result where its outcome requires one. Add meaningful tests with the feature. Blockers describe functional prerequisites; coordinate shared-file edits as described below.
-4. Check every acceptance item and add completion evidence at the bottom of the ticket: date, changed behavior/files, actual commands/results, relevant runtime/browser versions, manual/emulated checks and any limitation. Link existing result/artifact/code references when available. Planned checks, skipped general failures and unavailable live hosting are not passes.
-5. Mark the acceptance checklist, then replace the central State with `done`. The ticket's evidence/checklist supports review; it does not create a second status field. Keep a short result/reference in the work-note cell if useful.
-6. Rescan `todo` rows using their blockers to find the next work. If a completed prerequisite is reopened, reassess dependent completion evidence and reopen affected rows. Record product changes in the plan/decision record rather than silently changing a ticket.
+| State | Ticket | Priority | Impact | Size | Blockers / work note |
+| --- | --- | --- | --- | --- | --- |
+| done | [T15. Fix click suppression after cancelled dragging](15-cancelled-drag-click-suppression.md) | P1 | Next Start can require two clicks | Small | 212 browser cases, 59 pure tests, build, ten artifact cases and exhaustive checks passed; [evidence](15-cancelled-drag-click-suppression.md#completion-evidence) |
+| todo | [T16. Fit every tray orientation and its drag regions](16-tray-orientation-geometry.md) | P1 | Grey clipping and invisible drag source | Small to medium | None |
+| todo | [T17. Consolidate current maintenance documentation](17-maintenance-documentation.md) | P1 | Less repeated reading and obsolete guidance | Medium | None |
+| todo | [T18. Reduce repeated browser-test executions](18-browser-test-coverage.md) | P1 | Faster checks with useful platform coverage | Medium | [T15](15-cancelled-drag-click-suppression.md), [T16](16-tray-orientation-geometry.md), [T19](19-meaningful-test-assertions.md) |
+| todo | [T19. Repair weak and brittle test assertions](19-meaningful-test-assertions.md) | P2 | Better regressions and fewer incidental failures | Small | None |
+| todo | [T20. Show completion feedback near the board](20-visible-completion-feedback.md) | P2 | Clear finished state on phones | Small | None |
+| todo | [T21. Remove solver initialization from normal play](21-solver-initialization.md) | P2 | Avoid unused 625-candidate construction | Small | None |
+| todo | [T22. Limit rendering to the state that changed](22-rendering-responsibilities.md) | P2 | Less unrelated DOM work and clearer ownership | Medium | [T15](15-cancelled-drag-click-suppression.md), [T16](16-tray-orientation-geometry.md) |
+| todo | [T23. Retain CI diagnostics and cancel stale PR checks](23-ci-diagnostics-concurrency.md) | P2 | Easier debugging and less wasted CI work | Small | None |
+| todo | [T24. Scope verification to changes and releases](24-verification-policy.md) | P2 | Avoid release checks for unrelated edits | Medium | [T17](17-maintenance-documentation.md), [T18](18-browser-test-coverage.md) |
+| todo | [T25. Consolidate overlapping pure tests](25-pure-test-overlap.md) | P3 | Clearer tests with preserved coverage | Small | None |
+| todo | [T26. Remove obsolete research/provenance duplicates](26-historical-material.md) | P3 | Smaller tree with preserved source evidence | Small to medium | [T17](17-maintenance-documentation.md) |
 
-## Shared files and milestone coverage
+## Working rules
 
-T00 owns Git/repository setup; establish its local baseline before code changes and coordinate Git operations with active work. T01/T04 edit the core; tooling and feature tickets edit package scripts; T07 through T10 edit app/CSS. Sequence or coordinate those edits, preserve completed work and avoid artificial architecture just to separate tickets.
-
-| Original plan slice | Tickets |
-| --- | --- |
-| 0. Repository baseline and trustworthy reference | T00, T01, T02 |
-| 1. First complete timed non-drag game | T03, T04, T05, T07 |
-| 2. Personal records | T06, T08 |
-| 3. Transactional dragging | T09 |
-| 4. Responsive/accessibility finish | T10 |
-| 5. Artifact and public release | T11, T12, T13, T14 |
-
-Tests executable here are the release gate. Physical phones/game sets and screen-reader sign-off are not prerequisites. Report emulation and unperformed checks honestly. Publication is separate from local readiness: T13 closes local gates; T14 needs actual successful hosting evidence.
-
-Edit this table and the relevant ticket evidence directly.
+1. Read the ticket, completed blocker evidence and current contract. Set only this table's State to doing, done or blocked; dependency-waiting tickets stay todo.
+2. Implement the scoped change with meaningful checks. Tickets give focused checks; the current release policy applies until T24 replaces it. Build before production tests, which reuse that artifact.
+3. Add dated completion evidence with changed behavior, actual commands/results and limitations before checking acceptance items and marking the row done. Record actual reduced counts/timings.
+4. Preserve committed play, geometric transforms/anchors, full input/timing/Undo, practice separation, terminal completion and resilient records. Keep literal model regressions, independent oracle constants and exhaustive verification.
+5. Coordinate shared files directly: T15/T16/T20/T22 touch app input/rendering; T18/T19/T25 touch tests; T23/T24 touch CI. T17 updates all current ticket references if it replaces specification paths. Shared-file overlap alone is not a blocker.
+6. Policy/archival revisions belong to their named tickets. Until implemented, existing instructions remain in force. Preserve source/rights and emulation limits concisely and report only performed checks.

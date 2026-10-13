@@ -59,4 +59,4 @@ Build includes strict type checking. Production tests reuse that exact `dist/`; 
 
 Pass requires the agreed model, transaction/lifecycle/record behavior, complete non-drag play, native mouse and emulated touch checks, responsive/accessibility cases, and static artifact readiness. No physical-phone, physical-game or screen-reader sign-off is a hidden gate. Emulation does not claim those results, or prove low-end phone performance/human difficulty.
 
-T12 validated the Pages workflow locally. T14 records the successful hosted checks/deployment and live smoke check. Future publication claims still require a successful checked-artifact run and actual live verification; local readiness alone does not establish a new hosting result.
+[Verification results](TEST-RESULTS.md) record local workflow validation and the successful hosted checks/deployment and live smoke check. Future publication claims still require a successful checked-artifact run and actual live verification; local readiness alone does not establish a new hosting result.

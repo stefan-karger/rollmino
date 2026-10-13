@@ -2,7 +2,7 @@
 
 Status: agreed on 2026-10-12. [IMPLEMENTATION_PLAN.md](../IMPLEMENTATION_PLAN.md) is the full current specification. [DECISIONS.md](DECISIONS.md) records the user's answers.
 
-The V1 journey below is implemented and published at [Rollmino](https://stefan-karger.github.io/rollmino/). [Current checks and limits](TEST-RESULTS.md#integrated-v1-local-release-verification) distinguish automated emulation from hardware testing. [T14](tickets/14-public-pages-deployment.md#completion-evidence) records the successful checked-artifact deployment and live verification.
+The V1 journey below is implemented and published at [Rollmino](https://stefan-karger.github.io/rollmino/). [Current checks and limits](TEST-RESULTS.md#integrated-v1-local-release-verification) distinguish automated emulation from hardware testing. [Public release evidence](TEST-RESULTS.md#public-pages-release-verification) records the successful checked-artifact deployment and live verification.
 
 ## Required journey
 

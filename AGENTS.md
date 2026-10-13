@@ -4,9 +4,9 @@
 
 The user confirmed the complete V1 contract on 2026-10-12. [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) is the current agreed specification. The requirements interview is closed; [docs/DECISIONS.md](docs/DECISIONS.md) records the answers. `PLAN.md` is historical analysis, not an alternative active specification.
 
-When asked to implement, pick ready work from [docs/tickets/README.md](docs/tickets/README.md). The tickets divide the agreed plan's slices into scoped tasks with blockers, tests and completion criteria. Keep status only in that central tracker and record evidence in the ticket before marking it done. Do not reopen technology/product decisions without a concrete conflict. Do not implement the app merely because a planning/ticket-writing request or the reference engine exists. This handoff's planning work is complete.
+When asked to implement, pick ready work from [docs/tickets/README.md](docs/tickets/README.md). The active tickets scope the post-V1 review findings with priorities, blockers, tests and completion criteria. Keep status only in that central tracker and record evidence in the ticket before marking it done. Do not reopen technology/product decisions without a concrete conflict. Do not implement the app merely because a planning/ticket-writing request or the reference engine exists. The completed V1 ticket batch remains in Git history; the tracker now owns follow-up work.
 
-The V1 app, browser/artifact checks and Pages workflow are implemented and [published](https://stefan-karger.github.io/rollmino/). Read [current integrated evidence](docs/TEST-RESULTS.md#integrated-v1-local-release-verification), T14's hosting evidence and the tracker before choosing work; do not repeat completed slices. Further changes require a current user request and must preserve the accepted contract.
+The V1 app, browser/artifact checks and Pages workflow are implemented and [published](https://stefan-karger.github.io/rollmino/). Read [current integrated evidence](docs/TEST-RESULTS.md#integrated-v1-local-release-verification), [public release evidence](docs/TEST-RESULTS.md#public-pages-release-verification) and the tracker before choosing work; do not repeat completed slices. Further changes require a current user request and must preserve the accepted contract.
 
 ## Mandatory context
 

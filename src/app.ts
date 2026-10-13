@@ -361,8 +361,10 @@ function cancelGesture(): void {
 }
 
 gameWidget.addEventListener('pointerdown', event => {
-  if (!event.isPrimary || event.button !== 0 || gesture || session.phase !== 'running' || dialog.open) return;
+  if (!event.isPrimary || event.button !== 0 || gesture) return;
+  // A new primary interaction cannot be the previous drag's trailing click.
   suppressClick = false;
+  if (session.phase !== 'running' || dialog.open) return;
   const target = event.target as Element;
   const slotButton = target.closest<HTMLButtonElement>('[data-piece]');
   let id: PieceId | undefined;

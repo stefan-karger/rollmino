@@ -2,16 +2,16 @@
 
 Rollmino is a free, always-timed solo block puzzle with five difficulty levels and personal records in this browser. It runs entirely on a static website, with no account or backend. [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) is the agreed V1 specification; [docs/DECISIONS.md](docs/DECISIONS.md) records the user's choices.
 
-Play at **[Rollmino](https://stefan-karger.github.io/rollmino/)**. V1 supports tap, keyboard and Pointer Events. The integrated local release gates and the checked-artifact GitHub deployment pass. [Current evidence](docs/TEST-RESULTS.md#integrated-v1-local-release-verification) covers gameplay, records, accessibility, mobile emulation and the built artifact; [T14](docs/tickets/14-public-pages-deployment.md#completion-evidence) records the successful hosted run and live smoke check.
+Play at **[Rollmino](https://stefan-karger.github.io/rollmino/)**. V1 supports tap, keyboard and Pointer Events. The integrated local release gates and the checked-artifact GitHub deployment pass. [Current evidence](docs/TEST-RESULTS.md#integrated-v1-local-release-verification) covers gameplay, records, accessibility, mobile emulation and the built artifact; [Public release evidence](docs/TEST-RESULTS.md#public-pages-release-verification) records the successful hosted run and live smoke check.
 
-Source repository: [stefan-karger/rollmino](https://github.com/stefan-karger/rollmino). The local `main` branch tracks `origin/main`. [T00](docs/tickets/00-repository-setup.md#completion-evidence) records repository creation; T14 records synchronization and publication after implementation.
+Source repository: [stefan-karger/rollmino](https://github.com/stefan-karger/rollmino). The local `main` branch tracks `origin/main`. [T00](https://github.com/stefan-karger/rollmino/blob/61454115b4cf1310ec0f72e50b3fc5e0ec38dd03/docs/tickets/00-repository-setup.md#completion-evidence) records repository creation; [Public release evidence](docs/TEST-RESULTS.md#public-pages-release-verification) records synchronization and publication after implementation.
 
 ## Start here
 
 1. Read [AGENTS.md](AGENTS.md), [CODING_GUIDELINES.md](CODING_GUIDELINES.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
 2. Follow the active scope, interaction and test summaries in `docs/`. Earlier proposals in [PLAN.md](PLAN.md) and [docs/RESEARCH.md](docs/RESEARCH.md) are historical.
 3. Examine [engine/core.ts](engine/core.ts) and [fixtures/rolls.json](fixtures/rolls.json).
-4. Run the reference checks. When implementation is requested, pick a ready task from the [ticket tracker](docs/tickets/README.md), which breaks the agreed slices into independently checkable work.
+4. Run the reference checks. When implementation is requested, pick a ready task from the [ticket tracker](docs/tickets/README.md), which tracks review follow-ups with priorities, blockers and acceptance checks.
 
 [PROMPT_FOR_AGENT.md](PROMPT_FOR_AGENT.md) is the maintenance/publication handoff. Ticket evidence records actual work; historical plans do not override the accepted contract.
 
@@ -34,7 +34,7 @@ pnpm run verify:all
 pnpm run dev
 ```
 
-`pnpm run dev` serves the entry at `http://127.0.0.1:5173/`. After building, `pnpm run preview` serves `dist/` at `http://127.0.0.1:4173/`. `pnpm run typecheck` checks TypeScript without building. On Linux, browser installation uses `pnpm exec playwright install --with-deps chromium firefox webkit`. The Windows certificate-store retry used here is recorded in [T03's evidence](docs/tickets/03-web-tooling.md#completion-evidence).
+`pnpm run dev` serves the entry at `http://127.0.0.1:5173/`. After building, `pnpm run preview` serves `dist/` at `http://127.0.0.1:4173/`. `pnpm run typecheck` checks TypeScript without building. On Linux, browser installation uses `pnpm exec playwright install --with-deps chromium firefox webkit`. The Windows certificate-store retry used here is recorded in [T03's evidence](https://github.com/stefan-karger/rollmino/blob/61454115b4cf1310ec0f72e50b3fc5e0ec38dd03/docs/tickets/03-web-tooling.md#completion-evidence).
 
 The fast suite has 59 tests covering rules/validation, the independent oracle, all occupied-anchor transforms, run phases/timing/Undo and record ranking/storage faults. The separate `pnpm run verify:all` command validates every returned solution for all 62,208 Wizard boards with a cell-array oracle. The oracle reuses canonical orientation data. [Recorded evidence and limits](docs/TEST-RESULTS.md)
 
@@ -73,7 +73,7 @@ The repository uses **Settings > Pages > Build and deployment > Source > GitHub 
 | Path | Purpose |
 | --- | --- |
 | `IMPLEMENTATION_PLAN.md` | Current agreed specification, exact rules, implementation slices, commands and gates |
-| `docs/tickets/README.md` | Central ticket status/blockers and next-task selection; links detailed implementation tickets |
+| `docs/tickets/README.md` | Current review follow-up status, priorities, blockers and next-task selection |
 | `docs/DECISIONS.md` | Confirmed user requirements; interview closed |
 | `AGENTS.md` / `PROMPT_FOR_AGENT.md` | Maintenance/publication instructions and handoff |
 | `CODING_GUIDELINES.md` | KISS/YAGNI policy adopted from astro-portfolio |

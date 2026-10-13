@@ -91,6 +91,28 @@ test('native mouse preserves cyan/red occupied anchors at two board scales', asy
   }
 });
 
+test('Start works on its first click after Escape and release outside the widget', async ({ page }) => {
+  await openGame(page);
+  const from = await trayPoint(page, 'navy', [0, 0]);
+  const to = await center(cell(page, 4, 5));
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  await page.mouse.move(to.x, to.y, { steps: 5 });
+  await page.keyboard.press('Escape');
+  await page.mouse.move(5, 5);
+  await page.mouse.up();
+  await expect(page.locator('#undo')).toBeDisabled();
+  await page.locator('#new-game').click();
+  await page.getByRole('button', { name: 'Confirm', exact: true }).click();
+  await expect(page.locator('#ready')).toBeVisible();
+  await page.locator('#start').click();
+  await expect(page.locator('[data-content="blocker"]')).toHaveCount(7);
+  await expect(slot(page, 'navy')).toBeEnabled();
+  await slot(page, 'navy').click();
+  await cell(page, 4, 5).click();
+  await expect(cell(page, 4, 5)).toHaveAttribute('data-content', 'navy');
+});
+
 test('native mouse can transform a held anchor and commit only on release', async ({ page }) => {
   await openGame(page, { ...fixtures[0], level: 'STARTER' });
   const from = await trayPoint(page, 'cyan', [0, 0]);

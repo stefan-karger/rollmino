@@ -2,9 +2,9 @@
 
 Status: agreed product contract, confirmed by the user on 2026-10-12. This is the current implementation specification. [The decision record](docs/DECISIONS.md) preserves the interview answers. [PLAN.md](PLAN.md) and [the research](docs/RESEARCH.md) are historical analysis; their earlier feature proposals do not override this plan. Changes remain possible through an explicit revision of the affected decision.
 
-This handoff contains a reference engine, fixtures and tests. It does not yet contain a playable website. This planning pass changes documentation only. Implement the slices below when implementation is requested.
+V1 is implemented and published. This plan preserves its accepted behavior and original implementation slices; current maintenance work is in the follow-up tracker.
 
-Execution is divided into detailed tasks in [docs/tickets/README.md](docs/tickets/README.md). That short tracker owns ticket status, blockers and next-task selection; this plan remains the agreed behavior/architecture contract. Completing the ticket documentation does not complete any implementation ticket.
+[docs/tickets/README.md](docs/tickets/README.md) owns active follow-up status, priorities, blockers and next-task selection. The completed V1 ticket batch remains in Git history; this plan remains the agreed behavior/architecture contract. Creating follow-up tickets does not implement their changes.
 
 ## 1. Product and scope
 
@@ -12,7 +12,7 @@ Build **Rollmino**, a free, English-only, always-timed solo puzzle website. Phon
 
 The public repository is `stefan-karger/rollmino`. Initial hosting is GitHub Pages at `https://stefan-karger.github.io/rollmino/`, without a custom domain. Deliver a responsive website only.
 
-[T00](docs/tickets/00-repository-setup.md) covers early repository creation, its description, local initialization/baseline, origin/upstream and first source push. The existing local directory may keep its name. Repository source synchronization is separate from the website deployment in T14; blocked GitHub access does not prevent local code work after the local baseline is established.
+[T00](https://github.com/stefan-karger/rollmino/blob/61454115b4cf1310ec0f72e50b3fc5e0ec38dd03/docs/tickets/00-repository-setup.md) covers early repository creation, its description, local initialization/baseline, origin/upstream and first source push. The existing local directory may keep its name. Repository source synchronization is separate from the website deployment in T14; blocked GitHub access does not prevent local code work after the local baseline is established.
 
 | Required for V1 | Behavior |
 | --- | --- |
@@ -278,7 +278,7 @@ Pure session functions accept timestamps supplied by their caller so tests need 
 
 ## 10. Commands and browser configurations
 
-Only `test`, `verify:all` and the engine-only `typecheck` exist now. Add these scripts as the relevant files appear:
+The original implementation added the scripts below; all are now available:
 
 | Script | Command |
 | --- | --- |
