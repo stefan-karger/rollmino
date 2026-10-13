@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { activate, cell, center, complete, fixtures, mouseDrag, openGame, placePieces, resetRandom, seed, slot, trayPoint } from './helpers.ts';
+import { activate, cell, center, complete, fixtures, mouseDrag, openGame, openRecords, placePieces, resetRandom, seed, slot, trayPoint } from './helpers.ts';
 import { transformPiece } from '../engine/core.ts';
 test.setTimeout(60000);
 test.beforeEach(async ({ page }) => {
@@ -348,7 +348,14 @@ test('records and committed artwork stay mounted during dragging and timer ticks
     WIZARD: [{ elapsedMs: 1000, finishedAt: 1700000000000 }],
     MASTER: [{ elapsedMs: 2000, finishedAt: 1700000000000 }],
   })));
-  await openGame(page);
+  await seed(page);
+  await page.goto('./');
+  await openRecords(page);
+  await page.locator('#records-home').click();
+  await page.locator('#play').click();
+  await page.locator('#level').selectOption('WIZARD');
+  await resetRandom(page);
+  await page.locator('#start').click();
   await slot(page, 'navy').click();
   await cell(page, 4, 5).click();
   const record = await page.locator('#records-list li').elementHandle();
@@ -369,8 +376,8 @@ test('records and committed artwork stay mounted during dragging and timer ticks
   expect(await piece!.evaluate(node => node.isConnected)).toBe(true);
   await page.locator('#level').selectOption('MASTER');
   await page.getByRole('button', { name: 'Confirm', exact: true }).click();
-  await expect(page.locator('#records-list')).toContainText('00:02.00');
-  expect(await record!.evaluate(node => node.isConnected)).toBe(false);
+  await expect(page.locator('#records-list')).toContainText('00:01.00');
+  expect(await record!.evaluate(node => node.isConnected)).toBe(true);
 });
 
 test('native drag completion freezes once and saves one ranked record', { tag: '@shared' }, async ({ page }) => {
@@ -379,11 +386,12 @@ test('native drag completion freezes once and saves one ranked record', { tag: '
   await mouseDrag(page, await trayPoint(page, 'green', [1, 1]), await center(cell(page, 1, 4)));
   await expect(page.locator('#status')).toContainText('Completed in');
   await expect(page.locator('#undo')).toBeDisabled();
+  await expect(slot(page, 'green')).toBeDisabled();
+  await openRecords(page);
   await expect(page.locator('#records-list li')).toHaveCount(1);
   await page.locator('#clear-records').click();
   await page.getByRole('button', { name: 'Confirm', exact: true }).click();
   await expect(page.locator('#records-list li')).toHaveCount(0);
-  await expect(slot(page, 'green')).toBeDisabled();
 });
 
 test('native Chromium touch scrolls outside occupied source regions', { tag: '@touch' }, async ({ page, browserName }, testInfo) => {

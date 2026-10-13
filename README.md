@@ -16,7 +16,7 @@ Tab reaches grid/tray/controls. Arrows move without wrapping. Home/End reaches r
 
 Timing includes background/lock, confirmations and Undo. Completion freezes board/time. New game, Replay and level changes confirm active abandonment. Replay retains a hidden layout as timed practice and never ranks. Fair fresh rolls can rank even when repeated. Home confirms running abandonment and discards the layout. Browser Back follows the same confirmation; Forward opens fresh hidden play. Reload returns Home with fresh hidden Starter internally.
 
-Records show five best times/dates per level. Selected clearing confirms and preserves active play. Records stay in this browser; private mode/site-data/storage policies can erase them. Storage failures retain page-memory records with a reload-loss notice. No hints, pause, Redo, sync, PWA or Android app.
+Personal bests on Home shows five best times/dates for the selected records level. Clearing confirms that level and preserves other lists. The records filter does not change the play level. Records stay in this browser; private mode/site-data/storage policies can erase them. Storage failures retain page-memory records with a reload-loss notice. No hints, pause, Redo, sync, PWA or Android app.
 
 ## Development
 

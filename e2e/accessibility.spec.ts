@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { boardOffset, cell, complete, fixtures, openGame, placePieces, resetRandom, seed, slot } from './helpers.ts';
+import { boardOffset, cell, complete, fixtures, openGame, openRecords, placePieces, resetRandom, seed, slot } from './helpers.ts';
 
 async function noAxeViolations(page: import('@playwright/test').Page) {
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
@@ -22,6 +22,10 @@ test('ready, running, confirmation and completed states pass relevant axe checks
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
   await complete(page);
   await noAxeViolations(page);
+  await openRecords(page);
+  await noAxeViolations(page);
+  await page.locator('#clear-records').click();
+  await noAxeViolations(page);
 });
 
 for (const viewport of [
@@ -39,7 +43,7 @@ for (const viewport of [
     }
     await slot(page, 'navy').click();
     await cell(page, 4, 5).click();
-    for (const selector of ['#rotate', '#flip', '#remove', '#undo', '#new-game', '#replay', '#clear-records']) {
+    for (const selector of ['#rotate', '#flip', '#remove', '#undo', '#new-game', '#replay', '#game-home']) {
       const control = page.locator(selector);
       await control.scrollIntoViewIfNeeded();
       await expect(control).toBeInViewport();
@@ -47,6 +51,9 @@ for (const viewport of [
       // Firefox may report a 44px CSS box a few millionths below 44.
       expect(bounds!.height).toBeGreaterThanOrEqual(43.99);
     }
+    await openRecords(page);
+    await page.locator('#clear-records').scrollIntoViewIfNeeded();
+    await expect(page.locator('#clear-records')).toBeInViewport();
     await page.locator('#clear-records').click();
     await expect(page.getByRole('dialog', { name: 'Clear records?' })).toBeInViewport();
     await page.getByRole('button', { name: 'Cancel', exact: true }).click();
@@ -102,6 +109,7 @@ test('200 percent CSS zoom reflows and keeps board geometry aligned', { tag: '@d
   await slot(page, 'navy').click();
   await cell(page, 4, 5).click();
   await expect(cell(page, 4, 5)).toHaveAttribute('data-content', 'navy');
+  await openRecords(page);
   await page.locator('#clear-records').scrollIntoViewIfNeeded();
   await expect(page.locator('#clear-records')).toBeInViewport();
 });

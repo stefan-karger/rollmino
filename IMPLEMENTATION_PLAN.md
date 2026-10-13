@@ -100,7 +100,7 @@ The pure session has `ready`, `running` and `completed` phases, with `ranked` or
 | Level change | Hidden fresh ready at chosen level. Never rank a known replay layout at another level. |
 | Solving committed action | Freeze board/time, discard history/draft and consider ranked record once. Terminal completion rejects edits/Undo. |
 | Completed transitions | New game/level change prepare fresh ready; Replay prepares practice ready. No abandonment confirmation. |
-| Clear records | Confirm selected-level clearing; preserve session/time/history. |
+| Personal bests / Clear records | Home opens a separate records screen with an independent level filter. Confirm clearing the displayed level; preserve other lists/keys and restore Clear records focus. Return Home through the root history entry. No active run remains behind this screen. |
 | Blur/hidden/lock/resize | Cancel gesture, preserve committed play and continue timing. |
 
 Before Start reveal no puzzle coordinates through SVG, labels or other output, including retained practice dice. Disable editing and label fresh/practice. A coincidentally repeated fair roll is ranked; intentional replay never ranks.
@@ -145,7 +145,7 @@ Use one native confirmation with specific text and Confirm/Cancel. Cancel restor
 
 Store only level lists under `rollmino.records.v1` in localStorage. Entries contain whole-millisecond `elapsedMs` and valid epoch-date `finishedAt`. Keep at most five per level, ordered by fastest raw time then older date; identical ties retain stable insertion order. Display time and English local completion date only, without time-of-day/layouts/statistics/replay links.
 
-Only a ranked running-to-completed transition considers a result. Rendering, release/click, clearing and notices cannot save again. Show frozen time even in practice or outside the top five.
+Only a ranked running-to-completed transition considers a result. Rendering, release/click, clearing and notices cannot save again. Show frozen time even in practice or outside the top five. Keep ranked/practice feedback and storage-failure notices beside the board. Full lists, English local dates, the independent level filter, clearing and browser-storage explanation appear on Personal bests reached from Home. Inspecting records does not change the ordinary level or draw RNG.
 
 Validate known lists, finite nonnegative integer durations and valid integer dates. Normalize missing lists, discard malformed entries, sort/cap and strip extra fields. Invalid JSON/payload recovers to empty with a notice. Catch storage access/read/write errors, retain page-memory records and show reload loss. Read current valid storage before insertion/clearing. Cross-tab automatic refresh is outside scope.
 
@@ -194,11 +194,11 @@ Untagged scenarios run in all five projects. `@shared` runs only in desktop Chro
 | T15 first-click Start and T16 tray extents/hit regions/own-slot regression | All five |
 | 320px reachability/alignment and grid/modal focus | All five |
 | Full keyboard game, native mouse anchors/transforms/capture/collision/return, Escape/lost capture and CSS zoom alignment | Three desktop engines |
-| All three fixtures, ranking/storage fault permutations, shared transactions/synthetic cleanup, four-state axe and complete viewport matrix | Desktop Chromium |
+| All three fixtures, ranking/storage fault permutations, shared transactions/synthetic cleanup, game/records/dialog axe and complete viewport matrix | Desktop Chromium |
 | Native CDP touch/move/return/secondary input/cancel and scrolling | Mobile Chromium |
 | Built assets/errors, full first fixture, frozen time, practice exclusion and reload retention | Both artifact mounts; filesystem inspection once |
 
-After T30, the development suite selects 104 cases, with 23 completed games including phone practice-completion feedback. Shared DOM-stability, queued-dialog-close and five-level marking regressions do not complete another game. The dialog regression forces rapid cancellation/reopening through DOM events in desktop Chromium; the native confirmation scenario remains in all five projects. Home/history regressions cover running cancellation/time/focus, fresh Forward, root exit after repeated returns/reload, rapid dialog/history events and discarded practice ready. The marking regression checks literal level groups, transformed previews, committed/tray marks and cancellation. Production selects five cases and four completed games. Fixture completion supplies representative persistence checks; non-color marking coverage uses only restricted pieces. Additional fixtures/shared permutations do not repeat for every unrelated assertion. Mobile projects remain emulation.
+After T31, the development suite selects 104 cases, with 23 completed games including phone practice-completion feedback. Shared DOM-stability, queued-dialog-close and five-level marking regressions do not complete another game. The dialog regression forces rapid cancellation/reopening through DOM events in desktop Chromium; the native confirmation scenario remains in all five projects. Home/history regressions cover running cancellation/time/focus, fresh Forward, root exit after repeated returns/reload, rapid dialog/history events and discarded practice ready. The marking regression checks literal level groups, transformed previews, committed/tray marks and cancellation. Production selects five cases and four completed games. Fixture completion supplies representative persistence checks; non-color marking coverage uses only restricted pieces. Additional fixtures/shared permutations do not repeat for every unrelated assertion. Mobile projects remain emulation.
 
 The [cell-array oracle](tests/oracle.mjs) checks unique IDs, integer geometry, bounds, blockers, overlap, 29 piece cells, coverage, contacts and fixed placements. It imports only canonical orientations, has separate literal IDs/groups and uses no engine legality calls/masks. Test deliberately broken answers. The [exhaustive verifier](scripts/verify-all.mjs) requires a non-null answer and oracle pass for each of 62,208 Wizard boards before counting. Keep it separate from fast tests.
 

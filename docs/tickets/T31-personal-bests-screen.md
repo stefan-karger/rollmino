@@ -30,3 +30,18 @@ Use the [single verification policy](../../IMPLEMENTATION_PLAN.md#verification) 
 Add focused checks for screen-level filtering/clearing, completion-time save faults, preserved other keys and public navigation. Retain current normalization/ranking/fault tests. Build once before the root/subpath artifact checks and run Playwright sequentially.
 
 Update implemented records/layout documentation. Record dated commands/results, notices, focused behavior and any limits before checking acceptance and changing tracker status. No new deployment claim follows from local checks.
+
+## Implementation evidence
+
+Executed on 2026-10-13 in the Windows workspace. Read T30's completed evidence, the accepted revision/T29 compatibility boundaries, Records and the affected app/input/accessibility/artifact assertions before editing.
+
+Personal bests is reached from Home and has its own records-level filter, top-five list, dates, empty state, selected clearing and storage explanation. Filtering preserves the ordinary play level. The game keeps frozen completion feedback and a storage notice beside the board. One persistent polite atomic status element moves between the current game and records containers. Browser Back closes any records confirmation before hiding its screen. Records/schema/ranking code was unchanged.
+
+- `pnpm install --frozen-lockfile` passed without dependency changes. `pnpm test` passed all 68 tests, including existing ranking, normalization, current-storage reads, clear isolation and storage-fault checks. `pnpm run build` passed strict checking and Vite output for the final runtime.
+- The changed-path selector retained pure/build/full-browser/artifact/exhaustive checks because the navigation module remains an unknown conservative path. No selector policy was narrowed.
+- The first focused browser run reported 25 failures from the duplicate Level label and four passes. Renaming the records label to Records level resolved the ambiguity and identifies the list being inspected.
+- `pnpm run test:e2e --workers=1 --max-failures=1` passed all 104 cases without skips in 4.6 minutes. Existing representative games now inspect records through public Home navigation. The storage scenarios retain single insertion, practice exclusion, raw ordering/ties, five-entry limits, invalid recovery and read/access/write failures. Clearing tests preserve other levels/keys, and active Home cancellation preserves board/history/time before records become reachable. The committed-art/record-node regression now verifies that changing the play level leaves the independently filtered record list mounted.
+- Existing viewport/reflow checks now reach the separate records controls. Axe checks cover records and its clearing dialog in addition to the game states. T3 collaborative-browser review at 320 by 568 CSS pixels observed no overflow, readable controls/storage copy, heading entry focus and Tab reaching Records level, with exactly one polite live region. These are desktop-browser CSS checks, not physical-device or screen-reader results.
+- `pnpm run test:e2e:prod` passed all five root/subpath cases against the preceding final build, with public Personal bests navigation and reload retention. `pnpm run verify:all` independently validated all 62,208 Wizard answers in 40.14 seconds.
+
+Acceptance was checked against the implementation and these regressions. Documentation consistency and `git diff --check` passed before committing. No publication, physical-phone, pen or screen-reader pass is claimed. The unrelated-key clearing guarantee remains; first-visit offer behavior is implemented in its own ticket.

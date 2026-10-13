@@ -102,6 +102,17 @@ export async function complete(page: Page, fixture = fixtures[0], keyboard = fal
   await expect(page.getByRole('button', { name: 'Undo', exact: true })).toBeDisabled();
 }
 
+export async function openRecords(page: Page, level: Level = 'WIZARD'): Promise<void> {
+  if (await page.locator('#game-screen').isVisible()) {
+    const running = await cell(page, 0, 0).isEnabled();
+    await page.locator('#game-home').click();
+    if (running) await page.getByRole('button', { name: 'Confirm', exact: true }).click();
+  }
+  await page.locator('#personal-bests').click();
+  await page.locator('#records-level').selectOption(level);
+  await expect(page.locator('#records-title')).toBeVisible();
+}
+
 export async function center(locator: import('@playwright/test').Locator): Promise<{ x: number; y: number }> {
   const bounds = await locator.boundingBox();
   if (!bounds) throw Error('Missing pointer target');

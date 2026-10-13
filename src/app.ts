@@ -6,6 +6,7 @@ import type { Session } from './session.ts';
 import { Records } from './records.ts';
 import { trayBounds } from './tray-geometry.ts';
 import { navigation } from './navigation.ts';
+import type { Screen } from './navigation.ts';
 
 function element<T extends HTMLElement>(id: string): T {
   const found = document.getElementById(id);
@@ -44,7 +45,8 @@ let gesture: Gesture | undefined;
 let suppressClick = false;
 let focusedCell = 0;
 let pending: { accept: () => void; trigger: HTMLElement; cancel?: () => void } | undefined;
-let screen: 'home' | 'game' = 'home';
+let screen: Screen = 'home';
+let recordsLevel: Level = 'STARTER';
 let homeTrigger: HTMLElement | undefined;
 const cells: HTMLButtonElement[] = [];
 const slots = new Map<PieceId, HTMLButtonElement>();
@@ -54,6 +56,7 @@ for (const level of Object.keys(RESTRICTED)) {
   option.value = level;
   option.textContent = level[0] + level.slice(1).toLowerCase();
   levelControl.append(option);
+  element('records-level').append(option.cloneNode(true));
 }
 for (let y = 0; y < 6; y++) {
   const row = document.createElement('div');
@@ -193,7 +196,7 @@ function renderDraft(): void {
 
 function renderRecords(): void {
   const list = element('records-list');
-  list.replaceChildren(...records.lists[session.level].map(record => {
+  list.replaceChildren(...records.lists[recordsLevel].map(record => {
     const item = document.createElement('li');
     const time = document.createElement('span');
     time.textContent = formatTime(record.elapsedMs);
@@ -202,9 +205,11 @@ function renderRecords(): void {
     item.append(time, date);
     return item;
   }));
-  element('records-empty').hidden = records.lists[session.level].length > 0;
+  element('records-empty').hidden = records.lists[recordsLevel].length > 0;
   element('storage-notice').textContent = records.notice;
   element('storage-notice').hidden = !records.notice;
+  element('game-storage-notice').textContent = records.notice;
+  element('game-storage-notice').hidden = !records.notice;
 }
 
 function selectPiece(id: PieceId): void {
@@ -260,12 +265,10 @@ function removeSelected(): void {
 }
 function enterReady(next: Session): void {
   cancelGesture();
-  const previousLevel = session.level;
   session = next;
   draft = undefined;
   focusedCell = 0;
   announce('Puzzle hidden until Start.');
-  if (previousLevel !== session.level) renderRecords();
   renderGame();
   startButton.focus();
 }
@@ -332,13 +335,20 @@ element('undo').addEventListener('click', () => {
 element('new-game').addEventListener('click', event => transition('Start a fresh game and abandon this unfinished run?', event.currentTarget as HTMLElement, () => freshSession(session.level)));
 element('replay').addEventListener('click', event => transition('Replay this layout as practice and abandon this unfinished run?', event.currentTarget as HTMLElement, () => replay(session)));
 element('clear-records').addEventListener('click', event => {
+  if (screen !== 'records') return;
   const trigger = event.currentTarget as HTMLElement;
-  confirmAction(`Clear the saved ${session.level[0] + session.level.slice(1).toLowerCase()} records in this browser?`, trigger, () => {
-    records.clear(session.level);
+  const level = recordsLevel;
+  confirmAction(`Clear the saved ${level[0] + level.slice(1).toLowerCase()} records in this browser?`, trigger, () => {
+    records.clear(level);
     announce('Records cleared for this level.');
     renderRecords();
     trigger.focus();
   }, 'Clear records?');
+});
+element('records-level').addEventListener('change', event => {
+  recordsLevel = (event.currentTarget as HTMLSelectElement).value as Level;
+  announce('');
+  renderRecords();
 });
 levelControl.addEventListener('change', () => {
   const chosen = levelControl.value as Level;
@@ -502,6 +512,7 @@ setInterval(updateTimer, 100);
 renderRecords();
 renderGame();
 const nav = navigation(next => {
+  if (pending) finishConfirmation(false);
   homeTrigger = undefined;
   cancelGesture();
   session = freshSession(session.level);
@@ -510,9 +521,12 @@ const nav = navigation(next => {
   screen = next;
   element('home-screen').hidden = next !== 'home';
   element('game-screen').hidden = next !== 'game';
+  element('records-screen').hidden = next !== 'records';
+  element(next === 'records' ? 'records-status' : 'game-status').append(status);
   renderGame();
-  announce(next === 'home' ? '' : 'Puzzle hidden until Start.');
-  (next === 'home' ? element('play') : startButton).focus();
+  announce(next === 'game' ? 'Puzzle hidden until Start.' : '');
+  if (next === 'records') renderRecords();
+  (next === 'home' ? element('play') : next === 'records' ? element('records-title') : startButton).focus();
 }, accept => {
   const trigger = homeTrigger ?? pending?.trigger ?? (document.activeElement instanceof HTMLElement ? document.activeElement : element('game-home'));
   homeTrigger = undefined;
@@ -521,8 +535,13 @@ const nav = navigation(next => {
   if (session.phase === 'running') {
     confirmAction('Return Home and abandon this unfinished run?', trigger, accept, 'Abandon this run?', () => nav.cancel());
   } else accept();
-}, () => { element<HTMLButtonElement>('play').disabled = false; });
-element('play').addEventListener('click', () => nav.play());
+}, () => {
+  element<HTMLButtonElement>('play').disabled = false;
+  element<HTMLButtonElement>('personal-bests').disabled = false;
+});
+element('play').addEventListener('click', () => nav.open('game'));
+element('personal-bests').addEventListener('click', () => nav.open('records'));
+element('records-home').addEventListener('click', () => nav.home());
 element('game-home').addEventListener('click', event => {
   homeTrigger = event.currentTarget as HTMLElement;
   nav.home();

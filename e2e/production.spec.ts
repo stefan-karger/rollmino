@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { readFileSync, readdirSync } from 'node:fs';
-import { cell, complete, fixtures, openGame, seed, slot } from './helpers.ts';
+import { cell, complete, fixtures, openGame, openRecords, seed, slot } from './helpers.ts';
 
 function productionErrors(page: Page, baseURL: string): string[] {
   const errors: string[] = [];
@@ -80,7 +80,8 @@ test(`production completes ${fixture.id}, freezes, replays as practice and retai
   await page.clock.fastForward(54321);
   await complete(page, fixture);
   await expect(page.locator('#timer')).toHaveText('00:54.32');
-  await expect(page.locator('#records-list li')).toHaveCount(1);
+  const saved = await page.evaluate(() => localStorage.getItem('rollmino.records.v1'));
+  expect(JSON.parse(saved!).WIZARD).toHaveLength(1);
   await page.clock.fastForward(20000);
   await expect(page.locator('#timer')).toHaveText('00:54.32');
   await page.locator('#replay').click();
@@ -88,13 +89,12 @@ test(`production completes ${fixture.id}, freezes, replays as practice and retai
   await page.locator('#start').click();
   await page.clock.fastForward(5000);
   await complete(page, fixture);
-  await expect(page.locator('#records-list li')).toHaveCount(1);
+  expect(await page.evaluate(() => localStorage.getItem('rollmino.records.v1'))).toBe(saved);
   await page.reload();
   await expect(page.locator('#home-screen')).toBeVisible();
-  await page.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(page.locator('#level')).toHaveValue('STARTER');
   await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
-  await page.locator('#level').selectOption(fixture.level);
+  await openRecords(page, fixture.level);
   await expect(page.locator('#records-list li')).toHaveCount(1);
   await expect(page.locator('#records-list')).toContainText('00:54.32');
   expect(errors).toEqual([]);

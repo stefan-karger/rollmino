@@ -45,7 +45,7 @@ test('Home has no RNG or focus leak and repeated returns leave one root entry', 
   await seed(page);
   await page.goto('./');
   await expect(page.locator('#home-screen')).toBeVisible();
-  await expect(page.getByRole('button')).toHaveCount(1);
+  await expect(page.getByRole('button')).toHaveCount(2);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.evaluate(() => { Math.random = () => { throw Error('Unexpected random draw before Start'); }; });
   for (let i = 0; i < 3; i++) {

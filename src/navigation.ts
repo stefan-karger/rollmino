@@ -1,11 +1,11 @@
-type Screen = 'home' | 'game';
+export type Screen = 'home' | 'game' | 'records';
 type Entry = { rollmino: true; index: number; screen: Screen };
 
 function entry(value: unknown): Entry | undefined {
   if (!value || typeof value !== 'object') return;
   const state = value as Partial<Entry>;
   if (state.rollmino === true && Number.isInteger(state.index) && state.index! >= 0
-    && (state.screen === 'home' || state.screen === 'game')) return state as Entry;
+    && (state.screen === 'home' || state.screen === 'game' || state.screen === 'records')) return state as Entry;
 }
 
 /** Only screens live in history. A history entry never contains a run. */
@@ -60,11 +60,11 @@ export function navigation(enter: (screen: Screen) => void,
   } else replaceRoot();
 
   return {
-    play() {
+    open(screen: Exclude<Screen, 'home'>) {
       if (restoring || deciding || approved || current.screen !== 'home') return;
-      current = { rollmino: true, index: 1, screen: 'game' };
+      current = { rollmino: true, index: 1, screen };
       history.pushState(current, '');
-      enter('game');
+      enter(screen);
     },
     home() {
       if (!restoring && !deciding && !approved && current.screen !== 'home') history.go(-current.index);

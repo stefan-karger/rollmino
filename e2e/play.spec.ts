@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { cell, complete, fixtures, openGame, resetRandom, seed, slot } from './helpers.ts';
+import { cell, complete, fixtures, openGame, openRecords, resetRandom, seed, slot } from './helpers.ts';
 
 test('loads the Rollmino entry and its styles without page or asset errors', async ({ page }) => {
   const errors: string[] = [];
@@ -59,7 +59,7 @@ for (const fixture of fixtures) {
       const bounds = await page.locator('#preview').boundingBox();
       expect(bounds!.y).toBeGreaterThanOrEqual(0);
       expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(844);
-      await expect(page.locator('#records-list li')).toHaveCount(1);
+      await expect(page.locator('#records-screen')).toBeHidden();
       await expect(page.locator('[aria-live="polite"]')).toHaveCount(1);
       await expect(page.getByRole('dialog')).not.toBeVisible();
       await page.locator('#new-game').click();
@@ -69,9 +69,8 @@ for (const fixture of fixtures) {
     }
     await page.reload();
     await expect(page.locator('#home-screen')).toBeVisible();
-    await page.getByRole('button', { name: 'Play', exact: true }).click();
     await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
-    await page.locator('#level').selectOption(fixture.level);
+    await openRecords(page, fixture.level);
     await expect(page.locator('#records-list li')).toHaveCount(1);
     await expect(page.locator('#records-list')).toContainText('01:05.43');
   });
