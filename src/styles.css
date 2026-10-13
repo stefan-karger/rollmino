@@ -16,6 +16,19 @@ button:focus-visible, select:focus-visible { outline: 3px solid #f3da85; outline
 #play { background: #e8edf3; color: #12161d; font-weight: 700; }
 .screen-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .screen-heading h1 { margin: 0; }
+.tutorial-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
+#tutorial-panel h2 { font-size: 1.3rem; margin: 12px 0; }
+.tutorial-examples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
+.tutorial-examples figure { margin: 0; padding: 8px; border: 2px solid transparent; border-radius: 8px; }
+.tutorial-examples figure.example-active { border-color: #f3da85; }
+.tutorial-examples svg { width: 100%; display: block; }
+.tutorial-examples figcaption { font-size: .8rem; margin-top: 8px; color: #c0ccda; line-height: 1.4; }
+.tutorial-examples .transform-example { grid-column: 1 / -1; display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: 12px; }
+.tutorial-examples .anchor-mark { font-size: .4px; }
+.level-comparison { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.level-comparison th, .level-comparison td { padding: 10px 4px; text-align: left; vertical-align: top; border-bottom: 1px solid #445367; }
+.level-pieces > span { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.level-pieces svg { width: 48px; height: 36px; flex-shrink: 0; }
 .run-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .level-picker { display: flex; align-items: center; gap: 8px; }
 #timer { font-size: 1.5rem; font-variant-numeric: tabular-nums; white-space: nowrap; }

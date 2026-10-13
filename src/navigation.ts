@@ -1,11 +1,11 @@
-export type Screen = 'home' | 'game' | 'records';
+export type Screen = 'home' | 'game' | 'records' | 'tutorial';
 type Entry = { rollmino: true; index: number; screen: Screen };
 
 function entry(value: unknown): Entry | undefined {
   if (!value || typeof value !== 'object') return;
   const state = value as Partial<Entry>;
   if (state.rollmino === true && Number.isInteger(state.index) && state.index! >= 0
-    && (state.screen === 'home' || state.screen === 'game' || state.screen === 'records')) return state as Entry;
+    && (state.screen === 'home' || state.screen === 'game' || state.screen === 'records' || state.screen === 'tutorial')) return state as Entry;
 }
 
 /** Only screens live in history. A history entry never contains a run. */

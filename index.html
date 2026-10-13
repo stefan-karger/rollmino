@@ -13,7 +13,7 @@
         <img class="home-mark" src="./favicon.svg" width="112" height="112" alt="" />
         <h1>Rollmino</h1>
         <p>Fill the board around seven blockers.</p>
-        <div class="home-actions"><button id="play" disabled>Play</button><button id="personal-bests" disabled>Personal bests</button></div>
+        <div class="home-actions"><button id="play" disabled>Play</button><button id="tutorial" disabled>Tutorial</button><button id="personal-bests" disabled>Personal bests</button></div>
       </section>
       <section id="game-screen" aria-label="Game" hidden>
         <div class="screen-heading"><h1>Rollmino</h1><button id="game-home">Home</button></div>
@@ -49,6 +49,15 @@
         <button id="clear-records">Clear records</button>
         <div id="records-status"></div>
         <p class="help">Best five for this level, saved in this browser. Records stay on your device. Private browsing or clearing site data can erase them. Changing browser or site address does not move your records.</p>
+      </section>
+      <section id="tutorial-screen" aria-label="Tutorial" hidden>
+        <div class="screen-heading"><h1>Tutorial</h1><button id="tutorial-home">Home</button></div>
+        <p class="help">Learn at your own pace. No clock or records.</p>
+        <p id="tutorial-progress" class="help"></p>
+        <div id="tutorial-panel"></div>
+        <button id="replay-example">Replay example</button>
+        <div class="tutorial-actions"><button id="tutorial-back">Back</button><button id="tutorial-next">Next</button></div>
+        <div id="tutorial-status"></div>
       </section>
     </main>
     <dialog id="confirm-dialog" aria-labelledby="confirm-title">

@@ -7,6 +7,8 @@ import { Records } from './records.ts';
 import { trayBounds } from './tray-geometry.ts';
 import { navigation } from './navigation.ts';
 import type { Screen } from './navigation.ts';
+import { colors, names, rect, pieceArt, restrictionMark as mark } from './piece-art.ts';
+import { tutorialPanels } from './tutorial.ts';
 
 function element<T extends HTMLElement>(id: string): T {
   const found = document.getElementById(id);
@@ -26,14 +28,6 @@ let storage: Storage | undefined;
 try { storage = window.localStorage; } catch { /* The records module supplies the page-only notice. */ }
 const records = new Records(storage);
 const dateFormat = new Intl.DateTimeFormat('en', { year: 'numeric', month: 'short', day: 'numeric' });
-const colors: Record<PieceId, string> = {
-  navy: '#608bc0', brown: '#b58a67', orange: '#ff9b48', purple: '#b891ee',
-  grey: '#b7c2cc', green: '#76bc83', cyan: '#65c8df', yellow: '#efd46e', red: '#ec7c7f',
-};
-const names: Record<PieceId, string> = {
-  navy: 'Navy square', brown: 'Brown domino', orange: 'Orange line', purple: 'Purple corner',
-  grey: 'Grey line', green: 'Green square', cyan: 'Cyan L', yellow: 'Yellow T', red: 'Red zigzag',
-};
 let session: Session = freshSession();
 type Draft = { id: PieceId; orientation: number; anchor: Cell; target: Cell };
 let draft: Draft | undefined;
@@ -101,17 +95,11 @@ function candidate(): Placement | undefined {
   if (!draft) return;
   return { id: draft.id, orientation: draft.orientation, x: draft.target[0] - draft.anchor[0], y: draft.target[1] - draft.anchor[1] };
 }
-function rect(x: number, y: number, fill: string, extra = ''): string {
-  return `<rect x="${x + .04}" y="${y + .04}" width=".92" height=".92" rx=".1" fill="${fill}" ${extra}/>`;
-}
 function restrictionMark(id: PieceId, x: number, y: number): string {
-  return RESTRICTED[session.level].includes(id)
-    ? `<rect class="restriction-mark" data-mark-piece="${id}" x="${x + .2}" y="${y + .2}" width=".6" height=".6"/>`
-    : '';
+  return mark(id, x, y, session.level);
 }
 function shape(id: PieceId, orientation: number, x = 0, y = 0, extra = ''): string {
-  return ORIENTATIONS[id][orientation].map(([dx, dy]) =>
-    rect(x + dx, y + dy, colors[id], extra) + restrictionMark(id, x + dx, y + dy)).join('');
+  return pieceArt(id, orientation, x, y, session.level, extra);
 }
 function announce(message: string): void { status.textContent = message; }
 function updateTimer(): void { timer.textContent = formatTime(elapsed(session, Date.now())); }
@@ -511,10 +499,12 @@ window.addEventListener('resize', cancelGesture);
 setInterval(updateTimer, 100);
 renderRecords();
 renderGame();
+const tutorial = tutorialPanels(announce);
 const nav = navigation(next => {
   if (pending) finishConfirmation(false);
   homeTrigger = undefined;
   cancelGesture();
+  tutorial.close();
   session = freshSession(session.level);
   draft = undefined;
   focusedCell = 0;
@@ -522,11 +512,13 @@ const nav = navigation(next => {
   element('home-screen').hidden = next !== 'home';
   element('game-screen').hidden = next !== 'game';
   element('records-screen').hidden = next !== 'records';
-  element(next === 'records' ? 'records-status' : 'game-status').append(status);
+  element('tutorial-screen').hidden = next !== 'tutorial';
+  element(next === 'records' ? 'records-status' : next === 'tutorial' ? 'tutorial-status' : 'game-status').append(status);
   renderGame();
   announce(next === 'game' ? 'Puzzle hidden until Start.' : '');
   if (next === 'records') renderRecords();
-  (next === 'home' ? element('play') : next === 'records' ? element('records-title') : startButton).focus();
+  if (next === 'tutorial') tutorial.open();
+  else (next === 'home' ? element('play') : next === 'records' ? element('records-title') : startButton).focus();
 }, accept => {
   const trigger = homeTrigger ?? pending?.trigger ?? (document.activeElement instanceof HTMLElement ? document.activeElement : element('game-home'));
   homeTrigger = undefined;
@@ -538,9 +530,12 @@ const nav = navigation(next => {
 }, () => {
   element<HTMLButtonElement>('play').disabled = false;
   element<HTMLButtonElement>('personal-bests').disabled = false;
+  element<HTMLButtonElement>('tutorial').disabled = false;
 });
 element('play').addEventListener('click', () => nav.open('game'));
 element('personal-bests').addEventListener('click', () => nav.open('records'));
+element('tutorial').addEventListener('click', () => nav.open('tutorial'));
+element('tutorial-home').addEventListener('click', () => nav.home());
 element('records-home').addEventListener('click', () => nav.home());
 element('game-home').addEventListener('click', event => {
   homeTrigger = event.currentTarget as HTMLElement;

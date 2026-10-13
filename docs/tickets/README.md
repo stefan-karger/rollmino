@@ -7,7 +7,7 @@ T15 through T26 are complete, with one verified commit per ticket. Their accepta
 | [T29](T29-onboarding-and-home.md) | Analyse and plan onboarding, the Starter exercise and Home navigation with the user | None | done |
 | [T30](T30-home-and-navigation.md) | Home, original branding and browser Back/Forward with safe game abandonment | T29 | done |
 | [T31](T31-personal-bests-screen.md) | Separate Personal bests screen and preserve completion/storage feedback | T30 | done |
-| [T32](T32-visual-tutorial.md) | Self-paced illustrated tutorial and exact level comparison | T30 | todo |
+| [T32](T32-visual-tutorial.md) | Self-paced illustrated tutorial and exact level comparison | T30 | done |
 | [T33](T33-starter-exercise.md) | Untimed three-piece Starter exercise with Undo and Reset step | T32 | todo |
 | [T34](T34-first-visit-and-repeat.md) | First-visit tutorial offer, repeat review and redo exercise | T33 | todo |
 | [T35](T35-integrated-verification.md) | Final navigation/tutorial/records checks, contract consolidation and readiness evidence | T31, T34 | todo |
