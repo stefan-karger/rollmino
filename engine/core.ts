@@ -75,6 +75,31 @@ export const ORIENTATIONS = Object.fromEntries(
   PIECE_IDS.map(id => [id, uniqueOrientations(SHAPES[id])]),
 ) as Record<PieceId, Cell[][]>;
 
+/** Row-major occupied anchor for tap/keyboard selection. */
+export function firstAnchor(id: PieceId, orientation: number): Cell {
+  return [...ORIENTATIONS[id][orientation][0]] as Cell;
+}
+
+/** Transform geometry and its occupied grab anchor together. */
+export function transformPiece(
+  id: PieceId, orientation: number, anchor: Cell, action: 'rotate' | 'flip',
+): { orientation: number; anchor: Cell } {
+  const shape = ORIENTATIONS[id][orientation];
+  if (!shape.some(([x, y]) => x === anchor[0] && y === anchor[1])) {
+    throw new Error('Expected an occupied anchor.');
+  }
+  const transform = ([x, y]: Cell): Cell => action === 'rotate' ? [-y, x] : [-x, y];
+  const cells = shape.map(transform);
+  const minX = Math.min(...cells.map(([x]) => x));
+  const minY = Math.min(...cells.map(([, y]) => y));
+  const [ax, ay] = transform(anchor);
+  const key = JSON.stringify(normalize(cells));
+  return {
+    orientation: ORIENTATIONS[id].findIndex(candidate => JSON.stringify(candidate) === key),
+    anchor: [ax - minX, ay - minY],
+  };
+}
+
 /** x/y is the upper-left corner of a normalized orientation. */
 export interface Placement {
   id: PieceId;

@@ -38,12 +38,12 @@ Add `test:transforms` as `node --experimental-strip-types --test tests/transform
 
 ## Done when
 
-- [ ] Rotate/Flip use the stated geometric formulas with normalization.
-- [ ] All transformed anchors remain occupied and closure tests recover the original geometry/anchor.
-- [ ] Literal direction tests and chiral reflection tests pass.
-- [ ] Existing orientation order, shape counts and fixture solutions are unchanged.
-- [ ] Helpers are pure, narrowly exported and tested without DOM initialization.
+- [x] Rotate/Flip use the stated geometric formulas with normalization.
+- [x] All transformed anchors remain occupied and closure tests recover the original geometry/anchor.
+- [x] Literal direction tests and chiral reflection tests pass.
+- [x] Existing orientation order, shape counts and fixture solutions are unchanged.
+- [x] Helpers are pure, narrowly exported and tested without DOM initialization.
 
 ## Completion evidence
 
-Not yet recorded. Add the actual changes, command results, checks and code reference here before setting this ticket to `done` in the tracker. Follow the [completion rules](README.md#working-and-completing-tickets).
+2026-10-13: Added pure `firstAnchor` and `transformPiece` helpers in `engine/core.ts`, plus exhaustive occupied-anchor closure, literal direction, chiral reflection, symmetry and hole tests in `tests/transforms.test.mjs`. Orientation generation and fixture data are unchanged. `pnpm run test:transforms` passed 3 tests; `pnpm test` passed 47 tests; `pnpm run typecheck` passed. Environment: Windows, Node 24.15.0, pnpm 12.10.0. No DOM or solver behavior changed.

@@ -11,6 +11,7 @@
   "scripts": {
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "test:rules": "node --experimental-strip-types --test tests/core.test.mjs tests/oracle.test.mjs",
+    "test:transforms": "node --experimental-strip-types --test tests/transforms.test.mjs",
     "verify:all": "node --experimental-strip-types scripts/verify-all.mjs",
     "typecheck": "tsc --noEmit",
     "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
