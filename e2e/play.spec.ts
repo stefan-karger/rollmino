@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { cell, complete, fixtures, openGame, seed, slot } from './helpers.ts';
+import { cell, complete, fixtures, openGame, resetRandom, seed, slot } from './helpers.ts';
 
 test('loads the Rollmino entry and its styles without page or asset errors', async ({ page }) => {
   const errors: string[] = [];
@@ -48,6 +48,7 @@ test('active confirmations preserve time on cancel, replay is hidden, and level 
   await seed(page, [fixtures[0].dice, fixtures[1].dice]);
   await page.goto('./');
   await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
+  await resetRandom(page);
   await page.getByRole('button', { name: 'Start', exact: true }).click();
   await expect(cell(page, 0, 0)).toBeFocused();
   await slot(page, 'navy').click();

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { activate, cell, center, complete, fixtures, mouseDrag, openGame, placePieces, seed, slot, trayPoint } from './helpers.ts';
+import { activate, cell, center, complete, fixtures, mouseDrag, openGame, placePieces, resetRandom, seed, slot, trayPoint } from './helpers.ts';
 import { transformPiece } from '../engine/core.ts';
 test.setTimeout(60000);
 test.beforeEach(async ({ page }) => {
@@ -9,6 +9,7 @@ test.beforeEach(async ({ page }) => {
 test('full keyboard-only game uses Tab, real transforms and grid navigation', async ({ page }) => {
   await seed(page);
   await page.goto('./');
+  await resetRandom(page);
   // The default Starter accepts this Wizard fixture too.
   await activate(page, '#start', true);
   await complete(page, fixtures[0], true);

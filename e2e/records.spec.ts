@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { cell, complete, openGame, seed, slot } from './helpers.ts';
+import { cell, complete, openGame, resetRandom, seed, slot } from './helpers.ts';
 const key = 'rollmino.records.v1';
 const entry = (elapsedMs: number, finishedAt = 1700000000000) => ({ elapsedMs, finishedAt });
 test.setTimeout(60000);
@@ -45,6 +45,7 @@ test('ranking caps five, uses milliseconds beneath equal displays and preserves 
   ] })), { key });
   await page.goto('./');
   await page.locator('#level').selectOption('WIZARD');
+  await resetRandom(page);
   await page.locator('#start').click();
   await page.clock.fastForward(1001);
   await complete(page);

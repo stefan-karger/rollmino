@@ -24,7 +24,7 @@ try { storage = window.localStorage; } catch { /* The records module supplies th
 const records = new Records(storage);
 const dateFormat = new Intl.DateTimeFormat('en', { year: 'numeric', month: 'short', day: 'numeric' });
 const colors: Record<PieceId, string> = {
-  navy: '#4c78af', brown: '#b58a67', orange: '#ff9b48', purple: '#b891ee',
+  navy: '#608bc0', brown: '#b58a67', orange: '#ff9b48', purple: '#b891ee',
   grey: '#b7c2cc', green: '#76bc83', cyan: '#65c8df', yellow: '#efd46e', red: '#ec7c7f',
 };
 const numbers: Partial<Record<PieceId, number>> = { navy: 1, brown: 2, orange: 3, purple: 4 };
@@ -257,6 +257,18 @@ dialog.addEventListener('close', () => {
   else { render(); action.trigger.focus(); }
 });
 dialog.addEventListener('cancel', () => { dialog.returnValue = 'cancel'; });
+dialog.addEventListener('keydown', event => {
+  if (event.key !== 'Tab') return;
+  const buttons = dialog.querySelectorAll<HTMLButtonElement>('button');
+  const first = buttons[0], last = buttons[buttons.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
 startButton.addEventListener('click', () => {
   if (session.phase !== 'ready') return;
   session = start(session, Date.now());

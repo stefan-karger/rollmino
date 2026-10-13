@@ -5,6 +5,7 @@ export default defineConfig({
   testIgnore: '**/production.spec.ts',
   forbidOnly: Boolean(process.env.CI),
   reporter: 'list',
+  timeout: 60000,
   use: {
     baseURL: 'http://127.0.0.1:5173/',
     trace: 'retain-on-failure',

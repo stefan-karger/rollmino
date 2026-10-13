@@ -42,12 +42,12 @@ All five development projects must pass their applicable suites. Chromium CDP-sp
 
 ## Done when
 
-- [ ] Full controls/records remain reachable at the tested sizes without horizontal page overflow.
-- [ ] Keyboard, grid semantics, dialog focus and meaningful action feedback pass.
-- [ ] Relevant app-specific axe findings are resolved or a specific justified exclusion is recorded.
-- [ ] The full desktop Chromium/Firefox/WebKit and mobile Chromium/WebKit matrix passes applicable checks.
-- [ ] Original assets/reduced-motion/contrast checks are recorded without claiming physical-phone or screen-reader results.
+- [x] Full controls/records remain reachable at the tested sizes without horizontal page overflow.
+- [x] Keyboard, grid semantics, dialog focus and meaningful action feedback pass.
+- [x] Relevant app-specific axe findings are resolved or a specific justified exclusion is recorded.
+- [x] The full desktop Chromium/Firefox/WebKit and mobile Chromium/WebKit matrix passes applicable checks.
+- [x] Original assets/reduced-motion/contrast checks are recorded without claiming physical-phone or screen-reader results.
 
 ## Completion evidence
 
-Not yet recorded. Add the actual changes, command results, checks and code reference here before setting this ticket to `done` in the tracker. Follow the [completion rules](README.md#working-and-completing-tickets).
+2026-10-13: Added nine accessibility/layout cases per project and the original `public/favicon.svg`. Native dialog Tab/Shift+Tab now loops between its controls. Improved navy glyph contrast, preserved reduced-motion/focus styling and added a test-only RNG reset before Start because axe can consume randomness. No production test/session API was introduced. `pnpm test` passed 59 tests; strict `pnpm run build` passed; the clean full `pnpm run test:e2e` rerun passed all 207 applicable cases in 6.7 minutes, with the 8 expected CDP-only skips elsewhere. The prior full run had one Firefox floating-point height failure at 43.999992px for a 44px CSS target; the assertion now allows 0.01px measurement rounding and the clean rerun passes. Axe WCAG 2/2.1/2.2 A/AA scans found zero violations in ready, running, dialog and completed states across all five projects, without exclusions. Verified six rows/36 cell names/one grid Tab stop, stable focus on timer updates, scoped shortcuts, dialog return focus, non-color identity, completion and records. Automated sizes: 320x568, 390x844, 768x1024, 1440x900 and 667x375. All required controls remain reachable by scrolling, ordinary buttons are 44px high, and SVG/HTML corner/center offsets stay below 1px. Inspected those widths, landscape scrolling and 200 percent CSS zoom/reflow in the T3 shared preview; the checked zoomed cell offset was about 0.02px with no horizontal overflow. This is CSS magnification/reflow, not a browser-chrome zoom audit. Dark numbered/anchor glyph contrast against the nine undimmed piece fills ranges from 5.07:1 to 12.20:1; labels remain undimmed. Windows, Node 24.15.0, pnpm 12.10.0, Playwright 1.64.0; bundled browser metadata is Chromium 156.0.8078.4, Firefox 157.0 and WebKit 27.2. No physical-phone, physical-pen or screen-reader audit is claimed.

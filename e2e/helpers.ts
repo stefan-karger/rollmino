@@ -13,12 +13,17 @@ export async function seed(page: Page, rolls = [fixtures[0].dice]): Promise<void
   await page.addInitScript(values => {
     let index = 0;
     Math.random = () => values[index++ % values.length];
+    (window as unknown as { resetTestRandom: () => void }).resetTestRandom = () => { index = 0; };
   }, values);
+}
+export async function resetRandom(page: Page): Promise<void> {
+  await page.evaluate(() => (window as unknown as { resetTestRandom: () => void }).resetTestRandom());
 }
 export async function openGame(page: Page, fixture = fixtures[0]): Promise<void> {
   await seed(page, [fixture.dice]);
   await page.goto('./');
   await page.getByLabel('Level', { exact: true }).selectOption(fixture.level);
+  await resetRandom(page);
   await page.getByRole('button', { name: 'Start', exact: true }).click();
 }
 export function transformPath(id: PieceId, wanted: number): { actions: ('rotate' | 'flip')[]; anchor: Cell } {

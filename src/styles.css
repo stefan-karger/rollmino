@@ -36,8 +36,7 @@ button:focus-visible, select:focus-visible { outline: 3px solid #f3da85; outline
 .piece-slot span { font-size: .73rem; }
 .piece-slot[aria-pressed=true] { outline: 2px solid #f3da85; outline-offset: 1px; }
 .piece-slot.placed svg { opacity: .45; }
-.anchor-mark { font-size: .55px; fill: #101820; font-weight: 700; }
-.anchor-mark { pointer-events: none; }
+.anchor-mark { font-size: .55px; fill: #101820; font-weight: 700; pointer-events: none; }
 .draggable-source { touch-action: none; }
 .ghost { opacity: .65; pointer-events: none; }
 #board-art .ghost text { fill: #101820; font-size: .5px; font-weight: 700; }
