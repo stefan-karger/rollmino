@@ -39,15 +39,20 @@ test('oracle accepts all stored Wizard fixtures at every level without changing 
   }
 });
 
-test('oracle independently checks solver answers and fixed placements for every fixture and level', () => {
+test('solver answers pass the oracle with frozen fixed inputs and no output aliases at every fixture and level', () => {
   for (const fixture of fixtures) for (const level of levels) for (const count of [0,1,4,9]) {
     const game = gameFor(fixture,level);
-    for (const p of fixture.solution.slice(0,count)) game.placed[p.id] = {...p};
+    for (const p of fixture.solution.slice(0,count)) game.placed[p.id] = Object.freeze({...p});
     const before = structuredClone(game);
+    Object.freeze(game.dice);
+    Object.freeze(game.placed);
+    Object.freeze(game);
     const answer = solve(game);
     assert.ok(answer);
     assertSolution(game,answer);
     assert.deepEqual(game,before);
+    answer[0].x = 99;
+    assert.deepEqual(game, before, 'returned placements must not alias fixed input');
   }
 });
 

@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import { ORIENTATIONS, PIECE_IDS, firstAnchor, transformPiece } from '../engine/core.ts';
 
 test('every orientation and occupied anchor closes after four rotations and two flips', () => {
+  const before = structuredClone(ORIENTATIONS);
   for (const id of PIECE_IDS) {
     ORIENTATIONS[id].forEach((shape, orientation) => {
       for (const anchor of shape) {
-        const before = structuredClone(ORIENTATIONS);
         for (const [action, count] of [['rotate', 4], ['flip', 2]]) {
           let draft = { orientation, anchor };
           for (let i = 0; i < count; i++) {

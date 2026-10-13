@@ -17,11 +17,15 @@ Run pnpm test before and after and compare behaviors, not counts alone. Run pnpm
 
 ## Acceptance
 
-- [ ] Removed tests are exact overlaps with identifiable retained coverage.
-- [ ] Literal regressions, independent oracle checks and solver failure/immutability contracts survive.
-- [ ] Tests read more clearly without a framework or shared implementation expectations.
-- [ ] Evidence records coverage comparison and passing commands.
+- [x] Removed tests are exact overlaps with identifiable retained coverage.
+- [x] Literal regressions, independent oracle checks and solver failure/immutability contracts survive.
+- [x] Tests read more clearly without a framework or shared implementation expectations.
+- [x] Evidence records coverage comparison and passing commands.
 
 ## Completion evidence
 
-Add dated implementation and verification results before marking the tracker done.
+2026-10-13. Merged four overlapping core tests with identifiable retained checks. Valid/truncated/wrong-die validation is now in the richer malformed-dice matrix. Other-piece collision and own-footprint movement share one test, retaining the navy/brown collision and multi-cell self-overlap/no-op/immutability cases. Full-count blocker false wins are in the exact-ID/coverage test, whose missing-ID loop already checks incompleteness. The four named historical false-win/sparse-dice/unknown-level regressions remain unchanged.
+
+Removed three redundant empty-solver calls from fixture replay and the core's 12-case positive fixed-placement solve matrix. The existing independent oracle matrix covers all three fixtures, five levels and fixed counts 0/1/4/9. It now freezes every input and checks returned-placement aliases after independent legality/fixed-position validation, retaining and broadening the removed matrix's contracts. Literal fixture placement through `canPlace`/`isSolved`, positive wins at all levels, non-enumerable fields and the distinct legal dead end remain. The oracle's implementation and separate literal IDs/groups are unchanged. Transform tests capture one orientation snapshot outside the anchor loop while still comparing immutability after every anchor. No case-builder was added; session/record tests are unchanged.
+
+Before edits `pnpm test` passed 72 tests in 1.698 seconds; afterward all 68 passed in 0.871 seconds. Earlier unchanged 72-test runs were about 0.88 seconds, so this pair does not establish a stable whole-suite speedup. The concrete reduction is 15 duplicate solver calls plus repeated snapshot creation; the main benefit is clearer ownership of coverage. Documentation checks and `git diff --check` passed. No TypeScript, runtime or oracle behavior changed, so strict/browser/exhaustive checks were not repeated for these pure-test edits under the T24 policy.
