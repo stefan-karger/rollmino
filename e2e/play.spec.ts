@@ -109,6 +109,26 @@ test('active confirmations preserve time on cancel, replay is hidden, and level 
   await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
 });
 
+test('a queued close cannot consume a reopened confirmation', { tag: '@shared' }, async ({ page }) => {
+  await openGame(page);
+  await page.getByLabel('Level', { exact: true }).selectOption('MASTER');
+  // Force reopening before the native close event runs, rather than relying on machine timing.
+  await page.evaluate(async () => {
+    const dialog = document.querySelector<HTMLDialogElement>('#confirm-dialog')!;
+    const level = document.querySelector<HTMLSelectElement>('#level')!;
+    const closed = new Promise<void>(resolve => dialog.addEventListener('close', () => resolve(), { once: true }));
+    dialog.querySelector<HTMLButtonElement>('button[value="cancel"]')!.click();
+    level.value = 'EXPERT';
+    level.dispatchEvent(new Event('change', { bubbles: true }));
+    await closed;
+  });
+  await expect(page.getByRole('dialog')).toContainText('Change to Expert');
+  await page.getByRole('button', { name: 'Confirm', exact: true }).click();
+  await expect(page.getByLabel('Level', { exact: true })).toHaveValue('EXPERT');
+  await expect(page.getByRole('button', { name: 'Start', exact: true })).toBeFocused();
+  await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
+});
+
 test('a coincidental repeated fresh roll remains ranked and a legal dead end is accepted', { tag: '@shared' }, async ({ page }) => {
   await openGame(page);
   await slot(page, 'navy').click();

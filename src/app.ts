@@ -274,14 +274,23 @@ function transition(text: string, trigger: HTMLElement, next: () => Session): vo
   if (session.phase === 'running') confirmAction(text, trigger, accept);
   else accept();
 }
-dialog.addEventListener('close', () => {
+function finishConfirmation(confirmed: boolean): void {
   const action = pending;
   pending = undefined;
+  dialog.close(confirmed ? 'confirm' : 'cancel');
   if (!action) return;
-  if (dialog.returnValue === 'confirm') action.accept();
+  if (confirmed) action.accept();
   else { renderDraft(); action.trigger.focus(); }
+}
+// Resolve the choice before another confirmation can open. Native close events are queued.
+dialog.querySelector('form')!.addEventListener('submit', event => {
+  event.preventDefault();
+  finishConfirmation((event.submitter as HTMLButtonElement | null)?.value === 'confirm');
 });
-dialog.addEventListener('cancel', () => { dialog.returnValue = 'cancel'; });
+dialog.addEventListener('cancel', event => {
+  event.preventDefault();
+  finishConfirmation(false);
+});
 dialog.addEventListener('keydown', event => {
   if (event.key !== 'Tab') return;
   const buttons = dialog.querySelectorAll<HTMLButtonElement>('button');
