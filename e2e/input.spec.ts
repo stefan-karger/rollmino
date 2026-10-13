@@ -341,6 +341,37 @@ test('Chromium native touch drag/move/return, secondary input and touchCancel ar
   await expect(page.locator('#undo')).toBeDisabled();
 });
 
+test('records and committed artwork stay mounted during dragging and timer ticks', { tag: '@shared' }, async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-10-13T10:00:00Z') });
+  await page.addInitScript(() => localStorage.setItem('rollmino.records.v1', JSON.stringify({
+    WIZARD: [{ elapsedMs: 1000, finishedAt: 1700000000000 }],
+    MASTER: [{ elapsedMs: 2000, finishedAt: 1700000000000 }],
+  })));
+  await openGame(page);
+  await slot(page, 'navy').click();
+  await cell(page, 4, 5).click();
+  const record = await page.locator('#records-list li').elementHandle();
+  const piece = await page.locator('#board-art .piece-number').elementHandle();
+  const source = await slot(page, 'cyan').locator('[data-anchor="0,0"]').elementHandle();
+  const from = await trayPoint(page, 'cyan', [0, 0]);
+  const to = await center(cell(page, 0, 0));
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  await page.mouse.move(to.x, to.y, { steps: 20 });
+  await page.clock.fastForward(5000);
+  expect(await record!.evaluate(node => node.isConnected)).toBe(true);
+  expect(await piece!.evaluate(node => node.isConnected)).toBe(true);
+  expect(await source!.evaluate(node => node.isConnected)).toBe(true);
+  await page.mouse.up(); // Blocker drop rejects without replacing committed content.
+  await expect(cell(page, 4, 5)).toHaveAttribute('data-content', 'navy');
+  expect(await record!.evaluate(node => node.isConnected)).toBe(true);
+  expect(await piece!.evaluate(node => node.isConnected)).toBe(true);
+  await page.locator('#level').selectOption('MASTER');
+  await page.getByRole('button', { name: 'Confirm', exact: true }).click();
+  await expect(page.locator('#records-list')).toContainText('00:02.00');
+  expect(await record!.evaluate(node => node.isConnected)).toBe(false);
+});
+
 test('native drag completion freezes once and saves one ranked record', { tag: '@shared' }, async ({ page }) => {
   await openGame(page);
   await placePieces(page, fixtures[0].solution.slice(0, -1));

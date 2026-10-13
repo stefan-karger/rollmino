@@ -65,7 +65,7 @@ for (let y = 0; y < 6; y++) {
     button.addEventListener('focus', () => {
       focusedCell = y * 6 + x;
       if (draft && !gesture) draft.target = [x, y];
-      render();
+      renderDraft();
     });
     cells.push(button);
     cell.append(button);
@@ -105,7 +105,16 @@ function shape(id: PieceId, orientation: number, x = 0, y = 0, extra = ''): stri
 function announce(message: string): void { status.textContent = message; }
 function updateTimer(): void { timer.textContent = formatTime(elapsed(session, Date.now())); }
 
-function render(): void {
+let axes = '';
+for (let i = 0; i < 6; i++) {
+  axes += `<text x="${i + .5}" y="-.15" text-anchor="middle">${String.fromCharCode(65 + i)}</text><text x="-.2" y="${i + .6}" text-anchor="middle">${i + 1}</text>`;
+}
+const background = cells.map((_, i) => rect(i % 6, Math.floor(i / 6), '#202c3b')).join('');
+art.innerHTML = `${axes}<g id="board-coordinates">${background}<g id="committed-art"></g><g id="draft-art" class="ghost"></g></g>`;
+const committedArt = art.querySelector<SVGGElement>('#committed-art')!;
+const draftArt = art.querySelector<SVGGElement>('#draft-art')!;
+
+function renderGame(): void {
   const active = session.phase === 'running';
   levelControl.value = session.level;
   element('ready').hidden = session.phase !== 'ready';
@@ -117,62 +126,65 @@ function render(): void {
   element('rule').textContent = restricted.length
     ? `Pieces ${restricted.map(id => numbers[id]).join(', ')} cannot share an edge. Corners may touch.`
     : 'Cover every empty cell with the nine pieces.';
-  let svg = '';
-  for (let i = 0; i < 6; i++) {
-    svg += `<text x="${i + .5}" y="-.15" text-anchor="middle">${String.fromCharCode(65 + i)}</text><text x="-.2" y="${i + .6}" text-anchor="middle">${i + 1}</text>`;
-  }
   let boardSvg = '';
   cells.forEach((button, i) => {
     const x = i % 6, y = Math.floor(i / 6);
     const id = owner(x, y);
     const blocker = session.phase !== 'ready' && session.game.dice.includes(coordinate(x, y));
     button.disabled = !active;
-    button.tabIndex = i === focusedCell ? 0 : -1;
     button.setAttribute('aria-label', `${coordinate(x, y)}, ${session.phase === 'ready' ? 'hidden' : blocker ? 'blocker' : id ? `${id} piece${numbers[id] ? ` ${numbers[id]}` : ''}` : 'empty'}`);
     button.dataset.content = blocker ? 'blocker' : id ?? 'empty';
     button.classList.toggle('draggable-source', active && Boolean(id));
-    boardSvg += rect(x, y, '#202c3b');
     if (blocker) boardSvg += `<circle cx="${x + .5}" cy="${y + .5}" r=".32" fill="#0c1118" stroke="#95a7bc" stroke-width=".045"/>`;
     if (id) {
       boardSvg += rect(x, y, colors[id]);
       if (numbers[id]) boardSvg += `<text class="piece-number" x="${x + .5}" y="${y + .63}" text-anchor="middle">${numbers[id]}</text>`;
     }
   });
-  const p = candidate();
-  let feedback = session.phase === 'completed'
-    ? `Completed in ${formatTime(session.elapsedMs)}. ${session.mode === 'practice' ? 'Practice' : 'Ranked'} run.`
-    : 'Select a piece, then a board cell.';
-  if (p && draft && session.phase === 'running') {
-    const legal = canPlace(session.game, p);
-    boardSvg += `<g class="ghost">${shape(p.id, p.orientation, p.x, p.y, `stroke="${legal ? '#fff' : '#ffb7b7'}" stroke-width=".055" stroke-dasharray="${legal ? '0' : '.13 .08'}"`)}<text x="${draft.target[0] + .5}" y="${draft.target[1] + .65}" text-anchor="middle">${legal ? '+' : '×'}</text></g>`;
-    feedback = `${names[p.id]} at ${coordinate(draft.target[0], draft.target[1])}: ${legal ? 'valid placement' : 'cannot place here'}. Anchor marked +.`;
-  }
-  art.innerHTML = `${svg}<g id="board-coordinates">${boardSvg}</g>`;
-  element('preview').textContent = feedback;
+  committedArt.innerHTML = boardSvg;
   for (const [id, button] of slots) {
     const placed = session.phase !== 'ready' ? session.game.placed[id] : undefined;
     const orientation = placed?.orientation ?? 0;
     button.disabled = !active;
     button.classList.toggle('placed', Boolean(placed));
-    button.setAttribute('aria-pressed', String(draft?.id === id));
     button.setAttribute('aria-label', `${names[id]}${numbers[id] ? ` piece ${numbers[id]}` : ''}, ${placed ? 'placed' : 'in tray'}`);
     const anchor = firstAnchor(id, orientation);
-    // HTML hit regions match only occupied SVG squares. SVG touch-action is inconsistent across engines.
-    // Keep the implicit touch-capture source mounted while capture transfers to the game.
-    if (!gesture) {
-      const cells = ORIENTATIONS[id][orientation];
-      const bounds = trayBounds(cells);
-      const svg = button.querySelector('svg')!;
-      svg.setAttribute('viewBox', `-0.15 -0.15 ${bounds.width} ${bounds.height}`);
-      svg.innerHTML = `${shape(id, orientation)}<text x="${anchor[0] + .5}" y="${anchor[1] + .66}" text-anchor="middle" class="anchor-mark">+</text>`;
-      button.querySelector('.grab-regions')!.innerHTML = cells.map(([x, y]) =>
-        `<span data-anchor="${x},${y}" class="grab-square ${active ? 'draggable-source' : ''}" style="left:${(x + .19) / bounds.width * 100}%;top:${(y + .19) / bounds.height * 100}%;width:${.92 / bounds.width * 100}%;height:${.92 / bounds.height * 100}%"></span>`).join('');
-    }
+    // Committed updates happen after gesture cleanup. Draft movement keeps capture sources mounted.
+    const cells = ORIENTATIONS[id][orientation];
+    const bounds = trayBounds(cells);
+    const svg = button.querySelector('svg')!;
+    svg.setAttribute('viewBox', `-0.15 -0.15 ${bounds.width} ${bounds.height}`);
+    svg.innerHTML = `${shape(id, orientation)}<text x="${anchor[0] + .5}" y="${anchor[1] + .66}" text-anchor="middle" class="anchor-mark">+</text>`;
+    button.querySelector('.grab-regions')!.innerHTML = cells.map(([x, y]) =>
+      `<span data-anchor="${x},${y}" class="grab-square ${active ? 'draggable-source' : ''}" style="left:${(x + .19) / bounds.width * 100}%;top:${(y + .19) / bounds.height * 100}%;width:${.92 / bounds.width * 100}%;height:${.92 / bounds.height * 100}%"></span>`).join('');
   }
-  for (const id of ['rotate', 'flip', 'remove']) element<HTMLButtonElement>(id).disabled = !active || !draft;
-  for (const id of ['rotate', 'flip']) element<HTMLButtonElement>(id).disabled ||= Boolean(gesture);
   element<HTMLButtonElement>('undo').disabled = session.phase !== 'running' || session.history.length === 0;
   element<HTMLButtonElement>('replay').disabled = session.phase === 'ready';
+  renderDraft();
+  updateTimer();
+}
+
+function renderDraft(): void {
+  const active = session.phase === 'running';
+  cells.forEach((button, i) => { button.tabIndex = i === focusedCell ? 0 : -1; });
+  for (const [id, button] of slots) button.setAttribute('aria-pressed', String(draft?.id === id));
+  for (const id of ['rotate', 'flip', 'remove']) element<HTMLButtonElement>(id).disabled = !active || !draft;
+  for (const id of ['rotate', 'flip']) element<HTMLButtonElement>(id).disabled ||= Boolean(gesture);
+  const p = candidate();
+  let ghost = '';
+  let feedback = session.phase === 'completed'
+    ? `Completed in ${formatTime(session.elapsedMs)}. ${session.mode === 'practice' ? 'Practice' : 'Ranked'} run.`
+    : 'Select a piece, then a board cell.';
+  if (p && draft && session.phase === 'running') {
+    const legal = canPlace(session.game, p);
+    ghost = `${shape(p.id, p.orientation, p.x, p.y, `stroke="${legal ? '#fff' : '#ffb7b7'}" stroke-width=".055" stroke-dasharray="${legal ? '0' : '.13 .08'}"`)}<text x="${draft.target[0] + .5}" y="${draft.target[1] + .65}" text-anchor="middle">${legal ? '+' : '×'}</text>`;
+    feedback = `${names[p.id]} at ${coordinate(draft.target[0], draft.target[1])}: ${legal ? 'valid placement' : 'cannot place here'}. Anchor marked +.`;
+  }
+  draftArt.innerHTML = ghost;
+  element('preview').textContent = feedback;
+}
+
+function renderRecords(): void {
   const list = element('records-list');
   list.replaceChildren(...records.lists[session.level].map(record => {
     const item = document.createElement('li');
@@ -186,28 +198,29 @@ function render(): void {
   element('records-empty').hidden = records.lists[session.level].length > 0;
   element('storage-notice').textContent = records.notice;
   element('storage-notice').hidden = !records.notice;
-  updateTimer();
 }
 
 function selectPiece(id: PieceId): void {
   if (session.phase !== 'running' || gesture) return;
   const orientation = session.game.placed[id]?.orientation ?? 0;
   draft = { id, orientation, anchor: firstAnchor(id, orientation), target: [focusedCell % 6, Math.floor(focusedCell / 6)] };
-  render();
+  renderDraft();
 }
 function acceptPlacement(p: Placement): void {
   const previous = session;
   session = place(session, p, Date.now());
   if (session === previous) {
     announce(session.phase === 'running' && canPlace(session.game, p) ? 'Piece is already there.' : 'Cannot place here. Try another cell or transform.');
+    renderDraft();
   } else {
     draft = undefined;
     if (previous.phase === 'running' && session.phase === 'completed' && session.mode === 'ranked') {
       records.insert(session.level, { elapsedMs: session.elapsedMs, finishedAt: session.finishedAt });
+      renderRecords();
     }
     announce(session.phase === 'completed' ? `Completed in ${formatTime(session.elapsedMs)}.` : `${names[p.id]} placed.`);
+    renderGame();
   }
-  render();
 }
 function activateCell(x: number, y: number): void {
   if (session.phase !== 'running' || gesture) return;
@@ -224,7 +237,7 @@ function transform(action: 'rotate' | 'flip'): void {
   if (!draft || session.phase !== 'running') return;
   draft = { ...draft, ...transformPiece(draft.id, draft.orientation, draft.anchor, action) };
   if (gesture?.phase === 'dragging') draft.target = boardCell(gesture.clientX, gesture.clientY);
-  render();
+  renderDraft();
 }
 function removeSelected(): void {
   cancelGesture();
@@ -234,16 +247,19 @@ function removeSelected(): void {
   session = remove(session, id, Date.now());
   draft = undefined;
   announce(previous === session ? 'Selection cleared.' : `${names[id]} removed.`);
-  render();
+  if (previous === session) renderDraft();
+  else renderGame();
   slots.get(id)!.focus();
 }
 function enterReady(next: Session): void {
   cancelGesture();
+  const previousLevel = session.level;
   session = next;
   draft = undefined;
   focusedCell = 0;
   announce('Puzzle hidden until Start.');
-  render();
+  if (previousLevel !== session.level) renderRecords();
+  renderGame();
   startButton.focus();
 }
 function confirmAction(text: string, trigger: HTMLElement, accept: () => void, title = 'Abandon this run?'): void {
@@ -263,7 +279,7 @@ dialog.addEventListener('close', () => {
   pending = undefined;
   if (!action) return;
   if (dialog.returnValue === 'confirm') action.accept();
-  else { render(); action.trigger.focus(); }
+  else { renderDraft(); action.trigger.focus(); }
 });
 dialog.addEventListener('cancel', () => { dialog.returnValue = 'cancel'; });
 dialog.addEventListener('keydown', event => {
@@ -282,7 +298,7 @@ startButton.addEventListener('click', () => {
   if (session.phase !== 'ready') return;
   session = start(session, Date.now());
   announce('Puzzle started. Select a piece.');
-  render();
+  renderGame();
   cells[focusedCell].focus();
 });
 element('rotate').addEventListener('click', () => transform('rotate'));
@@ -294,7 +310,8 @@ element('undo').addEventListener('click', () => {
   const previous = session;
   session = undo(session);
   if (previous !== session) announce('Last action undone.');
-  render();
+  if (previous === session) renderDraft();
+  else renderGame();
 });
 element('new-game').addEventListener('click', event => transition('Start a fresh game and abandon this unfinished run?', event.currentTarget as HTMLElement, () => freshSession(session.level)));
 element('replay').addEventListener('click', event => transition('Replay this layout as practice and abandon this unfinished run?', event.currentTarget as HTMLElement, () => replay(session)));
@@ -303,7 +320,7 @@ element('clear-records').addEventListener('click', event => {
   confirmAction(`Clear the saved ${session.level[0] + session.level.slice(1).toLowerCase()} records in this browser?`, trigger, () => {
     records.clear(session.level);
     announce('Records cleared for this level.');
-    render();
+    renderRecords();
     trigger.focus();
   }, 'Clear records?');
 });
@@ -342,7 +359,7 @@ gameWidget.addEventListener('keydown', event => {
     event.preventDefault();
     const id = draft.id;
     draft = undefined;
-    render();
+    renderDraft();
     slots.get(id)!.focus();
   }
 });
@@ -366,7 +383,7 @@ function cancelGesture(): void {
   if (!held) return;
   suppressClick = true;
   draft = held.phase === 'dragging' ? { ...held.source } : draft;
-  render();
+  renderDraft();
 }
 
 gameWidget.addEventListener('pointerdown', event => {
@@ -420,7 +437,7 @@ window.addEventListener('pointermove', event => {
   gesture.clientY = event.clientY;
   draft!.target = boardCell(event.clientX, event.clientY);
   event.preventDefault();
-  render();
+  renderDraft();
 });
 window.addEventListener('pointerup', event => {
   if (!gesture || gesture.pointerId !== event.pointerId) return;
@@ -445,7 +462,7 @@ window.addEventListener('pointerup', event => {
   } else {
     draft = { ...held.source };
     announce('Cannot drop here. Piece returned to its starting position.');
-    render();
+    renderDraft();
   }
 });
 window.addEventListener('pointercancel', event => {
@@ -466,4 +483,5 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) cance
 new ResizeObserver(cancelGesture).observe(element('game').querySelector('.board-frame')!);
 window.addEventListener('resize', cancelGesture);
 setInterval(updateTimer, 100);
-render();
+renderRecords();
+renderGame();
