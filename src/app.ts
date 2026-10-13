@@ -35,6 +35,12 @@ const names: Record<PieceId, string> = {
 let session: Session = freshSession();
 type Draft = { id: PieceId; orientation: number; anchor: Cell; target: Cell };
 let draft: Draft | undefined;
+type Gesture = {
+  pointerId: number; phase: 'armed' | 'dragging'; source: Draft;
+  startX: number; startY: number; clientX: number; clientY: number;
+};
+let gesture: Gesture | undefined;
+let suppressClick = false;
 let focusedCell = 0;
 let pending: { accept: () => void; trigger: HTMLElement } | undefined;
 const cells: HTMLButtonElement[] = [];
@@ -57,7 +63,7 @@ for (let y = 0; y < 6; y++) {
     button.addEventListener('click', () => activateCell(x, y));
     button.addEventListener('focus', () => {
       focusedCell = y * 6 + x;
-      if (draft) draft.target = [x, y];
+      if (draft && !gesture) draft.target = [x, y];
       render();
     });
     cells.push(button);
@@ -70,8 +76,8 @@ for (const id of PIECE_IDS) {
   const button = document.createElement('button');
   button.className = 'piece-slot';
   button.dataset.piece = id;
-  button.innerHTML = `<svg viewBox="-0.15 -0.15 4.3 3.3" aria-hidden="true"></svg><span>${names[id]}${numbers[id] ? ` ${numbers[id]}` : ''}</span>`;
-  button.addEventListener('click', () => selectPiece(id));
+  button.innerHTML = `<span class="piece-art" aria-hidden="true"><svg viewBox="-0.15 -0.15 4.3 3.3"></svg><span class="grab-regions"></span></span><span class="piece-label">${names[id]}${numbers[id] ? ` ${numbers[id]}` : ''}</span>`;
+  button.addEventListener('click', () => { selectPiece(id); button.focus({ preventScroll: true }); });
   slots.set(id, button);
   tray.append(button);
 }
@@ -121,6 +127,7 @@ function render(): void {
     button.tabIndex = i === focusedCell ? 0 : -1;
     button.setAttribute('aria-label', `${coordinate(x, y)}, ${session.phase === 'ready' ? 'hidden' : blocker ? 'blocker' : id ? `${id} piece${numbers[id] ? ` ${numbers[id]}` : ''}` : 'empty'}`);
     button.dataset.content = blocker ? 'blocker' : id ?? 'empty';
+    button.classList.toggle('draggable-source', active && Boolean(id));
     boardSvg += rect(x, y, '#202c3b');
     if (blocker) boardSvg += `<circle cx="${x + .5}" cy="${y + .5}" r=".32" fill="#0c1118" stroke="#95a7bc" stroke-width=".045"/>`;
     if (id) {
@@ -144,11 +151,17 @@ function render(): void {
     button.classList.toggle('placed', Boolean(placed));
     button.setAttribute('aria-pressed', String(draft?.id === id));
     button.setAttribute('aria-label', `${names[id]}${numbers[id] ? ` piece ${numbers[id]}` : ''}, ${placed ? 'placed' : 'in tray'}`);
-    const anchor = draft?.id === id ? draft.anchor : firstAnchor(id, orientation);
-    const shown = draft?.id === id ? draft.orientation : orientation;
-    button.querySelector('svg')!.innerHTML = `${shape(id, shown)}<text x="${anchor[0] + .5}" y="${anchor[1] + .66}" text-anchor="middle" class="anchor-mark">+</text>`;
+    const anchor = firstAnchor(id, orientation);
+    // HTML hit regions match only occupied SVG squares. SVG touch-action is inconsistent across engines.
+    // Keep the implicit touch-capture source mounted while capture transfers to the game.
+    if (!gesture) {
+      button.querySelector('svg')!.innerHTML = `${shape(id, orientation)}<text x="${anchor[0] + .5}" y="${anchor[1] + .66}" text-anchor="middle" class="anchor-mark">+</text>`;
+      button.querySelector('.grab-regions')!.innerHTML = ORIENTATIONS[id][orientation].map(([x, y]) =>
+        `<span data-anchor="${x},${y}" class="grab-square ${active ? 'draggable-source' : ''}" style="left:${(x + .19) / 4.3 * 100}%;top:${(y + .19) / 3.3 * 100}%;width:${.92 / 4.3 * 100}%;height:${.92 / 3.3 * 100}%"></span>`).join('');
+    }
   }
   for (const id of ['rotate', 'flip', 'remove']) element<HTMLButtonElement>(id).disabled = !active || !draft;
+  for (const id of ['rotate', 'flip']) element<HTMLButtonElement>(id).disabled ||= Boolean(gesture);
   element<HTMLButtonElement>('undo').disabled = session.phase !== 'running' || session.history.length === 0;
   element<HTMLButtonElement>('replay').disabled = session.phase === 'ready';
   const list = element('records-list');
@@ -168,7 +181,7 @@ function render(): void {
 }
 
 function selectPiece(id: PieceId): void {
-  if (session.phase !== 'running') return;
+  if (session.phase !== 'running' || gesture) return;
   const orientation = session.game.placed[id]?.orientation ?? 0;
   draft = { id, orientation, anchor: firstAnchor(id, orientation), target: [focusedCell % 6, Math.floor(focusedCell / 6)] };
   render();
@@ -188,7 +201,7 @@ function acceptPlacement(p: Placement): void {
   render();
 }
 function activateCell(x: number, y: number): void {
-  if (session.phase !== 'running') return;
+  if (session.phase !== 'running' || gesture) return;
   focusedCell = y * 6 + x;
   if (draft) {
     draft.target = [x, y];
@@ -201,9 +214,11 @@ function activateCell(x: number, y: number): void {
 function transform(action: 'rotate' | 'flip'): void {
   if (!draft || session.phase !== 'running') return;
   draft = { ...draft, ...transformPiece(draft.id, draft.orientation, draft.anchor, action) };
+  if (gesture?.phase === 'dragging') draft.target = boardCell(gesture.clientX, gesture.clientY);
   render();
 }
 function removeSelected(): void {
+  cancelGesture();
   if (!draft) return;
   const id = draft.id;
   const previous = session;
@@ -214,6 +229,7 @@ function removeSelected(): void {
   slots.get(id)!.focus();
 }
 function enterReady(next: Session): void {
+  cancelGesture();
   session = next;
   draft = undefined;
   focusedCell = 0;
@@ -222,6 +238,7 @@ function enterReady(next: Session): void {
   startButton.focus();
 }
 function confirmAction(text: string, trigger: HTMLElement, accept: () => void, title = 'Abandon this run?'): void {
+  cancelGesture();
   pending = { trigger, accept };
   element('confirm-title').textContent = title;
   element('confirm-text').textContent = text;
@@ -251,6 +268,7 @@ element('rotate').addEventListener('click', () => transform('rotate'));
 element('flip').addEventListener('click', () => transform('flip'));
 element('remove').addEventListener('click', removeSelected);
 element('undo').addEventListener('click', () => {
+  cancelGesture();
   draft = undefined;
   const previous = session;
   session = undo(session);
@@ -276,6 +294,11 @@ levelControl.addEventListener('change', () => {
 });
 gameWidget.addEventListener('keydown', event => {
   if (dialog.open || session.phase !== 'running') return;
+  if (event.key === 'Escape' && gesture) {
+    event.preventDefault();
+    cancelGesture();
+    return;
+  }
   const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-cell]');
   if (button && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) {
     if (event.altKey || event.metaKey || event.shiftKey || (event.ctrlKey && !['Home', 'End'].includes(event.key))) return;
@@ -302,5 +325,122 @@ gameWidget.addEventListener('keydown', event => {
     slots.get(id)!.focus();
   }
 });
+
+/** The same six-cell SVG rectangle backs both pointer geometry and HTML cells. */
+function boardCell(clientX: number, clientY: number): Cell {
+  const group = art.querySelector<SVGGElement>('#board-coordinates')!;
+  const matrix = group.getScreenCTM();
+  if (!matrix) return [-1, -1];
+  const point = new DOMPoint(clientX, clientY).matrixTransform(matrix.inverse());
+  return [Math.floor(point.x), Math.floor(point.y)];
+}
+function releaseGesture(): Gesture | undefined {
+  const held = gesture;
+  gesture = undefined;
+  if (held && gameWidget.hasPointerCapture(held.pointerId)) gameWidget.releasePointerCapture(held.pointerId);
+  return held;
+}
+function cancelGesture(): void {
+  const held = releaseGesture();
+  if (!held) return;
+  suppressClick = true;
+  draft = held.phase === 'dragging' ? { ...held.source } : draft;
+  render();
+}
+
+gameWidget.addEventListener('pointerdown', event => {
+  if (!event.isPrimary || event.button !== 0 || gesture || session.phase !== 'running' || dialog.open) return;
+  suppressClick = false;
+  const target = event.target as Element;
+  const slotButton = target.closest<HTMLButtonElement>('[data-piece]');
+  let id: PieceId | undefined;
+  let anchor: Cell | undefined;
+  let orientation = 0;
+  let world: Cell = [focusedCell % 6, Math.floor(focusedCell / 6)];
+  if (slotButton) {
+    const square = target.closest<HTMLElement>('[data-anchor]');
+    if (!square) return;
+    id = slotButton.dataset.piece as PieceId;
+    const [x, y] = square.dataset.anchor!.split(',');
+    anchor = [Number(x), Number(y)];
+    orientation = session.game.placed[id]?.orientation ?? 0;
+  } else {
+    const button = target.closest<HTMLButtonElement>('[data-cell]');
+    if (!button) return;
+    const index = Number(button.dataset.cell);
+    world = [index % 6, Math.floor(index / 6)];
+    id = owner(...world);
+    if (!id) return;
+    const placement = session.game.placed[id]!;
+    orientation = placement.orientation;
+    anchor = [world[0] - placement.x, world[1] - placement.y];
+  }
+  gesture = {
+    pointerId: event.pointerId, phase: 'armed', source: { id, orientation, anchor, target: world },
+    startX: event.clientX, startY: event.clientY, clientX: event.clientX, clientY: event.clientY,
+  };
+  event.preventDefault();
+  (slotButton ?? target.closest<HTMLButtonElement>('[data-cell]'))?.focus({ preventScroll: true });
+  // Do not rebuild the pointer-down SVG before a below-threshold native click.
+  element<HTMLButtonElement>('rotate').disabled = true;
+  element<HTMLButtonElement>('flip').disabled = true;
+});
+window.addEventListener('pointermove', event => {
+  if (!gesture || gesture.pointerId !== event.pointerId) return;
+  if (gesture.phase === 'armed') {
+    if (Math.hypot(event.clientX - gesture.startX, event.clientY - gesture.startY) <= 6) return;
+    gesture.phase = 'dragging';
+    gameWidget.setPointerCapture(event.pointerId);
+    draft = { ...gesture.source };
+  }
+  gesture.clientX = event.clientX;
+  gesture.clientY = event.clientY;
+  draft!.target = boardCell(event.clientX, event.clientY);
+  event.preventDefault();
+  render();
+});
+window.addEventListener('pointerup', event => {
+  if (!gesture || gesture.pointerId !== event.pointerId) return;
+  const held = releaseGesture()!;
+  if (held.phase === 'armed') {
+    // Native click performs selection or the selected piece's destination tap once.
+    for (const id of ['rotate', 'flip']) element<HTMLButtonElement>(id).disabled = !draft;
+    return;
+  }
+  suppressClick = true;
+  if (!draft || session.phase !== 'running') return;
+  draft.target = boardCell(event.clientX, event.clientY);
+  const pointed = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>('[data-piece]');
+  if (pointed?.dataset.piece === held.source.id) {
+    removeSelected();
+    return;
+  }
+  const [x, y] = draft.target;
+  const proposal = candidate()!;
+  if (x >= 0 && x < 6 && y >= 0 && y < 6 && canPlace(session.game, proposal)) {
+    acceptPlacement(proposal);
+  } else {
+    draft = { ...held.source };
+    announce('Cannot drop here. Piece returned to its starting position.');
+    render();
+  }
+});
+window.addEventListener('pointercancel', event => {
+  if (gesture?.pointerId === event.pointerId) cancelGesture();
+});
+gameWidget.addEventListener('lostpointercapture', event => {
+  if (event.target === gameWidget && gesture?.pointerId === event.pointerId) cancelGesture();
+});
+gameWidget.addEventListener('click', event => {
+  if (suppressClick && event.detail !== 0) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    suppressClick = false;
+  }
+}, true);
+window.addEventListener('blur', cancelGesture);
+document.addEventListener('visibilitychange', () => { if (document.hidden) cancelGesture(); });
+new ResizeObserver(cancelGesture).observe(element('game').querySelector('.board-frame')!);
+window.addEventListener('resize', cancelGesture);
 setInterval(updateTimer, 100);
 render();

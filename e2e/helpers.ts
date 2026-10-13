@@ -52,8 +52,8 @@ export async function activate(page: Page, selector: string, keyboard: boolean):
   }
   throw Error(`Cannot reach ${selector} through Tab`);
 }
-export async function complete(page: Page, fixture = fixtures[0], keyboard = false): Promise<void> {
-  for (const p of fixture.solution) {
+export async function placePieces(page: Page, placements: Placement[], keyboard = false): Promise<void> {
+  for (const p of placements) {
     await activate(page, `[data-piece="${p.id}"]`, keyboard);
     const path = transformPath(p.id, p.orientation);
     for (const action of path.actions) {
@@ -62,18 +62,38 @@ export async function complete(page: Page, fixture = fixtures[0], keyboard = fal
     }
     const x = p.x + path.anchor[0], y = p.y + path.anchor[1];
     if (keyboard) {
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 20; i++) {
         if (await page.locator('#grid button:focus').count()) break;
-        await page.keyboard.press('Tab');
+        await page.keyboard.press('Shift+Tab');
       }
+      await expect(page.locator('#grid button:focus')).toHaveCount(1);
       await page.keyboard.press('Control+Home');
       for (let i = 0; i < x; i++) await page.keyboard.press('ArrowRight');
       for (let i = 0; i < y; i++) await page.keyboard.press('ArrowDown');
+      await expect(cell(page, x, y)).toBeFocused();
       await page.keyboard.press('Enter');
     } else if (await page.evaluate(() => navigator.maxTouchPoints > 0)) await cell(page, x, y).tap();
     else await cell(page, x, y).click();
     await expect(slot(page, p.id)).toHaveClass(/placed/);
   }
+}
+export async function complete(page: Page, fixture = fixtures[0], keyboard = false): Promise<void> {
+  await placePieces(page, fixture.solution, keyboard);
   await expect(page.getByRole('status')).toContainText('Completed in');
   await expect(page.getByRole('button', { name: 'Undo', exact: true })).toBeDisabled();
+}
+
+export async function center(locator: import('@playwright/test').Locator): Promise<{ x: number; y: number }> {
+  const bounds = await locator.boundingBox();
+  if (!bounds) throw Error('Missing pointer target');
+  return { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
+}
+export async function trayPoint(page: Page, id: PieceId, anchor: Cell) {
+  return center(slot(page, id).locator(`[data-anchor="${anchor.join(',')}"]`));
+}
+export async function mouseDrag(page: Page, from: { x: number; y: number }, to: { x: number; y: number }) {
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  await page.mouse.move(to.x, to.y, { steps: 6 });
+  await page.mouse.up();
 }

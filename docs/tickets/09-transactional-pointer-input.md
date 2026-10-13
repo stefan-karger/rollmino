@@ -41,12 +41,12 @@ Cover different anchors of cyan/red, tray-to-board and board-to-board moves, sel
 
 ## Done when
 
-- [ ] Native mouse and Chromium-emulated touch placement/movement/return work with preserved occupied anchors.
-- [ ] Every invalid/cancelled gesture leaves committed state/history unchanged.
-- [ ] Capture cleans up without duplicate commits or late-session changes; secondary input and compatibility clicks are handled.
-- [ ] Tap/keyboard still complete games and normal scrolling remains available outside source regions.
-- [ ] Applicable input tests pass; evidence explicitly distinguishes emulation/synthetic branches from real hardware.
+- [x] Native mouse and Chromium-emulated touch placement/movement/return work with preserved occupied anchors.
+- [x] Every invalid/cancelled gesture leaves committed state/history unchanged.
+- [x] Capture cleans up without duplicate commits or late-session changes; secondary input and compatibility clicks are handled.
+- [x] Tap/keyboard still complete games and normal scrolling remains available outside source regions.
+- [x] Applicable input tests pass; evidence explicitly distinguishes emulation/synthetic branches from real hardware.
 
 ## Completion evidence
 
-Not yet recorded. Add the actual changes, command results, checks and code reference here before setting this ticket to `done` in the tracker. Follow the [completion rules](README.md#working-and-completing-tickets).
+2026-10-13: Added one-primary-pointer armed/dragging transactions in `src/app.ts`: six-pixel threshold, stable game capture, inverse SVG CTM mapping, occupied anchors, R/F during drag, release-time validation, own-slot removal, click suppression and cancellation before Undo/transitions. Committed pieces remain authoritative until release. Tray HTML hit areas match occupied SVG squares; native Chromium touch testing exposed SVG touch-action/capture problems, repaired by keeping source nodes mounted and using those HTML areas. Holes/labels/empty cells/gutters retain normal scrolling. Pointer starts explicitly preserve source focus across WebKit mouse defaults. The public keyboard fixture helper returns to the grid with Shift+Tab and asserts focus. `pnpm test` passed 59 tests; strict `pnpm run build` passed; `pnpm run test:e2e e2e/input.spec.ts` passed all 92 applicable cases in 3.0 minutes across five projects, with 8 expected skips for the two mobile-Chromium-only CDP cases. Native mouse checks cover cyan/red anchors at 320/800 CSS px widths, held transforms, self-overlap, removal, rejected drops, threshold taps/holes, capture loss, Undo and single ranked drag completion. Native Chromium CDP touch checks cover placement/movement/return, a second finger, touchCancel, capture transfer and scrolling outside source regions. Blur, hidden-document, pointercancel and held-action cleanup branches use explicitly synthetic events; Escape, viewport resize, mouse gestures and capture release use browser input. Windows, Node 24.15.0, pnpm 12.10.0, Playwright 1.64.0. Shared Pointer Events support pen input, but no physical pen, phone or screen-reader audit is claimed.
