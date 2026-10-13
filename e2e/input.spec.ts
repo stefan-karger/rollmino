@@ -199,8 +199,12 @@ test('native mouse rejects blockers, overlaps, edges and outside without adding 
   }
   await mouseDrag(page, await trayPoint(page, 'brown', [0, 0]), await center(cell(page, 5, 0)));
   await expect(slot(page, 'brown')).not.toHaveClass(/placed/);
-  await mouseDrag(page, await trayPoint(page, 'green', [0, 0]), await center(cell(page, 4, 5)));
+  // A4's 2x2 footprint is in bounds and blocker-free; only the navy at B5 collides.
+  await mouseDrag(page, await center(cell(page, 4, 5)), await center(cell(page, 1, 4)));
+  await mouseDrag(page, await trayPoint(page, 'green', [0, 0]), await center(cell(page, 0, 3)));
   await expect(slot(page, 'green')).not.toHaveClass(/placed/);
+  await page.locator('#undo').click();
+  await expect(cell(page, 4, 5)).toHaveAttribute('data-content', 'navy');
   await page.locator('#undo').click();
   await expect(cell(page, 4, 5)).toHaveAttribute('data-content', 'empty');
   await expect(page.locator('#undo')).toBeDisabled();

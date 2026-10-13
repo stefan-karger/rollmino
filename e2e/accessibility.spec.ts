@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { cell, complete, fixtures, openGame, resetRandom, seed, slot } from './helpers.ts';
+import { boardOffset, cell, complete, fixtures, openGame, resetRandom, seed, slot } from './helpers.ts';
 
 async function noAxeViolations(page: import('@playwright/test').Page) {
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
@@ -34,13 +34,7 @@ for (const viewport of [
     const mainWidth = await page.locator('main').evaluate(el => el.getBoundingClientRect().width);
     expect(mainWidth).toBeLessThanOrEqual(Math.min(viewport.width, 440));
     for (const [x, y] of [[0, 0], [5, 0], [0, 5], [5, 5], [3, 3]]) {
-      const offset = await cell(page, x, y).evaluate((el, position) => {
-        const matrix = document.querySelector<SVGGElement>('#board-coordinates')!.getScreenCTM()!;
-        const visual = new DOMPoint(position.x + .5, position.y + .5).matrixTransform(matrix);
-        const bounds = el.getBoundingClientRect();
-        return Math.hypot(visual.x - bounds.x - bounds.width / 2, visual.y - bounds.y - bounds.height / 2);
-      }, { x, y });
-      expect(offset).toBeLessThan(1);
+      expect(await boardOffset(page, x, y)).toBeLessThan(1);
     }
     await slot(page, 'navy').click();
     await cell(page, 4, 5).click();
@@ -101,6 +95,9 @@ test('200 percent CSS zoom reflows and keeps board geometry aligned', async ({ p
   await openGame(page);
   await page.evaluate(() => { document.documentElement.style.zoom = '2'; });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  for (const [x, y] of [[0, 0], [5, 0], [0, 5], [5, 5], [3, 3]]) {
+    expect(await boardOffset(page, x, y)).toBeLessThan(1);
+  }
   await slot(page, 'navy').click();
   await cell(page, 4, 5).click();
   await expect(cell(page, 4, 5)).toHaveAttribute('data-content', 'navy');
@@ -108,7 +105,7 @@ test('200 percent CSS zoom reflows and keeps board geometry aligned', async ({ p
   await expect(page.locator('#clear-records')).toBeInViewport();
 });
 
-test('reduced motion, visible focus and non-color identity are present', async ({ page }) => {
+test('visible focus and non-color identity remain usable with reduced motion requested', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openGame(page);
   await expect(page.locator('#rule')).toHaveText('Pieces 1, 2, 3, 4 cannot share an edge. Corners may touch.');
@@ -119,7 +116,6 @@ test('reduced motion, visible focus and non-color identity are present', async (
   await expect(cell(page, 1, 0)).toBeFocused();
   await expect(cell(page, 1, 0)).toHaveCSS('outline-style', 'solid');
   await expect(cell(page, 1, 0)).toHaveCSS('outline-width', '3px');
-  await expect(page.locator('body')).toHaveCSS('animation-name', 'none');
   await page.keyboard.press('Control+Home');
   await slot(page, 'navy').click();
   await expect(page.locator('#preview')).toContainText('cannot place here');

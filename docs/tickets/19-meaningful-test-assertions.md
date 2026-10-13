@@ -18,11 +18,17 @@ Run pnpm test, pnpm run build, focused input/accessibility cases and pnpm run te
 
 ## Acceptance
 
-- [ ] Assertions test production behavior and their names match their evidence.
-- [ ] Artifact checks allow legitimate packaging changes while rejecting missing assets/leaks.
-- [ ] Geometry, collision, focus and non-color coverage remain meaningful.
-- [ ] Evidence explains removed assertions and verification of replacements.
+- [x] Assertions test production behavior and their names match their evidence.
+- [x] Artifact checks allow legitimate packaging changes while rejecting missing assets/leaks.
+- [x] Geometry, collision, focus and non-color coverage remain meaningful.
+- [x] Evidence explains removed assertions and verification of replacements.
 
 ## Completion evidence
 
-Add dated implementation and verification results before marking the tracker done.
+2026-10-13, same Windows/Node/pnpm/browser setup as T16. Removed the subtract/add anchor tautology while retaining closure, literal direction/reflection, occupied-anchor, symmetry and immutability checks. Removed the body-only animation assertion and renamed the test to describe visible focus/non-color usability with reduced motion requested; there is no animated descendant to verify.
+
+Layout and CSS zoom now measure centers of actual rendered SVG rectangles against HTML cells at all four corners and a center cell. An initial CTM-based version exposed a Firefox measurement discrepancy under CSS zoom: it reported 31.32px offset although the rendered SVG/HTML centers agreed within 0.02px. The shared helper therefore uses rendered bounds for visual alignment. This tests CSS reflow/visual alignment and tap play, not browser-chrome zoom or zoomed native dragging. A temporary 3px grid translation produced a 5.995px zoomed offset and the expected failure; restoring the CSS passed.
+
+The drag-overlap rejection now moves navy to B5 and attempts green at A4. That 2x2 footprint is in bounds and blocker-free, so only piece collision causes rejection. Undo demonstrates that rejection added no history. Artifact checks require the entry/favicon and compiled JS/CSS without exact counts; they retain asset MIME/content/error/static-service checks and reject provenance/test paths or text. Adding an original SVG and second JS chunk passed both mounts. Injecting `resetTestRandom` into a temporary artifact file failed both mounts; all temporary files were removed and the untouched artifact passed.
+
+`pnpm test` passed 60 tests; `pnpm run build` passed strict checking/build. Forty focused input/layout/zoom/focus cases passed across all five projects in 2.5 minutes. The ten production cases passed in 28.1 seconds. `pnpm run check:docs` and `git diff --check` passed. Only test assertions/helpers changed; runtime, oracle, solver and fixtures are unchanged, so the full runtime/exhaustive sequence was not repeated.

@@ -13,9 +13,6 @@ test('every orientation and occupied anchor closes after four rotations and two 
             draft = transformPiece(id, draft.orientation, draft.anchor, action);
             assert.ok(ORIENTATIONS[id][draft.orientation].some(cell =>
               cell[0] === draft.anchor[0] && cell[1] === draft.anchor[1]));
-            const target = [4, 3];
-            const origin = target.map((value, axis) => value - draft.anchor[axis]);
-            assert.deepEqual(origin.map((value, axis) => value + draft.anchor[axis]), target);
           }
           assert.deepEqual(draft, { orientation, anchor });
         }

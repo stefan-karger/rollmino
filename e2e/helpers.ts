@@ -8,6 +8,19 @@ export const fixtures = JSON.parse(readFileSync(new URL('../fixtures/rolls.json'
 export const cell = (page: Page, x: number, y: number) => page.locator(`[data-cell="${y * 6 + x}"]`);
 export const slot = (page: Page, id: PieceId) => page.locator(`[data-piece="${id}"]`);
 
+export async function boardOffset(page: Page, x: number, y: number): Promise<number> {
+  return cell(page, x, y).evaluate((el, position) => {
+    // Compare rendered SVG and HTML bounds. Firefox's screen CTM omits part of CSS zoom.
+    const rect = [...document.querySelectorAll<SVGRectElement>('#board-coordinates > rect')].find(rect =>
+      Math.floor(rect.x.baseVal.value) === position.x && Math.floor(rect.y.baseVal.value) === position.y);
+    if (!rect) throw Error('Missing visual board cell');
+    const visual = rect.getBoundingClientRect();
+    const bounds = el.getBoundingClientRect();
+    return Math.hypot(visual.x + visual.width / 2 - bounds.x - bounds.width / 2,
+      visual.y + visual.height / 2 - bounds.y - bounds.height / 2);
+  }, { x, y });
+}
+
 export async function seed(page: Page, rolls = [fixtures[0].dice]): Promise<void> {
   const values = rolls.flatMap(dice => dice.map((face, i) => (DICE[i].indexOf(face) + .5) / 6));
   await page.addInitScript(values => {

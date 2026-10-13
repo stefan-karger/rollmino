@@ -18,14 +18,15 @@ function productionErrors(page: Page, baseURL: string): string[] {
   return errors;
 }
 
-test('dist contains only the app entry, original favicon and compiled assets', () => {
-  const files = readdirSync('dist', { recursive: true }).map(String).filter(path => !['assets'].includes(path));
-  expect(files).toHaveLength(4);
+test('dist includes required app assets and excludes provenance and test content', () => {
+  const files = readdirSync('dist', { recursive: true, withFileTypes: true }).filter(entry => entry.isFile())
+    .map(entry => `${entry.parentPath}/${entry.name}`.replace(/^dist[/\\]/, ''));
   expect(files).toContain('index.html');
   expect(files).toContain('favicon.svg');
-  expect(files.filter(path => /^assets[/\\].+\.js$/.test(path))).toHaveLength(1);
-  expect(files.filter(path => /^assets[/\\].+\.css$/.test(path))).toHaveLength(1);
+  expect(files.some(path => /^assets[/\\].+\.js$/.test(path))).toBe(true);
+  expect(files.some(path => /^assets[/\\].+\.css$/.test(path))).toBe(true);
   for (const file of files) {
+    expect(file).not.toMatch(/(?:original-handoff|research-archive|fixtures|tests|e2e)(?:[/\\]|$)|SHA256SUMS|\.test\./);
     const text = readFileSync(`dist/${file}`, 'utf8');
     for (const forbidden of ['original-handoff', 'research-archive', 'resetTestRandom', 'pointerEvidence', 'tests/oracle']) {
       expect(text).not.toContain(forbidden);
@@ -46,12 +47,16 @@ test('production starts hidden and loads required assets without runtime service
     ...Array.from(document.querySelectorAll<HTMLScriptElement>('script[src]'), el => el.src),
     ...Array.from(document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"], link[rel="icon"]'), el => el.href),
   ]);
-  expect(assets).toHaveLength(3);
+  expect(assets.some(asset => new URL(asset).pathname.endsWith('.js'))).toBe(true);
+  expect(assets.some(asset => new URL(asset).pathname.endsWith('.css'))).toBe(true);
+  expect(assets.some(asset => new URL(asset).pathname.endsWith('/favicon.svg'))).toBe(true);
   for (const asset of assets) {
     expect(asset.startsWith(baseURL!)).toBe(true);
     const response = await request.get(asset);
     expect(response.status()).toBe(200);
-    expect(response.headers()['content-type']).toMatch(asset.endsWith('.svg') ? /image\/svg\+xml/ : asset.endsWith('.css') ? /text\/css/ : /javascript/);
+    const extension = new URL(asset).pathname.split('.').pop();
+    const mime = extension === 'svg' ? /image\/svg\+xml/ : extension === 'css' ? /text\/css/ : extension === 'js' ? /javascript/ : /image\//;
+    expect(response.headers()['content-type']).toMatch(mime);
     expect((await response.body()).length).toBeGreaterThan(0);
   }
   await page.locator('#start').click();
