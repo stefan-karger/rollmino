@@ -2,9 +2,9 @@
 
 Rollmino is a free, always-timed solo block puzzle with five difficulty levels and personal records in this browser. It runs entirely on a static website, with no account or backend. [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) is the agreed V1 specification; [docs/DECISIONS.md](docs/DECISIONS.md) records the user's choices.
 
-The complete V1 game is playable locally through tap, keyboard and Pointer Events. The integrated local release gates pass. [Current evidence](docs/TEST-RESULTS.md#integrated-v1-local-release-verification) covers gameplay, records, accessibility, mobile emulation and the built artifact. Public Pages activation and live verification remain [T14](docs/tickets/14-public-pages-deployment.md).
+Play at **[Rollmino](https://stefan-karger.github.io/rollmino/)**. V1 supports tap, keyboard and Pointer Events. The integrated local release gates and the checked-artifact GitHub deployment pass. [Current evidence](docs/TEST-RESULTS.md#integrated-v1-local-release-verification) covers gameplay, records, accessibility, mobile emulation and the built artifact; [T14](docs/tickets/14-public-pages-deployment.md#completion-evidence) records the successful hosted run and live smoke check.
 
-Source repository: [stefan-karger/rollmino](https://github.com/stefan-karger/rollmino). The local `main` branch tracks `origin/main`. [T00's setup evidence](docs/tickets/00-repository-setup.md#completion-evidence) records repository creation; T14 verifies synchronization and publication after implementation.
+Source repository: [stefan-karger/rollmino](https://github.com/stefan-karger/rollmino). The local `main` branch tracks `origin/main`. [T00](docs/tickets/00-repository-setup.md#completion-evidence) records repository creation; T14 records synchronization and publication after implementation.
 
 ## Start here
 
@@ -49,7 +49,7 @@ The development suite passes 207 applicable cases in desktop Chromium/Firefox/We
 - Fresh rolls can rank; intentional replay is timed practice. Completed runs freeze; reload abandons unfinished play.
 - Best five personal runs per level in this browser, with time/date and confirmed selected-level clearing.
 - Plain TypeScript, Vite, SVG, CSS and native HTML controls. Node tests and Playwright.
-- GitHub Pages hosting is prepared for public `stefan-karger/rollmino`; T14 performs activation/live verification. No backend, PWA or Android package.
+- Published from public `stefan-karger/rollmino` through GitHub Pages. No backend, PWA or Android package.
 - Tests executable here are the release gate. Real-phone tests are optional and never claimed without evidence.
 
 Tap a tray piece, then a board cell to place immediately. The marked occupied square is the tap anchor; Rotate turns it clockwise and Flip reflects it left/right. Dragging preserves the square you grabbed. Illegal drops restore committed play, and returning a placed piece to its own tray slot removes it. Placed shapes stay dimmed and selectable.
@@ -66,7 +66,7 @@ Records contain only elapsed milliseconds and completion dates. A fair fresh rol
 
 The build job has read-only source and Pages access. The dependent deploy job alone gets `pages: write` and `id-token: write`, and uses the `github-pages` environment. No application API secret or generated publishing branch is needed. pnpm comes from `packageManager` before Node 24 enables the lockfile-based pnpm cache.
 
-For the first publication, choose **Settings > Pages > Build and deployment > Source > GitHub Actions** in the public `stefan-karger/rollmino` repository, then push `main` or run the workflow manually. T14 performs that setup and records the actual deployment. This workflow's local validation does not establish a GitHub-run pass. Action setup follows the [official Pages workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [Node setup](https://github.com/actions/setup-node) and [pnpm setup](https://github.com/pnpm/action-setup) documentation.
+The repository uses **Settings > Pages > Build and deployment > Source > GitHub Actions**, with the `github-pages` environment restricted to the `main` branch and no custom domain. Push `main` or manually run the workflow on `main` to publish after its checks succeed. [Verified deployment](https://github.com/stefan-karger/rollmino/actions/runs/38363711259). Action setup follows the [official Pages workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [Node setup](https://github.com/actions/setup-node) and [pnpm setup](https://github.com/pnpm/action-setup) documentation.
 
 ## Folder guide
 

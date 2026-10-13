@@ -1,6 +1,6 @@
-# Maintenance and publication handoff prompt
+# Maintenance handoff prompt
 
-Maintain Rollmino according to `IMPLEMENTATION_PLAN.md`. Read `AGENTS.md`, `CODING_GUIDELINES.md`, current `docs/TEST-RESULTS.md` evidence and the ticket tracker first. The user confirmed V1 on 2026-10-12; the app and its local release gates are implemented. Do not repeat the interview or completed implementation slices. Public Pages activation/live verification remains T14 until its evidence is recorded.
+Maintain Rollmino according to `IMPLEMENTATION_PLAN.md`. Read `AGENTS.md`, `CODING_GUIDELINES.md`, current `docs/TEST-RESULTS.md` evidence and the ticket tracker first. The user confirmed V1 on 2026-10-12; the app is implemented and published at `https://stefan-karger.github.io/rollmino/`. Do not repeat the interview or completed implementation slices. T14 records the actual checked-artifact deployment and live smoke evidence.
 
 Use the established TypeScript/Vite/SVG/CSS stack, native HTML controls, Node tests and Playwright. Use packageManager-pinned pnpm and frozen-lockfile installation. Preserve the canonical physical dice, nine IDs/29 cells/28 orientations, five contact groups, repaired state validation and independently checked reference solver. Archives remain provenance and never app assets.
 
@@ -8,6 +8,6 @@ Preserve the complete timed journey: hidden Start; immediate tap and occupied-an
 
 Pick work from `docs/tickets/README.md`, which alone tracks ticket status. Follow the relevant ticket checks, record actual evidence before completion, and preserve existing user work. For reference changes run fast tests first and maintain literal-model/oracle/exhaustive checks. Runtime/build changes require the full release sequence: frozen installation, pure tests, strict build, five-project development tests, existing-artifact root/subpath tests and all 62,208 independently checked Wizard answers. Documentation-only edits need link/command consistency checks.
 
-The Pages workflow builds once and deploys the tested dist after successful checks; PRs cannot publish. T14 applies GitHub Actions as the public repository's Pages source and records the actual successful run/URL/live controls. Report concrete blockers and the next action instead of claiming local tests prove hosting.
+The Pages workflow builds once and deploys the tested dist after successful checks; PRs cannot publish. The public repository uses GitHub Actions as its Pages source, and its deployment environment allows main only. Consult T14 for the recorded hosted run/URL/live controls. Report concrete blockers and the next action instead of claiming local tests prove a new deployment succeeded.
 
 State actual browser/runtime versions and distinguish mobile emulation, synthetic cleanup branches and CSS zoom/reflow from physical hardware or screen-reader audits. Executable checks here are the release gate. Use original assets and keep the source/rights limitations explicit. Do not add an unavailable-device sign-off requirement or claim unperformed checks.

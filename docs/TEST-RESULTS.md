@@ -16,7 +16,7 @@ Executed on 2026-10-13 in this Windows workspace with Node 24.15.0, pnpm 12.10.0
 | `pnpm run test:e2e` | 207 applicable cases passed across all five projects; 8 expected skips for two mobile-Chromium-only CDP cases; 6.3 minutes in T11 |
 | `pnpm run test:e2e:prod` | All 10 root/Pages-path cases passed against the same preceding dist in 15.5 seconds |
 | `pnpm run verify:all` | Every returned answer on all 62,208 Wizard boards passed the independent oracle in 27.36 seconds |
-| Workflow validation | Official actionlint 1.7.12 passed; actual GitHub execution remains T14 |
+| Workflow validation | Official actionlint 1.7.12 passed; successful hosted execution is recorded separately in T14 |
 | Clean contributor checkout | Detached `1a9c8c6` checkout with no node_modules installed all 23 locked packages from the local store, passed 59 pure tests, strict build and all 10 production cases in 17.1 seconds; existing browser binaries reused |
 
 The built artifact contains only `index.html`, `favicon.svg`, `assets/index-CIHiYrAQ.css` and `assets/index-DrVNgP7r.js`. The JS SHA-256 is `787FC845B2C80897D12E26C544424C8F479773F38AC57149402828B3DE70B236`. Both production configurations serve this artifact without rebuilding. Requests/asset MIME checks reject missing assets, page/console errors, unexpected runtime APIs, external fonts and development WebSockets.
@@ -41,7 +41,17 @@ Inspected 320/390/768/1440 CSS px widths and 667x375 landscape with the shared T
 
 Native mouse and CDP touch evidence is browser automation; mobile projects emulate phones. Blur/hidden-document/pointercancel and held-action cleanup branches are explicitly synthetic. Physical phone, pen, current physical game set and screen-reader checks were not performed. These are not additional release gates. The oracle reuses canonical orientations and establishes one returned answer per encoded board, not human difficulty, all partial-state completability or physical-source certification.
 
-No accepted product deviations were needed. The detached-checkout tests use the same committed runtime/build code as the integrated release; subsequent handoff edits change documentation/package description only. Public activation, successful hosted Actions and live URL verification remain T14.
+No accepted product deviations were needed. The detached-checkout tests use the same committed runtime/build code as the integrated release; subsequent handoff edits change documentation/package description only. The public deployment evidence is recorded below and in T14.
+
+## Public Pages release verification
+
+Published and checked on 2026-10-13 at about 07:48 UTC. [Rollmino](https://stefan-karger.github.io/rollmino/) is served by public [stefan-karger/rollmino](https://github.com/stefan-karger/rollmino), with Actions as the Pages source, HTTPS enforced, no custom domain and a main-only github-pages environment. Existing authorized Git credentials were reused without recording credentials.
+
+[Workflow 38363711259](https://github.com/stefan-karger/rollmino/actions/runs/38363711259) succeeded for [8105f41](https://github.com/stefan-karger/rollmino/commit/8105f41fd93139cae446945b959fb3c7267c9f18). Its Ubuntu/Node 24.21.0 run passed frozen setup, browser installation, all 59 pure tests, strict build, 207 applicable development cases in 4.6 minutes with the 8 expected CDP skips, all 10 production cases in 12.2 seconds, and all 62,208 independent Wizard answers in 25.40 seconds. Configuration, tested-artifact upload and the dependent deployment all succeeded.
+
+Live shared-preview checks in desktop Chromium 152.0.7977.130/Electron 44.4.2 verified the title, hidden 36-cell ready screen, all five available levels, Start revealing seven blockers, Starter and Wizard play, a rotated/flipped brown piece placed on a vertical empty pair, meaningful feedback and reachable records controls. The Level control's change event selected Wizard; piece actions used the public controls. A full same-URL navigation reloaded into Starter hidden ready with timer 00:00.00 and no placements. An error/unhandled-rejection listener captured no runtime errors during the observed Wizard controls.
+
+The live HTML/JS/CSS/favicon returned HTTP 200 with correct MIME types and project-path asset URLs. Downloaded and inspected the successful run's github-pages tar artifact; all four hashes match the tested local build. Live JS/CSS/favicon SHA-256 values match that CI archive. Localhost records were not treated as Pages records. The shared preview's screenshot/resize calls failed during the live smoke check; rendered DOM geometry, controls and HTTP/resource inspection supplied these live checks. T10's separate local visual/layout evidence remains unchanged. No physical-device or screen-reader claim is added by publication.
 
 ## Original packaging evidence
 

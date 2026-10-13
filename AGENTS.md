@@ -6,7 +6,7 @@ The user confirmed the complete V1 contract on 2026-10-12. [IMPLEMENTATION_PLAN.
 
 When asked to implement, pick ready work from [docs/tickets/README.md](docs/tickets/README.md). The tickets divide the agreed plan's slices into scoped tasks with blockers, tests and completion criteria. Keep status only in that central tracker and record evidence in the ticket before marking it done. Do not reopen technology/product decisions without a concrete conflict. Do not implement the app merely because a planning/ticket-writing request or the reference engine exists. This handoff's planning work is complete.
 
-The V1 app, browser/artifact checks and Pages workflow are implemented. Read [current integrated evidence](docs/TEST-RESULTS.md#integrated-v1-local-release-verification) and the tracker before choosing work; do not repeat completed slices. Public activation/live verification remains T14 until its actual hosting evidence is recorded.
+The V1 app, browser/artifact checks and Pages workflow are implemented and [published](https://stefan-karger.github.io/rollmino/). Read [current integrated evidence](docs/TEST-RESULTS.md#integrated-v1-local-release-verification), T14's hosting evidence and the tracker before choosing work; do not repeat completed slices. Further changes require a current user request and must preserve the accepted contract.
 
 ## Mandatory context
 

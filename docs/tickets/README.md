@@ -22,7 +22,7 @@ Read the table top to bottom. Pick the first `todo` ticket whose listed blockers
 | `done` | [T11. Test the production artifact at root and Pages subpath](11-production-artifact-verification.md) | [T10](10-responsive-accessibility.md) | Full release sequence passed, including 10 artifact cases and 62,208 answers; [evidence](11-production-artifact-verification.md#completion-evidence) |
 | `done` | [T12. Add the checked-artifact GitHub Pages workflow](12-pages-workflow.md) | [T11](11-production-artifact-verification.md) | Actionlint and workflow review passed; [evidence](12-pages-workflow.md#completion-evidence) |
 | `done` | [T13. Close local release gates and update the implementation handoff](13-release-handoff.md) | [T12](12-pages-workflow.md) | Integrated gates mapped, clean contributor setup and docs checks passed; [evidence](13-release-handoff.md#completion-evidence) |
-| `todo` | [T14. Deploy GitHub Pages and verify the live site](14-public-pages-deployment.md) | [T00](00-repository-setup.md), [T13](13-release-handoff.md) | Existing public repo, successful deployment and live smoke check |
+| `done` | [T14. Deploy GitHub Pages and verify the live site](14-public-pages-deployment.md) | [T00](00-repository-setup.md), [T13](13-release-handoff.md) | Published and smoke-checked live; [run](https://github.com/stefan-karger/rollmino/actions/runs/38363711259) / [evidence](14-public-pages-deployment.md#completion-evidence) |
 
 ## Working and completing tickets
 
