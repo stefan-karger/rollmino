@@ -43,12 +43,12 @@ For workflow-only edits, reuse current local application evidence and inspect th
 
 ## Done when
 
-- [ ] The workflow has explicit test/build and dependent deploy jobs with correct triggers.
-- [ ] PRs cannot publish; main/manual publication requires successful full checks.
-- [ ] The uploaded/deployed artifact is the tested `dist/` and no deploy rebuild occurs.
-- [ ] Permissions, Pages environment, concurrency and repository setup instructions are explicit.
-- [ ] Local/configuration validation is recorded honestly; the remaining actual-host verification is assigned to T14.
+- [x] The workflow has explicit test/build and dependent deploy jobs with correct triggers.
+- [x] PRs cannot publish; main/manual publication requires successful full checks.
+- [x] The uploaded/deployed artifact is the tested `dist/` and no deploy rebuild occurs.
+- [x] Permissions, Pages environment, concurrency and repository setup instructions are explicit.
+- [x] Local/configuration validation is recorded honestly; the remaining actual-host verification is assigned to T14.
 
 ## Completion evidence
 
-Not yet recorded. Add the actual changes, command results, checks and code reference here before setting this ticket to `done` in the tracker. Follow the [completion rules](README.md#working-and-completing-tickets).
+2026-10-13: Added `.github/workflows/pages.yml` and README Pages setup/trigger/permission instructions. PR, main-push and manual runs use Node 24, packageManager-pinned pnpm, frozen installation and Playwright system/browser setup. pnpm setup precedes the Node pnpm cache. All existing release commands run in order; build runs once, production checks reuse dist, and only successful non-PR runs configure Pages/upload dist. Deploy needs build, uses github-pages and receives Pages/OIDC write permissions; build has only contents/pages read. Publication runs share a non-cancelling concurrency group. Checked current primary documentation for [Pages actions](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [checkout](https://github.com/actions/checkout), [Node setup](https://github.com/actions/setup-node) and [pnpm setup](https://github.com/pnpm/action-setup); selected checkout/setup-node v7, pnpm action-setup v6, configure-pages v5, upload-pages-artifact v4 and deploy-pages v4. Reviewed conditions, needs, default failure propagation, artifact path and command/script correspondence. The official actionlint 1.7.12 Windows binary passed workflow validation with no findings; its downloaded archive matched the published SHA-256 `6E7241B51E6817EA6A047693D8E6FED13B31819C9A0DD6C5A726E1592D22F6E9`. No runtime dependency was added. `git diff --check` passed. T11 full-release evidence applies because no app/build configuration changed. The standalone gh login was absent, but the existing T00 Git credential helper authenticated API reads as stefan-karger without exposing or recording credentials. Pages activation and actual Actions/deployment evidence remain T14; no hosted-run pass is claimed here.

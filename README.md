@@ -47,6 +47,14 @@ The browser startup case passes in desktop Chromium/Firefox/WebKit and mobile Ch
 - Public `stefan-karger/rollmino` on GitHub Pages. No backend, PWA or Android package.
 - Tests executable here are the release gate. Real-phone tests are optional and never claimed without evidence.
 
+## Pages workflow
+
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml) checks pull requests without publishing. Pushes to `main` and manual dispatch run the same checks, then deploy the tested `dist/`. It builds once, checks root and `/rollmino/`, and uploads only after browser tests and exhaustive verification pass. Publication runs share a concurrency group and do not cancel an active deployment.
+
+The build job has read-only source and Pages access. The dependent deploy job alone gets `pages: write` and `id-token: write`, and uses the `github-pages` environment. No application API secret or generated publishing branch is needed. pnpm comes from `packageManager` before Node 24 enables the lockfile-based pnpm cache.
+
+For the first publication, choose **Settings > Pages > Build and deployment > Source > GitHub Actions** in the public `stefan-karger/rollmino` repository, then push `main` or run the workflow manually. T14 performs that setup and records the actual deployment. This workflow's local validation does not establish a GitHub-run pass. Action setup follows the [official Pages workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [Node setup](https://github.com/actions/setup-node) and [pnpm setup](https://github.com/pnpm/action-setup) documentation.
+
 ## Folder guide
 
 | Path | Purpose |
