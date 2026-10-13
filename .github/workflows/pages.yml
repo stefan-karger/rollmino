@@ -12,7 +12,7 @@ permissions:
 # All publication runs share one group; PR checks use independent groups.
 concurrency:
   group: pages-${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'deployment' }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -49,6 +49,14 @@ jobs:
         run: pnpm run test:e2e:prod
       - name: Independently verify every Wizard solution
         run: pnpm run verify:all
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
       - name: Configure Pages
         if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
