@@ -1,59 +1,30 @@
-# Agent handoff instructions for Rollmino
+# Rollmino agent instructions
 
-## Your task
+V1 is implemented and published. [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) is the single current contract, confirmed on 2026-10-12. The interview is closed. Preserve behavior; identify a concrete conflict before proposing a user-visible revision. Historical material does not override the contract.
 
-The user confirmed the complete V1 contract on 2026-10-12. [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) is the current agreed specification. The requirements interview is closed; [docs/DECISIONS.md](docs/DECISIONS.md) records the answers. `PLAN.md` is historical analysis, not an alternative active specification.
+## Read and choose work
 
-When asked to implement, pick ready work from [docs/tickets/README.md](docs/tickets/README.md). The active tickets scope the post-V1 review findings with priorities, blockers, tests and completion criteria. Keep status only in that central tracker and record evidence in the ticket before marking it done. Do not reopen technology/product decisions without a concrete conflict. Do not implement the app merely because a planning/ticket-writing request or the reference engine exists. The completed V1 ticket batch remains in Git history; the tracker now owns follow-up work.
+Read [README.md](README.md), the contract and [CODING_GUIDELINES.md](CODING_GUIDELINES.md), then the [tracker](docs/tickets/README.md), current ticket and completed blocker evidence. Consult [dated live evidence](docs/TEST-RESULTS.md#public-pages-release-verification) for hosting work. Read relevant code/tests/fixtures before edits; run fast tests before reference changes.
 
-The V1 app, browser/artifact checks and Pages workflow are implemented and [published](https://stefan-karger.github.io/rollmino/). Read [current integrated evidence](docs/TEST-RESULTS.md#integrated-v1-local-release-verification), [public release evidence](docs/TEST-RESULTS.md#public-pages-release-verification) and the tracker before choosing work; do not repeat completed slices. Further changes require a current user request and must preserve the accepted contract.
+Choose the first todo ticket whose blockers are done. Keep status only in the tracker. Record dated behavior, actual commands/results and limits before checking acceptance and marking done. Do not implement without a current user request or repeat completed slices. Shared-file overlap alone is not a blocker.
 
-## Mandatory context
+## Correctness and engineering
 
-Read in this order: `README.md`, `docs/V1-SCOPE.md`, `docs/RESEARCH.md`, `engine/core.ts`, `docs/TEST-PLAN.md`, `docs/UI-AND-INTERACTIONS.md`, `docs/SOURCES-AND-RISKS.md`.
+1. Preserve six actual faces per die with duplicates, seven distinct physical blockers, nine IDs/29 squares/28 orientations and exact contact groups.
+2. Master is not a superset of Expert; diagonal contact is legal. Rotate/Flip transform cells and occupied anchors geometrically, never by index stepping.
+3. Keep one committed game, transactional rejection/cancellation and full active Undo. Wins require exact IDs, legal placements and full coverage.
+4. Preserve hidden Start, wall time through background/confirmations/Undo, fresh/practice separation, terminal completion and single ranked consideration.
+5. Preserve complete tap/keyboard/native pointer play, stable focus, storage notices and selected-level clearing.
+6. The reference solver preserves fixed placements and returns null for legal dead ends. Preserve malformed-state regressions and independent checks. No assistance ships.
 
-Then read `CODING_GUIDELINES.md`, `docs/DECISIONS.md`, `IMPLEMENTATION_PLAN.md` and the ticket tracker/current ticket. Consult the findings/evidence in historical `PLAN.md` as needed. The agreed plan supersedes older optional timer/hint, preview-then-Place, short Undo and physical-phone gate proposals.
+Use TypeScript/Vite/SVG/CSS/native HTML, Node tests and Playwright. Follow KISS/YAGNI for readable cohesive responsibilities, not mechanical file/dependency minimums. Use pinned pnpm/frozen installs and only `pnpm-lock.yaml`. Avoid backend/auth/generic engines/stores/speculative APIs.
 
-Before changing the reference, run the fast tests and inspect the existing engine/fixtures. Known defects and prior exhaustive evidence are documented; do not assume passing old tests establishes robust state validation.
+Use original art; never publish official graphics or provenance assets. Correct verified discrepancies with model/tests/evidence. Provenance/checksums remain historical until T26's authorized cleanup.
 
-## Non-negotiable correctness rules
+## Verification and publication
 
-1. Use the actual per-die six-face tables. Repeated faces affect probabilities.
-2. Physical rolls place seven blockers in seven distinct cells of a 6 by 6 board.
-3. Exactly nine piece IDs occupy 29 squares with 28 unique geometric orientations.
-4. Respect per-level special-piece contact restrictions. Master is not a superset of Expert; diagonal contact is permitted.
-5. Flips and rotations are geometric transformations. Orientation indices are implementation details.
-6. Validate solved committed placements, including exact IDs and complete coverage. Visual paint and drop counts cannot establish a win.
-7. The reference solver preserves fixed placements and returns null for a legal dead end. No solver assistance ships in V1.
+Follow the [verification policy](IMPLEMENTATION_PLAN.md#verification). Until T24 revises it, runtime/build edits require frozen installation, pure tests, strict build, five development projects, both production mounts and 62,208 independently checked answers. Docs-only edits require local-file/anchor/command consistency and `git diff --check`.
 
-## Engineering guidance
+Build before production tests, which reuse dist. Run Playwright invocations sequentially. Executable checks here are the gate. Report emulation, synthetic cleanup and CSS reflow honestly; do not invent physical-device/pen/game/screen-reader passes or gates.
 
-- Follow [CODING_GUIDELINES.md](CODING_GUIDELINES.md), adopted from the user's astro-portfolio KISS/YAGNI policy. Optimize for understandable cohesive code and ongoing maintenance, not a mechanical file/dependency minimum.
-- The confirmed stack is TypeScript, Vite, SVG, CSS, native HTML controls, Node tests and Playwright. Do not repeat a greenfield stack-selection exercise.
-- Use pnpm, pinned by `packageManager` in `package.json`, for dependencies and scripts. Keep `pnpm-lock.yaml` as the only dependency lockfile and use `pnpm install --frozen-lockfile` for verification/CI.
-- Keep pure testable rules, one authoritative committed game, deterministic fixtures and static hosting.
-- Preserve the documented validation regressions and repairs. Make every exhaustive answer's independent legality check reproducible.
-- Build playable slices with executable checks. Add modules only for meaningful current responsibilities.
-- Avoid backend, auth, multiplayer, physics, 3D, generic game engines, generalized state architecture and speculative extensibility.
-- Use original artwork. Do not copy official logos/manual graphics or publish provenance directories as app assets.
-- Document verified source discrepancies and correct model/tests; never silently follow a mistaken reference.
-- Tests executable in the current environment are the release gate. No physical-phone or screen-reader release gate was requested. Do not claim unperformed tests.
-
-## Plan contract
-
-The agreed plan contains stack alternatives/trade-offs, required/nice-to-have/excluded scope, exact rules, minimal file responsibilities, ordered slices, interaction/session state machines, record/timer behavior, test fixtures/failure cases, commands, acceptance/deployment gates and bounded risks.
-
-Keep active docs consistent when an accepted decision changes. Routine implementation details follow the coding guidelines. If a change would alter agreed user-visible behavior, identify that decision and propose a focused revision.
-
-## Existing verification commands
-
-```bash
-pnpm install --frozen-lockfile
-pnpm test
-pnpm run build
-pnpm run test:e2e
-pnpm run test:e2e:prod
-pnpm run verify:all
-```
-
-The exhaustive check is separate from the fast suite. Node type stripping runs pure tests, not the browser build. Browser/artifact commands are executable and their current results are recorded in `docs/TEST-RESULTS.md`. Production tests reuse the preceding `dist/`; build before running them. Use the frozen lockfile and documented Playwright browser/system setup for contributor verification.
+PRs cannot publish. Main/manual deployment passes full gates and deploys their tested artifact. Keep read-only build permissions, dependent deployment and non-cancelling serialized publication. Local readiness does not prove deployment. Report concrete blockers and next actions.

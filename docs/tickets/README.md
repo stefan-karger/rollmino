@@ -14,7 +14,7 @@ P1 is next work, P2 is worthwhile follow-up, and P3 is optional cleanup. Small c
 | --- | --- | --- | --- | --- | --- |
 | done | [T15. Fix click suppression after cancelled dragging](15-cancelled-drag-click-suppression.md) | P1 | Next Start can require two clicks | Small | 212 browser cases, 59 pure tests, build, ten artifact cases and exhaustive checks passed; [evidence](15-cancelled-drag-click-suppression.md#completion-evidence) |
 | done | [T16. Fit every tray orientation and its drag regions](16-tray-orientation-geometry.md) | P1 | Grey clipping and invisible drag source | Small to medium | None |
-| todo | [T17. Consolidate current maintenance documentation](17-maintenance-documentation.md) | P1 | Less repeated reading and obsolete guidance | Medium | None |
+| done | [T17. Consolidate current maintenance documentation](17-maintenance-documentation.md) | P1 | Less repeated reading and obsolete guidance | Medium | None |
 | todo | [T18. Reduce repeated browser-test executions](18-browser-test-coverage.md) | P1 | Faster checks with useful platform coverage | Medium | [T15](15-cancelled-drag-click-suppression.md), [T16](16-tray-orientation-geometry.md), [T19](19-meaningful-test-assertions.md) |
 | todo | [T19. Repair weak and brittle test assertions](19-meaningful-test-assertions.md) | P2 | Better regressions and fewer incidental failures | Small | None |
 | todo | [T20. Show completion feedback near the board](20-visible-completion-feedback.md) | P2 | Clear finished state on phones | Small | None |

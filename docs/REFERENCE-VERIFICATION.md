@@ -1,5 +1,7 @@
 # Reference engine and verification evidence
 
+Historical reference audit. Current maintenance follows the [contract](../IMPLEMENTATION_PLAN.md#verification); V1 is implemented and published. This file records earlier experiments and is retained until T26's archival cleanup.
+
 ## Model invariants
 
 - Nine piece IDs cover 29 cells.
@@ -30,4 +32,4 @@ pnpm install --frozen-lockfile && pnpm run typecheck
 
 The archived log is historical evidence, not a substitute for rerunning the canonical engine. T01 repaired malformed-state validation and T02 added the independent answer oracle required by [IMPLEMENTATION_PLAN.md](../IMPLEMENTATION_PLAN.md). The fast default suite does not enumerate all boards; `verify:all` is the separate exhaustive command.
 
-The sweep validates one returned solution per board. It does not count all solutions, measure human difficulty or enumerate all partial positions. The oracle verifies seven distinct in-board blocker coordinates; the literal core tests and physical-die enumeration establish their physical model. Shared orientation data limits its independence. These checks do not certify source-independent physical accuracy, browser input, storage, accessibility, layout, real devices or a finished app. T03 adds a separately tested minimal browser entry, without gameplay.
+The sweep validates one returned solution per board. It does not count all solutions, measure human difficulty or enumerate all partial positions. The oracle verifies seven distinct in-board blocker coordinates; literal core tests and physical-die enumeration establish their physical model. Shared orientation data limits independence. These reference checks alone do not certify physical accuracy, browser input, storage, accessibility, layout or real devices. Browser/release evidence is separate in [TEST-RESULTS.md](TEST-RESULTS.md).

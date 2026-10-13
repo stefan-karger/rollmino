@@ -1,6 +1,6 @@
 # Genius Square source research (historical)
 
-Status: historical source research, not the current feature or release contract. [IMPLEMENTATION_PLAN.md](../IMPLEMENTATION_PLAN.md) and [DECISIONS.md](DECISIONS.md) supersede the UI/technology/scope proposals below. Timing, personal records, full active-run Undo, immediate tap placement and touch dragging are required; hints and physical-device sign-off are not. The original verbatim research remains in `original-handoff/genius-square-greenfield-research.md`. Preserve the source/model discussion as evidence.
+Status: historical source research, not the current contract. [IMPLEMENTATION_PLAN.md](../IMPLEMENTATION_PLAN.md) preserves the accepted decisions and supersedes the proposals below. Timing, records, full active Undo, immediate tap placement and touch dragging are required; hints and physical-device sign-off are not. The original verbatim research remains in `original-handoff/genius-square-greenfield-research.md` until T26's archival cleanup.
 
 **Research date:** 2026-10-12  
 **Target:** the SmartGames 2022–2023 five-level Genius Square edition, including the physical seven-die setup.  

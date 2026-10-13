@@ -2,7 +2,7 @@
 
 Package-manager migration on 2026-10-12: commands in historical results below are current pnpm equivalents. Those earlier runs used the previous package manager; their original commands are preserved in commit `df3e241`. [Actual pnpm verification](docs/TEST-RESULTS.md#pnpm-migration-verification).
 
-Status: superseded by the user-confirmed [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) on 2026-10-12. The entire proposal below is historical. Its optional timer/hints, short Undo, preview-then-Place, optional touch drag and physical-device release gates are not active requirements. [docs/DECISIONS.md](docs/DECISIONS.md) records the accepted choices. Preserve the analysis/audit evidence; execute the new plan.
+Status: historical analysis, superseded by the user-confirmed [current contract](IMPLEMENTATION_PLAN.md) on 2026-10-12. Its optional timer/hints, short Undo, preview-then-Place, optional touch drag and physical-device gates are not requirements. The original decisions remain in Git at `d74ac8a`; the consolidated contract preserves them. T26 owns archival cleanup.
 
 Original review on 2026-10-12. The body preserves the initial proposals and verification findings, before the requirements interview closed. It did not build the browser app or change the reference engine. The confirmed plan carries forward the verified defects and useful evidence with the agreed scope.
 
