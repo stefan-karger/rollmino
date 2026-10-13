@@ -42,12 +42,12 @@ Open both mounts with available browser tools and check Start/placement/assets. 
 
 ## Done when
 
-- [ ] Root and Pages-path projects test the same preceding `dist/` successfully.
-- [ ] No test config rebuilds or drops the subpath when navigating.
-- [ ] Full fixture completion/reload records work without missing assets, unexpected errors or runtime services.
-- [ ] The full release command sequence passes on the code being recorded.
-- [ ] Artifact inspection confirms only original application content ships and evidence states the actual automated environment.
+- [x] Root and Pages-path projects test the same preceding `dist/` successfully.
+- [x] No test config rebuilds or drops the subpath when navigating.
+- [x] Full fixture completion/reload records work without missing assets, unexpected errors or runtime services.
+- [x] The full release command sequence passes on the code being recorded.
+- [x] Artifact inspection confirms only original application content ships and evidence states the actual automated environment.
 
 ## Completion evidence
 
-Not yet recorded. Add the actual changes, command results, checks and code reference here before setting this ticket to `done` in the tracker. Follow the [completion rules](README.md#working-and-completing-tickets).
+2026-10-13: Added `playwright.production.config.ts`, `e2e/production.spec.ts` and `test:e2e:prod`. Root and /rollmino/ Chromium projects serve the same preceding dist through Vite preview, with no build inside either configuration. Each mount checks hidden ready, deterministic blockers, required JS/CSS/favicon status and MIME types, public-control completion of all three fixtures, frozen timing, practice exclusion and record retention after reload. Page exceptions, unexpected error logs, failed/missing assets, external/service/font requests and WebSockets fail these tests. Artifact audit confirms exactly four files and no provenance/oracle/test-hook content. The full ordered release sequence passed: frozen-lockfile installation; 59 pure tests; strict production build; 207 applicable development cases with 8 intentional CDP-only skips in 6.3 minutes; all 10 production cases in 15.5 seconds; all 62,208 Wizard answers independently validated in 27.36 seconds. A final strict typecheck also passed after the MIME assertions. Opened both production mounts in the T3 shared preview and checked Start, seven blockers, actual navy placement and correctly prefixed subpath asset URLs. The first visual-navigation attempt happened after the test-owned servers stopped; restarting the preview servers resolved it, then they were stopped before the release sequence. Tested JS artifact `dist/assets/index-DrVNgP7r.js` has SHA-256 `787FC845B2C80897D12E26C544424C8F479773F38AC57149402828B3DE70B236`; HTML, favicon and CSS are the only other artifact files. Windows, Node 24.15.0, pnpm 12.10.0 and Playwright 1.64.0; five development projects and two production Chromium projects. No live hosting, physical-device or screen-reader pass is claimed here.

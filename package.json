@@ -19,7 +19,8 @@
     "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
     "build": "pnpm run typecheck && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:prod": "playwright test --config playwright.production.config.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
