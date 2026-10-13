@@ -16,7 +16,7 @@ button:focus-visible, select:focus-visible { outline: 3px solid #f3da85; outline
 .board-frame { position: relative; width: 100%; aspect-ratio: 1; margin: 16px 0 12px; }
 #board-art { width: 100%; height: 100%; display: block; }
 #board-art text { fill: #c0ccda; font-size: .23px; }
-#board-art .piece-number { fill: #101820; font-size: .38px; font-weight: 700; }
+.restriction-mark { fill: none; stroke: #fff; stroke-width: .075px; pointer-events: none; }
 #grid { position: absolute; left: 6.923077%; top: 6.923077%; width: 92.307692%; height: 92.307692%; display: grid; grid-template-rows: repeat(6, 1fr); }
 #grid [role=row] { display: grid; grid-template-columns: repeat(6, 1fr); }
 #grid [role=gridcell] { min-width: 0; min-height: 0; }
@@ -36,10 +36,10 @@ button:focus-visible, select:focus-visible { outline: 3px solid #f3da85; outline
 .piece-slot span { font-size: .73rem; }
 .piece-slot[aria-pressed=true] { outline: 2px solid #f3da85; outline-offset: 1px; }
 .piece-slot.placed svg { opacity: .45; }
-.anchor-mark { font-size: .55px; fill: #101820; font-weight: 700; pointer-events: none; }
+.anchor-mark { font-size: .4px; fill: #101820; font-weight: 700; pointer-events: none; }
 .draggable-source { touch-action: none; }
 .ghost { opacity: .65; pointer-events: none; }
-#board-art .ghost text { fill: #101820; font-size: .5px; font-weight: 700; }
+#board-art .ghost text { fill: #101820; font-size: .4px; font-weight: 700; }
 #status { min-height: 2.9em; font-size: .9rem; }
 .run-actions { display: flex; gap: 8px; }
 .help { font-size: .8rem; }

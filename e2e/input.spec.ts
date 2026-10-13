@@ -351,7 +351,7 @@ test('records and committed artwork stay mounted during dragging and timer ticks
   await slot(page, 'navy').click();
   await cell(page, 4, 5).click();
   const record = await page.locator('#records-list li').elementHandle();
-  const piece = await page.locator('#board-art .piece-number').elementHandle();
+  const piece = await page.locator('#committed-art .restriction-mark').elementHandle();
   const source = await slot(page, 'cyan').locator('[data-anchor="0,0"]').elementHandle();
   const from = await trayPoint(page, 'cyan', [0, 0]);
   const to = await center(cell(page, 0, 0));

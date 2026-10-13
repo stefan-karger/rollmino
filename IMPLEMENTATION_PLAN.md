@@ -24,12 +24,12 @@ Distinct die sets partition all 36 cells, so every physical roll yields seven di
 
 Here `#` is occupied, `.` is empty and `/` starts another row. Exactly nine IDs cover 29 cells with 28 geometric orientations and 625 in-bounds placement candidates. Preserve deterministic orientation order for fixtures.
 
-| ID | Base shape | Cells | Orientations | Restriction number |
+| ID | Base shape | Cells | Orientations | Special piece |
 | --- | --- | ---: | ---: | --- |
-| navy | `#` | 1 | 1 | 1 |
-| brown | `##` | 2 | 2 | 2 |
-| orange | `###` | 3 | 2 | 3 |
-| purple | `#./##` | 3 | 4 | 4 |
+| navy | `#` | 1 | 1 | yes |
+| brown | `##` | 2 | 2 | yes |
+| orange | `###` | 3 | 2 | yes |
+| purple | `#./##` | 3 | 4 | yes |
 | grey | `####` | 4 | 2 | none |
 | green | `##/##` | 4 | 1 | none |
 | cyan | `#./#./##` | 4 | 8 | none |
@@ -45,6 +45,8 @@ Here `#` is occupied, `.` is empty and `/` starts another row. Exactly nine IDs 
 | Wizard | navy, brown, orange, purple |
 
 Diagonal contact is legal. Restricted pieces may touch blockers, boundaries and unrestricted pieces. Master is not a superset of Expert. Describe restrictions without claiming objectively increasing human difficulty.
+
+The user revised the indicators on 2026-10-13: replace piece numbers with inset white square outlines on each occupied square of a currently restricted piece, with the piece color visible inside, consistently in the tray, preview and committed board. Starter shows none; Master leaves navy unmarked. There is no display option. Accessible names identify restricted pieces and the rule text explains the marks. Keep the tap anchor and preview legality symbols inside the outline without overlapping its border. The rule tables and legality do not change.
 
 ## State validation and reference solver
 
@@ -175,7 +177,7 @@ Untagged scenarios run in all five projects. `@shared` runs only in desktop Chro
 | Native CDP touch/move/return/secondary input/cancel and scrolling | Mobile Chromium |
 | Built assets/errors, full first fixture, frozen time, practice exclusion and reload retention | Both artifact mounts; filesystem inspection once |
 
-The development suite currently selects 95 cases, with 23 completed games including phone practice-completion feedback. Shared DOM-stability and queued-dialog-close regressions do not complete another game. The latter forces rapid cancellation/reopening through DOM events in desktop Chromium; the native confirmation scenario remains in all five projects. Production selects five cases and four completed games. Fixture completion supplies representative persistence checks; non-color glyph coverage uses only restricted pieces. Additional fixtures/shared permutations do not repeat for every unrelated assertion. Mobile projects remain emulation.
+The development suite currently selects 96 cases, with 23 completed games including phone practice-completion feedback. Shared DOM-stability, queued-dialog-close and five-level marking regressions do not complete another game. The dialog regression forces rapid cancellation/reopening through DOM events in desktop Chromium; the native confirmation scenario remains in all five projects. The marking regression checks literal level groups, transformed previews, committed/tray marks and cancellation. Production selects five cases and four completed games. Fixture completion supplies representative persistence checks; non-color marking coverage uses only restricted pieces. Additional fixtures/shared permutations do not repeat for every unrelated assertion. Mobile projects remain emulation.
 
 The [cell-array oracle](tests/oracle.mjs) checks unique IDs, integer geometry, bounds, blockers, overlap, 29 piece cells, coverage, contacts and fixed placements. It imports only canonical orientations, has separate literal IDs/groups and uses no engine legality calls/masks. Test deliberately broken answers. The [exhaustive verifier](scripts/verify-all.mjs) requires a non-null answer and oracle pass for each of 62,208 Wizard boards before counting. Keep it separate from fast tests.
 

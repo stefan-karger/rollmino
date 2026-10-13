@@ -8,6 +8,8 @@ Play [Rollmino](https://stefan-karger.github.io/rollmino/), a free, always-timed
 
 Choose a level, then Start to reveal seven blockers and begin timing. Select a piece and tap a cell to place immediately, or drag from an occupied square. Rotate turns clockwise; Flip mirrors left/right. The marked square is the tap anchor; dragging preserves the square grabbed.
 
+Inset white square outlines identify the pieces that cannot share an edge at the selected level. Starter has no outlines. The small + marks the tap anchor inside its square.
+
 Illegal attempts preserve committed play. Placed shapes stay dimmed and selectable. Use Remove, Delete or drag back to the own slot to remove. Undo covers all successful active-run actions without rewinding time.
 
 Tab reaches grid/tray/controls. Arrows move without wrapping. Home/End reaches row ends; Ctrl+Home/End reaches board ends. Enter/Space activates, R/F transforms, Delete removes and Escape cancels.

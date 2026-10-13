@@ -28,7 +28,6 @@ const colors: Record<PieceId, string> = {
   navy: '#608bc0', brown: '#b58a67', orange: '#ff9b48', purple: '#b891ee',
   grey: '#b7c2cc', green: '#76bc83', cyan: '#65c8df', yellow: '#efd46e', red: '#ec7c7f',
 };
-const numbers: Partial<Record<PieceId, number>> = { navy: 1, brown: 2, orange: 3, purple: 4 };
 const names: Record<PieceId, string> = {
   navy: 'Navy square', brown: 'Brown domino', orange: 'Orange line', purple: 'Purple corner',
   grey: 'Grey line', green: 'Green square', cyan: 'Cyan L', yellow: 'Yellow T', red: 'Red zigzag',
@@ -77,7 +76,7 @@ for (const id of PIECE_IDS) {
   const button = document.createElement('button');
   button.className = 'piece-slot';
   button.dataset.piece = id;
-  button.innerHTML = `<span class="piece-art" aria-hidden="true"><svg viewBox="-0.15 -0.15 4.3 3.3"></svg><span class="grab-regions"></span></span><span class="piece-label">${names[id]}${numbers[id] ? ` ${numbers[id]}` : ''}</span>`;
+  button.innerHTML = `<span class="piece-art" aria-hidden="true"><svg viewBox="-0.15 -0.15 4.3 3.3"></svg><span class="grab-regions"></span></span><span class="piece-label">${names[id]}</span>`;
   button.addEventListener('click', () => { selectPiece(id); button.focus({ preventScroll: true }); });
   slots.set(id, button);
   tray.append(button);
@@ -99,8 +98,14 @@ function candidate(): Placement | undefined {
 function rect(x: number, y: number, fill: string, extra = ''): string {
   return `<rect x="${x + .04}" y="${y + .04}" width=".92" height=".92" rx=".1" fill="${fill}" ${extra}/>`;
 }
+function restrictionMark(id: PieceId, x: number, y: number): string {
+  return RESTRICTED[session.level].includes(id)
+    ? `<rect class="restriction-mark" data-mark-piece="${id}" x="${x + .2}" y="${y + .2}" width=".6" height=".6"/>`
+    : '';
+}
 function shape(id: PieceId, orientation: number, x = 0, y = 0, extra = ''): string {
-  return ORIENTATIONS[id][orientation].map(([dx, dy]) => rect(x + dx, y + dy, colors[id], extra)).join('');
+  return ORIENTATIONS[id][orientation].map(([dx, dy]) =>
+    rect(x + dx, y + dy, colors[id], extra) + restrictionMark(id, x + dx, y + dy)).join('');
 }
 function announce(message: string): void { status.textContent = message; }
 function updateTimer(): void { timer.textContent = formatTime(elapsed(session, Date.now())); }
@@ -124,7 +129,7 @@ function renderGame(): void {
     : session.mode === 'practice' ? 'Practice replay. This run cannot rank.' : 'Fresh roll. Your time can rank.';
   const restricted = RESTRICTED[session.level];
   element('rule').textContent = restricted.length
-    ? `Pieces ${restricted.map(id => numbers[id]).join(', ')} cannot share an edge. Corners may touch.`
+    ? 'White-marked pieces cannot share an edge. Corners may touch.'
     : 'Cover every empty cell with the nine pieces.';
   let boardSvg = '';
   cells.forEach((button, i) => {
@@ -132,13 +137,12 @@ function renderGame(): void {
     const id = owner(x, y);
     const blocker = session.phase !== 'ready' && session.game.dice.includes(coordinate(x, y));
     button.disabled = !active;
-    button.setAttribute('aria-label', `${coordinate(x, y)}, ${session.phase === 'ready' ? 'hidden' : blocker ? 'blocker' : id ? `${id} piece${numbers[id] ? ` ${numbers[id]}` : ''}` : 'empty'}`);
+    button.setAttribute('aria-label', `${coordinate(x, y)}, ${session.phase === 'ready' ? 'hidden' : blocker ? 'blocker' : id ? `${id} piece${restricted.includes(id) ? ', restricted' : ''}` : 'empty'}`);
     button.dataset.content = blocker ? 'blocker' : id ?? 'empty';
     button.classList.toggle('draggable-source', active && Boolean(id));
     if (blocker) boardSvg += `<circle cx="${x + .5}" cy="${y + .5}" r=".32" fill="#0c1118" stroke="#95a7bc" stroke-width=".045"/>`;
     if (id) {
-      boardSvg += rect(x, y, colors[id]);
-      if (numbers[id]) boardSvg += `<text class="piece-number" x="${x + .5}" y="${y + .63}" text-anchor="middle">${numbers[id]}</text>`;
+      boardSvg += rect(x, y, colors[id]) + restrictionMark(id, x, y);
     }
   });
   committedArt.innerHTML = boardSvg;
@@ -147,14 +151,14 @@ function renderGame(): void {
     const orientation = placed?.orientation ?? 0;
     button.disabled = !active;
     button.classList.toggle('placed', Boolean(placed));
-    button.setAttribute('aria-label', `${names[id]}${numbers[id] ? ` piece ${numbers[id]}` : ''}, ${placed ? 'placed' : 'in tray'}`);
+    button.setAttribute('aria-label', `${names[id]}${restricted.includes(id) ? ', restricted' : ''}, ${placed ? 'placed' : 'in tray'}`);
     const anchor = firstAnchor(id, orientation);
     // Committed updates happen after gesture cleanup. Draft movement keeps capture sources mounted.
     const cells = ORIENTATIONS[id][orientation];
     const bounds = trayBounds(cells);
     const svg = button.querySelector('svg')!;
     svg.setAttribute('viewBox', `-0.15 -0.15 ${bounds.width} ${bounds.height}`);
-    svg.innerHTML = `${shape(id, orientation)}<text x="${anchor[0] + .5}" y="${anchor[1] + .66}" text-anchor="middle" class="anchor-mark">+</text>`;
+    svg.innerHTML = `${shape(id, orientation)}<text x="${anchor[0] + .5}" y="${anchor[1] + .65}" text-anchor="middle" class="anchor-mark">+</text>`;
     button.querySelector('.grab-regions')!.innerHTML = cells.map(([x, y]) =>
       `<span data-anchor="${x},${y}" class="grab-square ${active ? 'draggable-source' : ''}" style="left:${(x + .19) / bounds.width * 100}%;top:${(y + .19) / bounds.height * 100}%;width:${.92 / bounds.width * 100}%;height:${.92 / bounds.height * 100}%"></span>`).join('');
   }

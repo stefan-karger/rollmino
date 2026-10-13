@@ -108,8 +108,8 @@ test('200 percent CSS zoom reflows and keeps board geometry aligned', { tag: '@d
 test('visible focus and non-color identity remain usable with reduced motion requested', { tag: '@shared' }, async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openGame(page);
-  await expect(page.locator('#rule')).toHaveText('Pieces 1, 2, 3, 4 cannot share an edge. Corners may touch.');
-  for (const [id, name] of [['navy', /square.*1/i], ['brown', /domino.*2/i], ['orange', /line.*3/i], ['purple', /corner.*4/i], ['cyan', /L/i], ['red', /zigzag/i]] as const) {
+  await expect(page.locator('#rule')).toHaveText('White-marked pieces cannot share an edge. Corners may touch.');
+  for (const [id, name] of [['navy', /square, restricted/i], ['brown', /domino, restricted/i], ['orange', /line, restricted/i], ['purple', /corner, restricted/i], ['cyan', /L/i], ['red', /zigzag/i]] as const) {
     await expect(slot(page, id)).toHaveAccessibleName(name);
   }
   await page.keyboard.press('ArrowRight');
@@ -122,7 +122,49 @@ test('visible focus and non-color identity remain usable with reduced motion req
   await cell(page, 0, 0).click();
   await expect(page.locator('#status')).toContainText('Cannot place here');
   await page.keyboard.press('Escape');
-  // These four pieces provide all nine restriction-number glyphs without another full game.
+  // These four pieces provide all nine restriction markings without another full game.
   await placePieces(page, fixtures[0].solution.filter(p => ['navy', 'brown', 'orange', 'purple'].includes(p.id)));
-  await expect(page.locator('#board-art .piece-number')).toHaveCount(9);
+  await expect(page.locator('#committed-art .restriction-mark')).toHaveCount(9);
+});
+
+test('white square outlines follow the level in tray, transformed preview and committed pieces', { tag: '@shared' }, async ({ page }) => {
+  const groups = {
+    STARTER: [], JUNIOR: ['navy', 'brown'], EXPERT: ['navy', 'brown', 'orange'],
+    MASTER: ['brown', 'orange', 'purple'], WIZARD: ['navy', 'brown', 'orange', 'purple'],
+  } as const;
+  const special = fixtures[0].solution.filter(p => ['navy', 'brown', 'orange', 'purple'].includes(p.id));
+  for (const level of Object.keys(groups) as (keyof typeof groups)[]) {
+    const restricted: readonly string[] = groups[level];
+    await openGame(page, { ...fixtures[0], level });
+    for (const [id, cells] of [['navy', 1], ['brown', 2], ['orange', 3], ['purple', 3], ['grey', 4], ['green', 4], ['cyan', 4], ['yellow', 4], ['red', 4]] as const) {
+      const active = restricted.includes(id);
+      await expect(slot(page, id).locator('.restriction-mark')).toHaveCount(active ? cells : 0);
+      if (active) await expect(slot(page, id)).toHaveAccessibleName(/restricted/);
+      else await expect(slot(page, id)).not.toHaveAccessibleName(/restricted/);
+    }
+    await slot(page, 'brown').click();
+    await page.locator('#rotate').click();
+    await expect(page.locator('#draft-art .restriction-mark')).toHaveCount(restricted.includes('brown') ? 2 : 0);
+    await placePieces(page, special);
+    const expected = restricted.reduce((count, id) => count + ({ navy: 1, brown: 2, orange: 3, purple: 3 }[id as 'navy' | 'brown' | 'orange' | 'purple']), 0);
+    await expect(page.locator('#committed-art .restriction-mark')).toHaveCount(expected);
+    const marks = await page.locator('#committed-art .restriction-mark').evaluateAll(nodes => nodes.map(node => {
+      const rect = node as SVGRectElement;
+      const cell = document.querySelector<HTMLButtonElement>(`[data-cell="${Math.floor(rect.y.baseVal.value) * 6 + Math.floor(rect.x.baseVal.value)}"]`)!;
+      return { owner: cell.dataset.content, piece: rect.dataset.markPiece, fill: getComputedStyle(rect).fill, stroke: getComputedStyle(rect).stroke, square: rect.width.baseVal.value === rect.height.baseVal.value, restricted: cell.getAttribute('aria-label')!.includes('restricted') };
+    }));
+    for (const mark of marks) {
+      expect(mark.owner).toBe(mark.piece);
+      expect(mark.fill).toBe('none');
+      expect(mark.stroke).toBe('rgb(255, 255, 255)');
+      expect(mark.square).toBe(true);
+      expect(mark.restricted).toBe(true);
+    }
+    await expect(page.locator('#board-art .piece-number')).toHaveCount(0);
+    // Cancelling a level change must retain the current marking group.
+    await page.locator('#level').selectOption(level === 'STARTER' ? 'WIZARD' : 'STARTER');
+    await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await expect(page.locator('#committed-art .restriction-mark')).toHaveCount(expected);
+    await expect(page.locator('#level')).toHaveValue(level);
+  }
 });
