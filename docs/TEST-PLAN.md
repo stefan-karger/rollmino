@@ -8,17 +8,21 @@
 pnpm install --frozen-lockfile
 pnpm test
 pnpm run test:rules
+pnpm run test:transforms
+pnpm run test:state
+pnpm run test:records
 pnpm run verify:all
 pnpm run typecheck
 pnpm run build
 pnpm run test:e2e
+pnpm run test:e2e:prod
 ```
 
-The fast pure suite has 44 tests covering T01's validation repairs, the literal model and T02's independent oracle. The separate exhaustive loop requires a non-null answer for each of 62,208 Wizard boards and checks every answer with the cell-array oracle. It reuses canonical orientation data but does not call the engine's legality checks or use their masks. [Current evidence](TEST-RESULTS.md)
+The fast pure suite has 59 tests covering T01's validation repairs, the literal model, T02's independent oracle, occupied-anchor transforms, run phases/timing/Undo and record ranking/storage faults. The separate exhaustive loop requires a non-null answer for each of 62,208 Wizard boards and checks every answer with the cell-array oracle. It reuses canonical orientation data but does not call the engine's legality checks or use their masks. [Current evidence](TEST-RESULTS.md#integrated-v1-local-release-verification)
 
-T03 adds a strict Vite build and one browser startup case in all five configured projects. Browser binaries must be installed with `pnpm exec playwright install chromium firefox webkit`; Linux uses `--with-deps`. The startup case checks the title/heading, loaded TypeScript entry and CSS, page errors and failed requests. It does not test gameplay, dragging, records or accessibility. `pnpm run dev` and `pnpm run preview` serve the source entry and built artifact for inspection.
+The strict Vite build and all browser suites are executable. Browser binaries must be installed with `pnpm exec playwright install chromium firefox webkit`; Linux uses `--with-deps`. The five-project development suite passes 207 applicable cases covering startup, public fixture play, lifecycle/timing, tap/keyboard/mouse input, records and accessibility. Eight expected skips exclude two CDP touch cases from the four other projects. Ten production cases serve the same preceding dist at root and /rollmino/, inspect original-only assets, reject missing/error/service requests, and complete all three fixtures with replay/record retention. `pnpm run dev` and `pnpm run preview` serve source and artifact for inspection.
 
-## Required coverage during implementation
+## Maintained coverage
 
 | Area | Required evidence |
 | --- | --- |
@@ -36,11 +40,11 @@ T03 adds a strict Vite build and one browser startup case in all five configured
 
 Reuse `fixtures/rolls.json`. Seed physical random face indices before app startup; do not add a production cheat panel or inject placements into a mutable global. Wizard `opening-seed` with navy at B6 is a legal dead end. A fair second roll may repeat the first; changed-board tests use predetermined different rolls.
 
-Development projects are desktop Chromium/Firefox/WebKit and mobile Chromium/WebKit emulation. All five currently pass startup checks. Future native Chromium touch sequences use CDP because Playwright's touchscreen API only provides taps. Cross-engine tap/keyboard/mouse checks and touch-specific cases require explicit coverage; synthetic events alone do not establish touch dragging.
+Development projects are desktop Chromium/Firefox/WebKit and mobile Chromium/WebKit emulation. All five pass their applicable gameplay/input/records/accessibility suites. Native Chromium touch sequences use CDP because Playwright's touchscreen API only provides taps. Synthetic blur/visibility/pointercancel cleanup branches are labeled separately; native CDP touchCancel, second-finger input, capture and touch scrolling establish the emulated touch evidence. The test-only seeded RNG can reset before Start after tools such as axe consume randomness; no mutable production game API exists.
 
-## Remaining release checks
+## Local release checks
 
-The full release sequence below includes `test:e2e:prod`, which becomes executable in T11. Other commands are available now with the current limited feature coverage:
+The full release sequence passes on the integrated V1 application:
 
 ```bash
 pnpm install --frozen-lockfile
@@ -54,3 +58,5 @@ pnpm run verify:all
 Build includes strict type checking. Production tests reuse that exact `dist/`; they do not rebuild. Keep exhaustive verification outside the fast default test and run it for release/rule changes. The Pages workflow publishes the checked artifact after successful checks.
 
 Pass requires the agreed model, transaction/lifecycle/record behavior, complete non-drag play, native mouse and emulated touch checks, responsive/accessibility cases, and static artifact readiness. No physical-phone, physical-game or screen-reader sign-off is a hidden gate. Emulation does not claim those results, or prove low-end phone performance/human difficulty.
+
+T12 validates the Pages workflow locally. T14 must record actual successful Actions/public hosting and a live smoke check; local release readiness does not establish that publication result.

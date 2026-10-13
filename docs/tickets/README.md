@@ -21,7 +21,7 @@ Read the table top to bottom. Pick the first `todo` ticket whose listed blockers
 | `done` | [T10. Finish phone layout, accessibility and browser compatibility](10-responsive-accessibility.md) | [T08](08-records-ui-integration.md), [T09](09-transactional-pointer-input.md) | 59 pure tests, build and 207 applicable browser cases passed; [evidence](10-responsive-accessibility.md#completion-evidence) |
 | `done` | [T11. Test the production artifact at root and Pages subpath](11-production-artifact-verification.md) | [T10](10-responsive-accessibility.md) | Full release sequence passed, including 10 artifact cases and 62,208 answers; [evidence](11-production-artifact-verification.md#completion-evidence) |
 | `done` | [T12. Add the checked-artifact GitHub Pages workflow](12-pages-workflow.md) | [T11](11-production-artifact-verification.md) | Actionlint and workflow review passed; [evidence](12-pages-workflow.md#completion-evidence) |
-| `todo` | [T13. Close local release gates and update the implementation handoff](13-release-handoff.md) | [T12](12-pages-workflow.md) | Local release gates/evidence and current contributor docs |
+| `done` | [T13. Close local release gates and update the implementation handoff](13-release-handoff.md) | [T12](12-pages-workflow.md) | Integrated gates mapped, clean contributor setup and docs checks passed; [evidence](13-release-handoff.md#completion-evidence) |
 | `todo` | [T14. Deploy GitHub Pages and verify the live site](14-public-pages-deployment.md) | [T00](00-repository-setup.md), [T13](13-release-handoff.md) | Existing public repo, successful deployment and live smoke check |
 
 ## Working and completing tickets

@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "packageManager": "pnpm@12.10.0",
-  "description": "Rollmino, a timed solo puzzle website in development",
+  "description": "A free timed solo block puzzle with five levels and local personal records",
   "engines": {
     "node": ">=22.16.0"
   },

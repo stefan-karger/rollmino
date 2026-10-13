@@ -2,6 +2,8 @@
 
 Status: agreed on 2026-10-12. The detailed state machines and geometry policy are in [IMPLEMENTATION_PLAN.md](../IMPLEMENTATION_PLAN.md), sections 5 through 8. This is a summary, not an alternative specification.
 
+These interactions are implemented through the authoritative session and stable HTML/SVG controls. [Integrated verification](TEST-RESULTS.md#integrated-v1-local-release-verification) covers complete tap/keyboard play, native mouse and Chromium-emulated touch dragging, cancellation, records and accessibility/layout checks. No physical-phone or screen-reader audit is claimed.
+
 ## Lifecycle
 
 - Ready hides all puzzle coordinates and disables piece editing. Start reveals the board and begins timing.

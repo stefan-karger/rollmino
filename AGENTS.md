@@ -6,6 +6,8 @@ The user confirmed the complete V1 contract on 2026-10-12. [IMPLEMENTATION_PLAN.
 
 When asked to implement, pick ready work from [docs/tickets/README.md](docs/tickets/README.md). The tickets divide the agreed plan's slices into scoped tasks with blockers, tests and completion criteria. Keep status only in that central tracker and record evidence in the ticket before marking it done. Do not reopen technology/product decisions without a concrete conflict. Do not implement the app merely because a planning/ticket-writing request or the reference engine exists. This handoff's planning work is complete.
 
+The V1 app, browser/artifact checks and Pages workflow are implemented. Read [current integrated evidence](docs/TEST-RESULTS.md#integrated-v1-local-release-verification) and the tracker before choosing work; do not repeat completed slices. Public activation/live verification remains T14 until its actual hosting evidence is recorded.
+
 ## Mandatory context
 
 Read in this order: `README.md`, `docs/V1-SCOPE.md`, `docs/RESEARCH.md`, `engine/core.ts`, `docs/TEST-PLAN.md`, `docs/UI-AND-INTERACTIONS.md`, `docs/SOURCES-AND-RISKS.md`.
@@ -30,7 +32,7 @@ Before changing the reference, run the fast tests and inspect the existing engin
 - The confirmed stack is TypeScript, Vite, SVG, CSS, native HTML controls, Node tests and Playwright. Do not repeat a greenfield stack-selection exercise.
 - Use pnpm, pinned by `packageManager` in `package.json`, for dependencies and scripts. Keep `pnpm-lock.yaml` as the only dependency lockfile and use `pnpm install --frozen-lockfile` for verification/CI.
 - Keep pure testable rules, one authoritative committed game, deterministic fixtures and static hosting.
-- Begin with the documented validation regressions and repairs. Make every exhaustive answer's independent legality check reproducible.
+- Preserve the documented validation regressions and repairs. Make every exhaustive answer's independent legality check reproducible.
 - Build playable slices with executable checks. Add modules only for meaningful current responsibilities.
 - Avoid backend, auth, multiplayer, physics, 3D, generic game engines, generalized state architecture and speculative extensibility.
 - Use original artwork. Do not copy official logos/manual graphics or publish provenance directories as app assets.
@@ -46,9 +48,12 @@ Keep active docs consistent when an accepted decision changes. Routine implement
 ## Existing verification commands
 
 ```bash
+pnpm install --frozen-lockfile
 pnpm test
+pnpm run build
+pnpm run test:e2e
+pnpm run test:e2e:prod
 pnpm run verify:all
-pnpm install --frozen-lockfile && pnpm run typecheck
 ```
 
-The exhaustive check is separate from the fast suite. Node type stripping runs reference/pure tests, not the browser build. Browser commands listed in the plan become executable as tooling and files are added; their results are not yet established.
+The exhaustive check is separate from the fast suite. Node type stripping runs pure tests, not the browser build. Browser/artifact commands are executable and their current results are recorded in `docs/TEST-RESULTS.md`. Production tests reuse the preceding `dist/`; build before running them. Use the frozen lockfile and documented Playwright browser/system setup for contributor verification.

@@ -1,8 +1,47 @@
-# Reference validation results
+# Verification results
 
 Package-manager migration on 2026-10-12: commands in historical results below are current pnpm equivalents. Those earlier runs used the previous package manager; their original commands are preserved in commit `df3e241`. [Actual pnpm verification](#pnpm-migration-verification).
 
-These results concern the rules engine and T03's minimal browser entry/tooling. Game controls, sessions, records and deployment are not yet implemented; no gameplay/mobile-input release pass is claimed.
+The current integrated V1 evidence appears first. Later sections preserve the reference, tooling and package-manager results from 2026-10-12; statements about then-unimplemented gameplay describe those historical checks.
+
+## Integrated V1 local release verification
+
+Executed on 2026-10-13 in this Windows workspace with Node 24.15.0, pnpm 12.10.0, TypeScript 5.8.3, Vite 8.3.4, Playwright 1.64.0 and axe Playwright 4.13.0. The bundled/tested browsers are Chromium 156.0.8078.4, Firefox 157.0 and WebKit 27.2. [T11's ordered release run](tickets/11-production-artifact-verification.md#completion-evidence) and [T12's workflow review](tickets/12-pages-workflow.md#completion-evidence) provide the detailed evidence.
+
+| Command/check | Actual result |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | Passed without dependency/lock changes |
+| `pnpm test` | 59 pure tests passed, no skips |
+| `pnpm run build` | Strict checking and production build passed |
+| `pnpm run test:e2e` | 207 applicable cases passed across all five projects; 8 expected skips for two mobile-Chromium-only CDP cases; 6.3 minutes in T11 |
+| `pnpm run test:e2e:prod` | All 10 root/Pages-path cases passed against the same preceding dist in 15.5 seconds |
+| `pnpm run verify:all` | Every returned answer on all 62,208 Wizard boards passed the independent oracle in 27.36 seconds |
+| Workflow validation | Official actionlint 1.7.12 passed; actual GitHub execution remains T14 |
+| Clean contributor checkout | Detached `1a9c8c6` checkout with no node_modules installed all 23 locked packages from the local store, passed 59 pure tests, strict build and all 10 production cases in 17.1 seconds; existing browser binaries reused |
+
+The built artifact contains only `index.html`, `favicon.svg`, `assets/index-CIHiYrAQ.css` and `assets/index-DrVNgP7r.js`. The JS SHA-256 is `787FC845B2C80897D12E26C544424C8F479773F38AC57149402828B3DE70B236`. Both production configurations serve this artifact without rebuilding. Requests/asset MIME checks reject missing assets, page/console errors, unexpected runtime APIs, external fonts and development WebSockets.
+
+### Acceptance gate evidence
+
+| Agreed local gate | Integrated evidence |
+| --- | --- |
+| Model | [core tests](../tests/core.test.mjs) and T01 preserve literal faces/shapes/groups and reject malformed committed wins |
+| Solver reference | [oracle](../tests/oracle.mjs), [oracle tests](../tests/oracle.test.mjs), exhaustive verifier and T02/T11 check independent occupancy/contact/fixed-placement legality |
+| Start and time | [session tests](../tests/session.test.mjs) and [play tests](../e2e/play.spec.ts) prove hidden ready, wall time through delayed/background/confirmation periods, Undo time and one frozen completion |
+| Play and transactions | Session tests and public-control fixtures complete all three boards; illegal/no-op/cancelled actions preserve committed state/history |
+| Inputs | [input tests](../e2e/input.spec.ts) complete keyboard play, native mouse anchors/transforms/moves/return/capture and native Chromium CDP touch placement/movement/return/cancellation/secondary input |
+| Lifecycle | Session/play tests cover active cancellation/acceptance, hidden practice replay, fresh level changes, reload abandonment and terminal completion |
+| Records | [pure record tests](../tests/records.test.mjs) and [browser record tests](../e2e/records.spec.ts) cover top five, millisecond/tie order, practice exclusion, single consideration, selected clearing and storage faults |
+| Layout/accessibility | [accessibility tests](../e2e/accessibility.spec.ts) cover named grid, visible/stable focus, native dialog focus, non-color cues, required widths/landscape, reduced motion and zero relevant axe findings in four states; no exclusions |
+| Static artifact | [production tests](../e2e/production.spec.ts) complete all fixtures, freeze/replay/reload records and verify assets/services at root and /rollmino/ |
+| Reproduction | Frozen installation/build/pure/production checks also pass in a fresh detached contributor checkout with unchanged tracked files |
+| Assets/scope | Original SVG/CSS only, one committed Game inside the session, separate drafts/gestures and records containing only time/date; no assistance, backend, PWA or test game API |
+
+Inspected 320/390/768/1440 CSS px widths and 667x375 landscape with the shared T3 preview. Automated corner/center SVG/HTML alignment stays below 1px. The 200% check uses CSS zoom/reflow, with about 0.02px offset at the manually checked zoomed cell, not browser-chrome zoom. Dark glyph contrast against undimmed piece fills ranges from 5.07:1 to 12.20:1; tray labels remain undimmed. HTML tray hit regions match occupied SVG squares and keep touch-action off holes/labels/gutters.
+
+Native mouse and CDP touch evidence is browser automation; mobile projects emulate phones. Blur/hidden-document/pointercancel and held-action cleanup branches are explicitly synthetic. Physical phone, pen, current physical game set and screen-reader checks were not performed. These are not additional release gates. The oracle reuses canonical orientations and establishes one returned answer per encoded board, not human difficulty, all partial-state completability or physical-source certification.
+
+No accepted product deviations were needed. The detached-checkout tests use the same committed runtime/build code as the integrated release; subsequent handoff edits change documentation/package description only. Public activation, successful hosted Actions and live URL verification remain T14.
 
 ## Original packaging evidence
 

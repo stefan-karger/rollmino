@@ -2,6 +2,8 @@
 
 Status: agreed on 2026-10-12. [IMPLEMENTATION_PLAN.md](../IMPLEMENTATION_PLAN.md) is the full current specification. [DECISIONS.md](DECISIONS.md) records the user's answers.
 
+The V1 journey below is implemented and its integrated local release gates pass. [Current checks and limits](TEST-RESULTS.md#integrated-v1-local-release-verification) distinguish automated emulation from hardware testing. Public activation and live verification remain the publication ticket in the [tracker](tickets/README.md).
+
 ## Required journey
 
 1. Open a free English-only Rollmino site. Choose any of five levels. The puzzle is hidden behind Start.

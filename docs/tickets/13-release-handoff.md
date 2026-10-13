@@ -43,12 +43,12 @@ Documentation-only edits need link/command consistency checks rather than invent
 
 ## Done when
 
-- [ ] All local acceptance gates have passing evidence for the integrated code.
-- [ ] Setup/controls/storage/test instructions match actual implementation and runnable commands.
-- [ ] No unapproved features, unused architecture, copied content or production cheat API remains.
-- [ ] Test limitations and any accepted deviations are explicit; unavailable hardware is not a hidden gate.
-- [ ] The handoff states local release readiness and identifies T14 as the remaining publication task.
+- [x] All local acceptance gates have passing evidence for the integrated code.
+- [x] Setup/controls/storage/test instructions match actual implementation and runnable commands.
+- [x] No unapproved features, unused architecture, copied content or production cheat API remains.
+- [x] Test limitations and any accepted deviations are explicit; unavailable hardware is not a hidden gate.
+- [x] The handoff states local release readiness and identifies T14 as the remaining publication task.
 
 ## Completion evidence
 
-Not yet recorded. Add the actual changes, command results, checks and code reference here before setting this ticket to `done` in the tracker. Follow the [completion rules](README.md#working-and-completing-tickets).
+2026-10-13: Reviewed the integrated canonical engine, session/records boundaries, app input/rendering, original-only artifact, current T01-T12 evidence and plan gates. Updated README, AGENTS, maintenance prompt, active scope/UI/test summaries, package description and `docs/TEST-RESULTS.md#integrated-v1-local-release-verification` with current commands, controls/anchors, wall time, practice eligibility, storage limits, browser evidence and a mapping for every local acceptance gate. Historical research/decision/provenance files remain unchanged. No product deviation, runtime behavior change, unused forwarding layer, assistance UI, service worker/backend or production test/session API was introduced. Verified final tracked app/build configuration in a detached clean checkout of 1a9c8c6: frozen install added all 23 packages from the local store, 59 pure tests passed, strict build passed, and all 10 production root/subpath checks passed in 17.1 seconds with existing installed browsers. All four contributor artifact hashes exactly match the T11 integrated artifact; tracked files stayed clean. Verified the resolved absolute temporary worktree path before removing only that checkout. Main frozen installation also passed after the description-only package edit. One-off Node consistency inspection checked 51 relative links/anchors and 85 pnpm command references; `git diff --check` passed. T11 supplies the unchanged runtime full release evidence, including 207 applicable browser cases and 62,208 independent answers; T12 supplies passing actionlint/workflow review. Windows, Node 24.15.0, pnpm 12.10.0 and Playwright 1.64.0. Emulation/synthetic/CSS zoom and unperformed hardware/screen-reader limits are explicit. Public activation and live verification remain T14; local readiness is not a publication claim.
