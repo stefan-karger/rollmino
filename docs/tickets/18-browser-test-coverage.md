@@ -17,11 +17,15 @@ Run pnpm test, pnpm run build, the revised development suite and pnpm run test:e
 
 ## Acceptance
 
-- [ ] Coverage maps retained V1 behavior to meaningful checks and applicable platforms.
-- [ ] T15/T16 regressions remain effective and no general failure is hidden by skips.
-- [ ] Native input, phone play, accessibility, records and both artifact mounts pass.
-- [ ] Evidence records removed repetitions, actual counts and measured savings.
+- [x] Coverage maps retained V1 behavior to meaningful checks and applicable platforms.
+- [x] T15/T16 regressions remain effective and no general failure is hidden by skips.
+- [x] Native input, phone play, accessibility, records and both artifact mounts pass.
+- [x] Evidence records removed repetitions, actual counts and measured savings.
 
 ## Completion evidence
 
-Add dated implementation and verification results before marking the tracker done.
+2026-10-13. The [coverage map](../../IMPLEMENTATION_PLAN.md#browser-coverage-map) documents the three development tags and explicit project selection. The five configurations remain. Desktop Chromium runs 43 shared/native cases; desktop Firefox and WebKit each run 17 native/representative cases; mobile Chromium runs nine including both CDP cases; mobile WebKit runs seven. T15/T16 run in every project. CDP scenarios assert their expected platform and are selected only there, with no runtime skips.
+
+Kept all three full fixtures in primary Chromium and first-fixture completion in every other project. That completion now checks reload/record retention as well as terminal time and replay. Full keyboard play, native mouse anchors/held transforms/capture/return/collision and native Escape/lost-capture cleanup run in all desktop engines. Narrow layout, grid/dialog focus and native confirmations remain cross-platform. Ranking/fault permutations, shared transactions, synthetic cleanup, axe-state and full viewport matrices run once in primary Chromium. Non-color glyph assertions place only restricted pieces instead of solving another game. Both artifact mounts still check assets/errors and full ranked/practice/reload behavior, while shared filesystem inspection runs once.
+
+Actual commands passed: 60 pure tests, strict build, `pnpm run test:e2e --workers=2` with all 93 cases in 2.7 minutes and no skips, and `pnpm run test:e2e:prod --workers=1` with all five cases in 13.6 seconds. Development is 114 cases and 4.2 minutes below the review baseline of 207/6.9 minutes. Relative to T16 in this workspace with two workers, it is 124 cases and 5.2 minutes below 217/7.9 minutes. Timings are environment-dependent. Completed games fall from about 80 to 21 in development and from 12 to four in production. `--list`, strict checking, documentation checks and `git diff --check` passed. Runtime/model/oracle/fixtures are unchanged; no physical-device or screen-reader claim is added.

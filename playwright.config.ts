@@ -11,11 +11,11 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [
-    { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'desktop-firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'desktop-webkit', use: { ...devices['Desktop Safari'] } },
-    { name: 'mobile-chromium', use: { ...devices['Pixel 7'] } },
-    { name: 'mobile-webkit', use: { ...devices['iPhone 13'] } },
+    { name: 'desktop-chromium', grepInvert: /@touch/, use: { ...devices['Desktop Chrome'] } },
+    { name: 'desktop-firefox', grepInvert: /@shared|@touch/, use: { ...devices['Desktop Firefox'] } },
+    { name: 'desktop-webkit', grepInvert: /@shared|@touch/, use: { ...devices['Desktop Safari'] } },
+    { name: 'mobile-chromium', grepInvert: /@shared|@desktop/, use: { ...devices['Pixel 7'] } },
+    { name: 'mobile-webkit', grepInvert: /@shared|@desktop|@touch/, use: { ...devices['iPhone 13'] } },
   ],
   webServer: {
     command: 'pnpm run dev',

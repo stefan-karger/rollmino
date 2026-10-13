@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: page.viewportSize()!.width, height: 1400 });
 });
 
-test('full keyboard-only game uses Tab, real transforms and grid navigation', async ({ page }) => {
+test('full keyboard-only game uses Tab, real transforms and grid navigation', { tag: '@desktop' }, async ({ page }) => {
   await seed(page);
   await page.goto('./');
   await resetRandom(page);
@@ -15,7 +15,7 @@ test('full keyboard-only game uses Tab, real transforms and grid navigation', as
   await complete(page, fixtures[0], true);
 });
 
-test('illegal/no-op taps preserve history; movement/removal Undo returns to empty', async ({ page }) => {
+test('illegal/no-op taps preserve history; movement/removal Undo returns to empty', { tag: '@shared' }, async ({ page }) => {
   await openGame(page);
   await slot(page, 'navy').click();
   await cell(page, 0, 0).click();
@@ -38,7 +38,7 @@ test('illegal/no-op taps preserve history; movement/removal Undo returns to empt
   await expect(page.locator('#undo')).toBeDisabled();
 });
 
-test('keyboard boundaries, draft transforms, Delete and Escape preserve focus', async ({ page }) => {
+test('keyboard boundaries, draft transforms, Delete and Escape preserve focus', { tag: '@desktop' }, async ({ page }) => {
   await openGame(page);
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('ArrowUp');
@@ -61,7 +61,7 @@ test('keyboard boundaries, draft transforms, Delete and Escape preserve focus', 
   await expect(slot(page, 'navy')).toBeFocused();
 });
 
-test('multi-cell moves can overlap their own old footprint', async ({ page }) => {
+test('multi-cell moves can overlap their own old footprint', { tag: '@shared' }, async ({ page }) => {
   await openGame(page, { ...fixtures[0], level: 'STARTER' });
   await slot(page, 'brown').click();
   await cell(page, 1, 0).click();
@@ -75,7 +75,7 @@ test('multi-cell moves can overlap their own old footprint', async ({ page }) =>
   await expect(cell(page, 3, 0)).toHaveAttribute('data-content', 'empty');
 });
 
-test('native mouse preserves cyan/red occupied anchors at two board scales', async ({ page }) => {
+test('native mouse preserves cyan/red occupied anchors at two board scales', { tag: '@desktop' }, async ({ page }) => {
   await openGame(page, { ...fixtures[0], level: 'STARTER' });
   for (const width of [320, 800]) {
     await page.setViewportSize({ width, height: 1000 });
@@ -150,7 +150,7 @@ test('vertical grey tray artwork and occupied drag regions fit above its label',
   }
 });
 
-test('native mouse can transform a held anchor and commit only on release', async ({ page }) => {
+test('native mouse can transform a held anchor and commit only on release', { tag: '@desktop' }, async ({ page }) => {
   await openGame(page, { ...fixtures[0], level: 'STARTER' });
   const from = await trayPoint(page, 'cyan', [0, 0]);
   const to = await center(cell(page, 4, 0));
@@ -172,7 +172,7 @@ test('native mouse can transform a held anchor and commit only on release', asyn
   await expect(page.locator('[data-content="cyan"]')).toHaveCount(0);
 });
 
-test('native mouse moves with self-overlap, rejects other slots, and removes through its own slot', async ({ page }) => {
+test('native mouse moves with self-overlap, rejects other slots, and removes through its own slot', { tag: '@desktop' }, async ({ page }) => {
   await openGame(page, { ...fixtures[0], level: 'STARTER' });
   await mouseDrag(page, await trayPoint(page, 'brown', [1, 0]), await center(cell(page, 2, 0)));
   await mouseDrag(page, await center(cell(page, 2, 0)), await center(cell(page, 3, 0)));
@@ -190,7 +190,7 @@ test('native mouse moves with self-overlap, rejects other slots, and removes thr
   await expect(page.locator('#undo')).toBeDisabled();
 });
 
-test('native mouse rejects blockers, overlaps, edges and outside without adding history', async ({ page }) => {
+test('native mouse rejects blockers, overlaps, edges and outside without adding history', { tag: '@desktop' }, async ({ page }) => {
   await openGame(page);
   await mouseDrag(page, await trayPoint(page, 'navy', [0, 0]), await center(cell(page, 4, 5)));
   for (const target of [await center(cell(page, 0, 0)), { x: 5, y: 5 }, await center(slot(page, 'red'))]) {
@@ -210,7 +210,7 @@ test('native mouse rejects blockers, overlaps, edges and outside without adding 
   await expect(page.locator('#undo')).toBeDisabled();
 });
 
-test('source taps and bounding-box holes do not accidentally drag or commit', async ({ page }) => {
+test('source taps and bounding-box holes do not accidentally drag or commit', { tag: '@desktop' }, async ({ page }) => {
   await openGame(page);
   const source = await trayPoint(page, 'navy', [0, 0]);
   await page.mouse.move(source.x, source.y);
@@ -236,7 +236,8 @@ test('source taps and bounding-box holes do not accidentally drag or commit', as
 });
 
 for (const cleanup of ['Escape', 'blur', 'resize', 'lost capture', 'pointercancel', 'hidden', 'Undo', 'New game'] as const) {
-  test(`drag cancellation via ${cleanup} preserves committed state and permits subsequent play`, async ({ page }) => {
+  const tag = cleanup === 'Escape' || cleanup === 'lost capture' ? '@desktop' : '@shared';
+  test(`drag cancellation via ${cleanup} preserves committed state and permits subsequent play`, { tag }, async ({ page }) => {
     await openGame(page);
     await slot(page, 'navy').click();
     await cell(page, 4, 5).click();
@@ -285,8 +286,9 @@ for (const cleanup of ['Escape', 'blur', 'resize', 'lost capture', 'pointercance
   });
 }
 
-test('Chromium native touch drag/move/return, secondary input and touchCancel are transactional', async ({ page, browserName }, testInfo) => {
-  test.skip(browserName !== 'chromium' || testInfo.project.name !== 'mobile-chromium', 'CDP touch input requires mobile Chromium.');
+test('Chromium native touch drag/move/return, secondary input and touchCancel are transactional', { tag: '@touch' }, async ({ page, browserName }, testInfo) => {
+  expect(browserName).toBe('chromium');
+  expect(testInfo.project.name).toBe('mobile-chromium');
   await page.setViewportSize({ width: 430, height: 1400 });
   await openGame(page, { ...fixtures[0], level: 'STARTER' });
   const cdp = await page.context().newCDPSession(page);
@@ -339,7 +341,7 @@ test('Chromium native touch drag/move/return, secondary input and touchCancel ar
   await expect(page.locator('#undo')).toBeDisabled();
 });
 
-test('native drag completion freezes once and saves one ranked record', async ({ page }) => {
+test('native drag completion freezes once and saves one ranked record', { tag: '@shared' }, async ({ page }) => {
   await openGame(page);
   await placePieces(page, fixtures[0].solution.slice(0, -1));
   await mouseDrag(page, await trayPoint(page, 'green', [1, 1]), await center(cell(page, 1, 4)));
@@ -352,8 +354,9 @@ test('native drag completion freezes once and saves one ranked record', async ({
   await expect(slot(page, 'green')).toBeDisabled();
 });
 
-test('native Chromium touch scrolls outside occupied source regions', async ({ page, browserName }, testInfo) => {
-  test.skip(browserName !== 'chromium' || testInfo.project.name !== 'mobile-chromium', 'CDP touch input requires mobile Chromium.');
+test('native Chromium touch scrolls outside occupied source regions', { tag: '@touch' }, async ({ page, browserName }, testInfo) => {
+  expect(browserName).toBe('chromium');
+  expect(testInfo.project.name).toBe('mobile-chromium');
   await page.setViewportSize({ width: 430, height: 800 });
   await openGame(page);
   await expect(page.locator('.grab-square').first()).toHaveCSS('touch-action', 'none');

@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { boardOffset, cell, complete, fixtures, openGame, resetRandom, seed, slot } from './helpers.ts';
+import { boardOffset, cell, complete, fixtures, openGame, placePieces, resetRandom, seed, slot } from './helpers.ts';
 
 async function noAxeViolations(page: import('@playwright/test').Page) {
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
   expect(results.violations).toEqual([]);
 }
 
-test('ready, running, confirmation and completed states pass relevant axe checks', async ({ page }) => {
+test('ready, running, confirmation and completed states pass relevant axe checks', { tag: '@shared' }, async ({ page }) => {
   await seed(page);
   await page.goto('./');
   await noAxeViolations(page);
@@ -27,7 +27,7 @@ for (const viewport of [
   { width: 320, height: 568 }, { width: 390, height: 844 },
   { width: 768, height: 1024 }, { width: 1440, height: 900 }, { width: 667, height: 375 },
 ]) {
-  test(`all actions remain reachable and aligned at ${viewport.width}x${viewport.height}`, async ({ page }) => {
+  test(`all actions remain reachable and aligned at ${viewport.width}x${viewport.height}`, { tag: viewport.width === 320 ? [] : '@shared' }, async ({ page }) => {
     await page.setViewportSize(viewport);
     await openGame(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -89,7 +89,7 @@ test('grid semantics, stable focus, scoped shortcuts and modal focus match the g
   await expect(page.locator('#start')).toBeFocused();
 });
 
-test('200 percent CSS zoom reflows and keeps board geometry aligned', async ({ page }) => {
+test('200 percent CSS zoom reflows and keeps board geometry aligned', { tag: '@desktop' }, async ({ page }) => {
   // CSS zoom provides a reproducible magnification/reflow check, not a browser-chrome zoom audit.
   await page.setViewportSize({ width: 640, height: 960 });
   await openGame(page);
@@ -105,7 +105,7 @@ test('200 percent CSS zoom reflows and keeps board geometry aligned', async ({ p
   await expect(page.locator('#clear-records')).toBeInViewport();
 });
 
-test('visible focus and non-color identity remain usable with reduced motion requested', async ({ page }) => {
+test('visible focus and non-color identity remain usable with reduced motion requested', { tag: '@shared' }, async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openGame(page);
   await expect(page.locator('#rule')).toHaveText('Pieces 1, 2, 3, 4 cannot share an edge. Corners may touch.');
@@ -122,7 +122,7 @@ test('visible focus and non-color identity remain usable with reduced motion req
   await cell(page, 0, 0).click();
   await expect(page.locator('#status')).toContainText('Cannot place here');
   await page.keyboard.press('Escape');
-  // Finish through native taps on touch projects and clicks on desktop.
-  await complete(page, fixtures[0]);
+  // These four pieces provide all nine restriction-number glyphs without another full game.
+  await placePieces(page, fixtures[0].solution.filter(p => ['navy', 'brown', 'orange', 'purple'].includes(p.id)));
   await expect(page.locator('#board-art .piece-number')).toHaveCount(9);
 });

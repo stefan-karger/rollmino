@@ -21,7 +21,7 @@ test('loads the Rollmino entry and its styles without page or asset errors', asy
 });
 
 for (const fixture of fixtures) {
-  test(`completes ${fixture.id} through public tap controls and freezes`, async ({ page }) => {
+  test(`completes ${fixture.id} through public tap controls, freezes and retains records`, { tag: fixture === fixtures[0] ? [] : '@shared' }, async ({ page }) => {
     await page.clock.install({ time: new Date('2026-10-13T09:59:50Z') });
     await page.clock.pauseAt(new Date('2026-10-13T10:00:00Z'));
     await openGame(page, fixture);
@@ -39,6 +39,11 @@ for (const fixture of fixtures) {
     await page.getByRole('button', { name: 'Start practice' }).click();
     for (const face of fixture.dice) await expect(page.getByRole('button', { name: `${face}, blocker`, exact: true })).toBeVisible();
     await expect(page.locator('#timer')).toHaveText('00:00.00');
+    await page.reload();
+    await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
+    await page.locator('#level').selectOption(fixture.level);
+    await expect(page.locator('#records-list li')).toHaveCount(1);
+    await expect(page.locator('#records-list')).toContainText('01:05.43');
   });
 }
 
@@ -79,7 +84,7 @@ test('active confirmations preserve time on cancel, replay is hidden, and level 
   await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
 });
 
-test('a coincidental repeated fresh roll remains ranked and a legal dead end is accepted', async ({ page }) => {
+test('a coincidental repeated fresh roll remains ranked and a legal dead end is accepted', { tag: '@shared' }, async ({ page }) => {
   await openGame(page);
   await slot(page, 'navy').click();
   await cell(page, 1, 5).click();

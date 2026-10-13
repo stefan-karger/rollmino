@@ -9,7 +9,7 @@ export default defineConfig({
   use: { ...devices['Desktop Chrome'], trace: 'retain-on-failure' },
   projects: [
     { name: 'production-root', use: { baseURL: 'http://127.0.0.1:4173/' } },
-    { name: 'production-pages', use: { baseURL: 'http://127.0.0.1:4174/rollmino/' } },
+    { name: 'production-pages', grepInvert: /@artifact-files/, use: { baseURL: 'http://127.0.0.1:4174/rollmino/' } },
   ],
   webServer: [
     { command: 'pnpm run preview', url: 'http://127.0.0.1:4173/', reuseExistingServer: false },

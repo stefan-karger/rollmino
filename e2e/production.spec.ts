@@ -18,7 +18,7 @@ function productionErrors(page: Page, baseURL: string): string[] {
   return errors;
 }
 
-test('dist includes required app assets and excludes provenance and test content', () => {
+test('dist includes required app assets and excludes provenance and test content', { tag: '@artifact-files' }, () => {
   const files = readdirSync('dist', { recursive: true, withFileTypes: true }).filter(entry => entry.isFile())
     .map(entry => `${entry.parentPath}/${entry.name}`.replace(/^dist[/\\]/, ''));
   expect(files).toContain('index.html');
@@ -67,31 +67,30 @@ test('production starts hidden and loads required assets without runtime service
   expect(errors).toEqual([]);
 });
 
-for (const fixture of fixtures) {
-  test(`production completes ${fixture.id}, freezes, replays as practice and retains records`, async ({ page, baseURL }) => {
-    const errors = productionErrors(page, baseURL!);
-    await page.clock.install({ time: new Date('2026-10-13T09:59:50Z') });
-    await page.clock.pauseAt(new Date('2026-10-13T10:00:00Z'));
-    await openGame(page, fixture);
-    for (const face of fixture.dice) await expect(page.getByRole('button', { name: `${face}, blocker`, exact: true })).toBeVisible();
-    await page.clock.fastForward(54321);
-    await complete(page, fixture);
-    await expect(page.locator('#timer')).toHaveText('00:54.32');
-    await expect(page.locator('#records-list li')).toHaveCount(1);
-    await page.clock.fastForward(20000);
-    await expect(page.locator('#timer')).toHaveText('00:54.32');
-    await page.locator('#replay').click();
-    await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
-    await page.locator('#start').click();
-    await page.clock.fastForward(5000);
-    await complete(page, fixture);
-    await expect(page.locator('#records-list li')).toHaveCount(1);
-    await page.reload();
-    await expect(page.locator('#level')).toHaveValue('STARTER');
-    await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
-    await page.locator('#level').selectOption(fixture.level);
-    await expect(page.locator('#records-list li')).toHaveCount(1);
-    await expect(page.locator('#records-list')).toContainText('00:54.32');
-    expect(errors).toEqual([]);
-  });
-}
+const fixture = fixtures[0];
+test(`production completes ${fixture.id}, freezes, replays as practice and retains records`, async ({ page, baseURL }) => {
+  const errors = productionErrors(page, baseURL!);
+  await page.clock.install({ time: new Date('2026-10-13T09:59:50Z') });
+  await page.clock.pauseAt(new Date('2026-10-13T10:00:00Z'));
+  await openGame(page, fixture);
+  for (const face of fixture.dice) await expect(page.getByRole('button', { name: `${face}, blocker`, exact: true })).toBeVisible();
+  await page.clock.fastForward(54321);
+  await complete(page, fixture);
+  await expect(page.locator('#timer')).toHaveText('00:54.32');
+  await expect(page.locator('#records-list li')).toHaveCount(1);
+  await page.clock.fastForward(20000);
+  await expect(page.locator('#timer')).toHaveText('00:54.32');
+  await page.locator('#replay').click();
+  await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
+  await page.locator('#start').click();
+  await page.clock.fastForward(5000);
+  await complete(page, fixture);
+  await expect(page.locator('#records-list li')).toHaveCount(1);
+  await page.reload();
+  await expect(page.locator('#level')).toHaveValue('STARTER');
+  await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
+  await page.locator('#level').selectOption(fixture.level);
+  await expect(page.locator('#records-list li')).toHaveCount(1);
+  await expect(page.locator('#records-list')).toContainText('00:54.32');
+  expect(errors).toEqual([]);
+});

@@ -144,6 +144,22 @@ Production tests reuse preceding dist without rebuilding at `/` and `/rollmino/`
 
 Preserve literal model/malformed-state regressions, every occupied-anchor transform, session/time/Undo and record/fault tests. Browser coverage includes complete tap/keyboard play, native mouse/capture, mobile-Chromium CDP touch/cancel/secondary input/scrolling, confirmation focus, narrow/landscape/desktop layout, CSS zoom/reflow, relevant axe states, artifact assets/errors and record retention.
 
+### Browser coverage map
+
+Untagged scenarios run in all five projects. `@shared` runs only in desktop Chromium, `@desktop` in all three desktop engines, and `@touch` only in mobile Chromium. Selection happens in project configuration, without runtime skips. Use `pnpm run test:e2e --list` to inspect it.
+
+| Checks | Platforms |
+| --- | --- |
+| Hidden startup, first fixture/tap completion, frozen time, replay, reload/records and native confirmations | All five |
+| T15 first-click Start and T16 tray extents/hit regions/own-slot regression | All five |
+| 320px reachability/alignment and grid/modal focus | All five |
+| Full keyboard game, native mouse anchors/transforms/capture/collision/return, Escape/lost capture and CSS zoom alignment | Three desktop engines |
+| All three fixtures, ranking/storage fault permutations, shared transactions/synthetic cleanup, four-state axe and complete viewport matrix | Desktop Chromium |
+| Native CDP touch/move/return/secondary input/cancel and scrolling | Mobile Chromium |
+| Built assets/errors, full first fixture, frozen time, practice exclusion and reload retention | Both artifact mounts; filesystem inspection once |
+
+The development suite currently selects 93 cases, with 21 completed games. Production selects five cases and four completed games. Fixture completion supplies representative persistence checks; non-color glyph coverage uses only restricted pieces. Additional fixtures/shared permutations do not repeat for every unrelated assertion. Mobile projects remain emulation.
+
 The [cell-array oracle](tests/oracle.mjs) checks unique IDs, integer geometry, bounds, blockers, overlap, 29 piece cells, coverage, contacts and fixed placements. It imports only canonical orientations, has separate literal IDs/groups and uses no engine legality calls/masks. Test deliberately broken answers. The [exhaustive verifier](scripts/verify-all.mjs) requires a non-null answer and oracle pass for each of 62,208 Wizard boards before counting. Keep it separate from fast tests.
 
 Wizard answers satisfy every other level's subset of contact restrictions; this is not five separate sweeps. Shared orientation data limits oracle independence. The sweep proves one answer per encoded board, not solution counts, human difficulty, all partial-state completability or physical certification.
