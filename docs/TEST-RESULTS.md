@@ -2,6 +2,65 @@
 
 The [contract](../IMPLEMENTATION_PLAN.md#verification) defines current checks. This file records performed results and their limits; [archived ticket evidence](#historical-archive) supplies implementation details. Local checks do not establish a new deployment.
 
+## Shared action styles, headers and placed-piece states
+
+On 2026-10-15, [T40](tickets/T40-unframed-tutorial.md) applied the user's follow-up refinements: unframed tutorial navigation/examples, secondary Back and primary Next around plain progress, and one Tutorial heading. All labeled action buttons now share the exercise Play primary style or Review tutorial secondary style. Highscores replaces Personal bests and shares identical heading typography and text-only Home links with Tutorial. Explicit tab indices retain the links in WebKit's native keyboard order. The ordinary footer follows Level, New game, Replay, Home, with two columns on narrow phones. The exercise has one compact Redo action; Reset step and its checkpoint code are removed, while individual Undo recovery remains.
+
+Available tray pieces keep solid colors; placed pieces now show muted cell outlines and a check mark. They remain selectable/repositionable, with restriction marks and occupied drag regions preserved. Shared-preview inspection covered both headers, primary/secondary computed styles, 320px footer targets and native placement/selection/Remove/Undo state changes. The native geometry check now compares the actual SVG rectangle corners through `getScreenCTM`, accounting for Firefox's larger client paint bounds on outlined shapes without widening the alignment threshold.
+
+All 75 pure tests and the final strict build passed. The complete five-project browser run passed all 145 cases without skips in 5.0 minutes using one worker; all five existing-artifact cases passed at root and `/rollmino/` in 8.8 seconds against that build. Independent verification checked 62,208 Wizard answers in 67.14 seconds earlier in this ticket, with its model/fixtures/verifier/oracle unchanged through the later UI refinements. Documentation consistency and `git diff --check` passed. The ticket records exact commands, deliberately interrupted provisional runs, the Firefox teardown diagnostic and the Firefox/WebKit corrections before the final clean pass. Playwright invocations ran sequentially, the temporary reuse config was removed and the user's process 15372 remains on port 5173.
+
+Coverage retains native keyboard/mouse and Chromium touch, fixed exercise protection, clean restart/terminal behavior, wall time/Undo/history, record retention/storage faults, reduced-motion axe, narrow reflow, dropdown contrast and both production mounts. Mobile projects/previews remain emulation; CSS zoom is reflow coverage, and held-drag Redo uses a synthetic cleanup click. No physical-device, pen, screen-reader or publication pass is claimed. Earlier sections below record the preceding UI stages.
+
+## Simplified tutorial navigation
+
+On 2026-10-15, [T39](tickets/T39-tutorial-navigation.md) replaced the tutorial's scattered actions with one Back/progress/Next bar. Try exercise replaces Next on the final panel. The compact header, shared static-example section and grouped exercise Reset/Redo actions match the new board's section style. Replay example and its highlighting/timer/cleanup code are removed; the six explanations, literal transforms/levels, native heading focus and untimed exercise behavior remain.
+
+All 75 pure tests, strict build and 13 focused tutorial/accessibility cases passed. The full five-project run passed all 145 cases without skips in 1.9 minutes; all five existing-artifact cases passed at root and `/rollmino/` in 8.5 seconds against that build. Independent verification checked 62,208 Wizard answers in 62.28 seconds. Documentation consistency and `git diff --check` passed. Playwright invocations ran sequentially, the temporary server-reuse wrapper was removed and the user's process 15372 remained on port 5173.
+
+Coverage includes last-panel-only exercise access and backtracking, static artwork through elapsed time, progress/heading focus, keyboard/tap exercise and review flows, reduced-motion axe, 320px grouped navigation and 200% CSS zoom. The ticket records exact commands and limits. Shared-preview snapshot/evaluation returned client automation errors after reopening the tab, so no new manual visual/screenshot pass is claimed. Mobile checks remain emulation; physical devices, pen, screen readers and publication were not verified.
+
+## Permanent responsive game and exercise layout
+
+On 2026-10-15, [T38](tickets/T38-main-responsive-layout.md) promoted the selected responsive comparison at number 2 to the default and applied its shared styling to the exercise. Both now use one compact three-by-three tray with controls above it on phones and the tray to the right of board/controls from 900 CSS pixels. Static ordinary-game HTML keeps the clock above play and secondary actions/collapsed help below it. The numbered switch, layout query handling, alternative styles and temporary control movement are removed. Accessible piece names, hover titles, teaching instructions and fixed-piece protection remain.
+
+All 75 pure tests and the strict 15-module build passed. The final clean development run passed all 145 cases without skips in 2.0 minutes, reusing the user's existing Vite server through a temporary config importing all five projects. All five production cases passed at both artifact mounts in 8.5 seconds against that build; the artifact also excludes comparison controls/code. Independent verification validated 62,208 Wizard answers in 56.05 seconds. Documentation consistency and `git diff --check` passed. Playwright invocations ran sequentially, the temporary wrapper was removed and the user's process 15372 remained on port 5173.
+
+Coverage includes shared game/exercise layout and axe at representative phone/tablet/desktop sizes, native occupied-region dragging, clock/draft/focus/Undo through reflow, keyboard/tap exercise completion and computed dropdown contrast of at least 4.5:1. The ticket records exact commands, preliminary assertion corrections and a run interrupted by development reloads before the final clean pass. Preview DOM inspection confirmed the exercise styling and wider tray placement; later client snapshot failures prevent a new exercise/phone screenshot claim. Exercise teaching content may scroll; mobile projects/resizing remain emulation. No physical-device, native-popup, pen, screen-reader or publication pass is claimed. The comparison sections below record earlier stages before this default was selected.
+
+## Merged tray and responsive comparison
+
+On 2026-10-15, [T37](tickets/T37-merged-tray.md) combined prototype 1's mobile placement with prototype 2's shared tray/control backgrounds. Candidates 1 and 2 place controls above a single three-by-three tray without individual piece cards. Candidate 2 moves the tray beside the board/controls from 900 CSS pixels. Native selects/options now use opaque dark backgrounds with readable light text.
+
+All 75 pure tests, strict build, the three focused prototype cases and all 145 development cases passed. The full browser run reused the developer-owned server through a temporary config importing the repository's five projects; it completed without skips in 2.1 minutes. All five artifact cases passed in 8.3 seconds against that build, and independent verification checked 62,208 Wizard answers in 27.65 seconds. Documentation consistency and local `git diff --check` passed. Playwright invocations ran sequentially; the temporary config was removed and the user's port-5173 process remained running.
+
+Expanded checks cover the shared 3×3 arrangement, controls above the mobile tray, tray placement beside the board/controls on tablet/desktop, 1024×600 merged-layout fit, occupied hit-region/native drag alignment at tablet width, continuing state through resizing and at least 4.5:1 computed select/option contrast. The ticket records setup diagnostics, exact commands and limits. Native popup appearance is not captured by the shared browser screenshots; phone projects/resizing remain emulation. At this stage the comparisons had not been published or selected as the default layout.
+
+## Game layout prototype verification
+
+On 2026-10-15, [T36](tickets/T36-game-prototypes.md) implemented the requested fixed 1–4 switch and four optional `?prototype=X` game layouts. Time, board, controls and all nine pieces remain visible without horizontal overflow or switch obstruction at 320×568, 390×844 and 1366×768. Names are retained for accessibility/hover; secondary actions/help sit below play. Switching preserves the current board, clock, draft and Undo. Reload preserves the requested prototype URL while returning to fresh Home. Missing/invalid values retain the established layout.
+
+Frozen installation, all 75 pure tests and strict build passed. The final `pnpm run test:e2e --max-failures=1` passed all 145 cases without skips in 1.9 minutes; `pnpm run test:e2e:prod` passed all five root/subpath cases in 8.4 seconds against that build. `pnpm run verify:all` independently validated 62,208 Wizard answers in 27.71 seconds. Documentation consistency and `git diff --check` passed. The conservative selector required the complete sequence for new paths; Playwright invocations ran sequentially.
+
+The ticket records the reproduced reload issue, repair, actual commands and acceptance evidence. Prototype coverage adds keyboard/state/query regressions in all five projects, native centered-art/hit-region dragging in the three desktop engines and layout/axe checks in desktop Chromium. Mobile projects and shared-preview resizing remain emulation. Short/landscape scrolling is allowed; no physical-device/pen/screen-reader checks or deployment are claimed. No final layout had been selected at this stage.
+
+## Board coordinate text selection
+
+On 2026-10-15, the board's decorative SVG text received `user-select: none` and its WebKit prefix so row/column labels cannot acquire a text-selection highlight. The rule is scoped to `#board-art text`.
+
+Shared Chromium preview inspection initially reported `user-select: auto` and returned `3` from a Selection API attempt on row 3. After the change, all twelve coordinate labels reported `none` and returned empty selection text from the same synthetic check. A native click on row 3 followed by Start left selection empty, revealed seven blockers and focused the first cell. Ordinary help text retained `user-select: auto`. This is browser inspection and a synthetic selection check, not a physical-device or native double-click/long-press test.
+
+| Command | Result |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | Passed without dependency/lock changes |
+| `pnpm exec playwright install chromium firefox webkit` | Passed |
+| `pnpm test` | All 75 pure tests passed |
+| `pnpm run build` | Strict TypeScript/Vite build passed |
+| `pnpm run test:e2e e2e/play.spec.ts e2e/input.spec.ts e2e/accessibility.spec.ts --max-failures=1` | All 88 selected cases passed in 1.3 minutes |
+| `pnpm run test:e2e:prod` | All five root/subpath artifact cases passed in 8.1 seconds against the preceding build |
+
+The changed-path selector chose pure/build/UI/artifact checks without exhaustive solving. Playwright invocations ran sequentially; phone projects remain emulation. Documentation consistency and local `git diff --check` passed. These results establish local verification only.
+
 ## Home and tutorial local readiness
 
 Executed on 2026-10-13 in the Windows workspace with Node 24.15.0, pnpm 12.10.0 and the existing pinned browser/tool versions. Runtime revision `0c80425` contains the complete Home/history, separate records, six-panel tutorial, Starter exercise and handled-offer flow. T35 changes verification and documentation only. [Archived T30 through T34 evidence](#historical-archive) retains the implementation checks, repairs/retries and rendered observations. The new revision is locally ready; the dated public releases below do not establish its publication.

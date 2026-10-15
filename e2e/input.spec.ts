@@ -114,7 +114,7 @@ test('Start works on its first click after Escape and release outside the widget
   await expect(cell(page, 4, 5)).toHaveAttribute('data-content', 'navy');
 });
 
-test('vertical grey tray artwork and occupied drag regions fit above its label', async ({ page }) => {
+test('vertical grey tray artwork and occupied drag regions fit inside its slot', async ({ page }) => {
   await openGame(page);
   for (const width of [320, 390, 800]) {
     await page.setViewportSize({ width, height: 1000 });
@@ -124,14 +124,14 @@ test('vertical grey tray artwork and occupied drag regions fit above its label',
     const errors = await slot(page, 'grey').evaluate(button => {
       const svg = button.querySelector('svg')!;
       const art = svg.getBoundingClientRect();
-      const label = button.querySelector('.piece-label')!.getBoundingClientRect();
+      const slot = button.getBoundingClientRect();
       const regions = [...button.querySelectorAll('.grab-square')];
       return [...svg.querySelectorAll('rect')].map((rect, i) => {
         const visual = rect.getBoundingClientRect();
         const hit = regions[i].getBoundingClientRect();
         return {
-          visible: visual.top >= art.top && visual.bottom <= art.bottom && visual.bottom <= label.top,
-          hitFits: hit.top >= art.top && hit.bottom <= art.bottom && hit.bottom <= label.top,
+          visible: visual.top >= art.top && visual.bottom <= art.bottom && visual.top >= slot.top && visual.bottom <= slot.bottom,
+          hitFits: hit.top >= art.top && hit.bottom <= art.bottom && hit.top >= slot.top && hit.bottom <= slot.bottom,
           offset: Math.max(Math.abs(hit.x - visual.x), Math.abs(hit.y - visual.y), Math.abs(hit.width - visual.width), Math.abs(hit.height - visual.height)),
         };
       });
@@ -143,7 +143,7 @@ test('vertical grey tray artwork and occupied drag regions fit above its label',
       expect(error.offset).toBeLessThan(1);
     }
     // The formerly clipped final cell remains a real occupied drag source.
-    await mouseDrag(page, await trayPoint(page, 'grey', [0, 3]), await center(slot(page, 'grey').locator('.piece-label')));
+    await mouseDrag(page, await trayPoint(page, 'grey', [0, 3]), await center(slot(page, 'grey')));
     await expect(page.locator('[data-content="grey"]')).toHaveCount(0);
     await page.locator('#undo').click();
     await expect(page.locator('[data-content="grey"]')).toHaveCount(4);
@@ -221,7 +221,11 @@ test('source taps and bounding-box holes do not accidentally drag or commit', { 
   await expect(slot(page, 'navy')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#undo')).toBeDisabled();
   await cell(page, 4, 5).click();
-  await mouseDrag(page, await center(slot(page, 'yellow').locator('.piece-label')), await center(cell(page, 2, 0)));
+  const padding = await slot(page, 'yellow').evaluate(button => {
+    const box = button.getBoundingClientRect();
+    return { x: box.left + 2, y: box.top + 2 };
+  });
+  await mouseDrag(page, padding, await center(cell(page, 2, 0)));
   await expect(slot(page, 'yellow')).not.toHaveClass(/placed/);
   // Yellow's upper-left bounding-box square is a hole.
   const svg = slot(page, 'yellow').locator('svg');
@@ -401,7 +405,7 @@ test('native Chromium touch scrolls outside occupied source regions', { tag: '@t
   await openGame(page);
   await expect(page.locator('.grab-square').first()).toHaveCSS('touch-action', 'none');
   await expect(cell(page, 1, 0)).toHaveCSS('touch-action', 'auto');
-  await expect(page.locator('.piece-label').first()).toHaveCSS('touch-action', 'auto');
+  await expect(slot(page, 'navy')).toHaveCSS('touch-action', 'auto');
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 5, y: 700, id: 1 }] });
   for (const y of [660, 610, 550, 490, 430]) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 5, y, id: 1 }] });

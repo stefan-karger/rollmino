@@ -1,26 +1,30 @@
 # Rollmino
 
-Play [Rollmino](https://stefan-karger.github.io/rollmino/), a free timed solo block puzzle with five levels and personal records in this browser. It runs on a static website without an account or backend. The locally implemented Home/tutorial revision is described below; its publication remains separate from the dated V1 release.
+Play [Rollmino](https://stefan-karger.github.io/rollmino/), a free timed solo block puzzle with five levels and personal records in this browser. It runs on a static website without an account or backend. The locally implemented Home/tutorial and responsive layout revisions are described below; their publication remains separate from the dated V1 release.
 
-[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) is the single current contract. [AGENTS.md](AGENTS.md) explains maintenance and [CODING_GUIDELINES.md](CODING_GUIDELINES.md) supplies KISS/YAGNI policy. Completed tickets and their evidence remain in the [Git archive](docs/TEST-RESULTS.md#historical-archive).
+[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) is the single current contract. [AGENTS.md](AGENTS.md) explains maintenance and [CODING_GUIDELINES.md](CODING_GUIDELINES.md) supplies KISS/YAGNI policy. The [tracker](docs/tickets/README.md) records current work; earlier completed tickets and their evidence remain in the [Git archive](docs/TEST-RESULTS.md#historical-archive).
 
 ## Playing
 
-Tutorial on Home offers six self-paced illustrated panels, with optional example replay and a level comparison. The explanation is untimed and never records a result. Try the exercise from any panel to use the real controls without a clock. Six prepared pieces stay fixed while you place Brown domino, Grey line and Cyan L. Undo and Reset step help you recover; any legal full-board finish succeeds. Exercise completion offers Play, Review tutorial and Redo exercise.
+Tutorial on Home offers six self-paced illustrated panels with a level comparison. An unframed row places progress between secondary Back and primary Next; Try exercise replaces Next on the final panel. The examples also sit directly on the page. Teaching is untimed and never records a result. The exercise uses the real controls without a clock: six prepared pieces stay fixed while you place Brown domino, Grey line and Cyan L. Undo reverses individual moves; the compact Redo exercise button starts the lesson over. Any legal full-board finish succeeds. Exercise completion offers Play, Review tutorial and Redo exercise.
 
-On a new visit, Home highlights the optional Tutorial. Choosing Play or Tutorial remembers only that the offer was handled; Personal bests does not dismiss it. Cleared or unavailable browser storage can repeat the invitation. Tutorial always opens at the first panel, with direct exercise access and no saved progress.
+On a new visit, Home highlights the optional tutorial invitation. Choosing Play or Tutorial remembers only that the offer was handled; Highscores does not dismiss it. Cleared or unavailable browser storage can repeat the invitation. Tutorial always opens at the first panel without saved progress. Home remains available throughout teaching.
 
 Choose Play on Home, choose a level, then Start to reveal seven blockers and begin timing. Select a piece and tap a cell to place immediately, or drag from an occupied square. Rotate turns clockwise; Flip mirrors left/right. The marked square is the tap anchor; dragging preserves the square grabbed.
 
+Time sits above the board. Controls sit above one compact three-by-three piece tray; from 900 CSS pixels the tray moves to the right of the board and controls. The exercise uses the same presentation. Piece names remain available to assistive technology and on hover. Level, New game, Replay and Home sit below ordinary play in that order, followed by collapsed rules/keyboard help.
+
+Action buttons share two styles throughout: mint primary actions and dark filled, bordered secondary actions. Tutorial and Highscores share the same heading and text-only Home link. Narrow phones use two rows for the game footer to keep full-size controls.
+
 Inset white square outlines identify the pieces that cannot share an edge at the selected level. Starter has no outlines. The small + marks the tap anchor inside its square.
 
-Illegal attempts preserve committed play. Placed shapes stay dimmed and selectable. Use Remove, Delete or drag back to the own slot to remove. Undo covers all successful active-run actions without rewinding time.
+Illegal attempts preserve committed play. Placed shapes become muted outlines with a check mark in the tray and stay selectable; available shapes keep their solid colors. Use Remove, Delete or drag back to the own slot to remove. Undo covers all successful active-run actions without rewinding time.
 
 Tab reaches grid/tray/controls. Arrows move without wrapping. Home/End reaches row ends; Ctrl+Home/End reaches board ends. Enter/Space activates, R/F transforms, Delete removes and Escape cancels.
 
 Timing includes background/lock, confirmations and Undo. Completion freezes board/time. New game, Replay and level changes confirm active abandonment. Replay retains a hidden layout as timed practice and never ranks. Fair fresh rolls can rank even when repeated. Home confirms running abandonment and discards the layout. Browser Back follows the same confirmation; Forward opens fresh hidden play. Reload returns Home with fresh hidden Starter internally.
 
-Personal bests on Home shows five best times/dates for the selected records level. Clearing confirms that level and preserves other lists. The records filter does not change the play level. Records stay in this browser; private mode/site-data/storage policies can erase them. Storage failures retain page-memory records with a reload-loss notice. Ordinary games have no hints, pause or Redo. No sync, PWA or Android app.
+Highscores on Home shows five best times/dates for the selected records level. Clearing confirms that level and preserves other lists. The records filter does not change the play level. Records stay in this browser; private mode/site-data/storage policies can erase them. Storage failures retain page-memory records with a reload-loss notice. Ordinary games have no hints, pause or Redo. No sync, PWA or Android app.
 
 ## Development
 
@@ -49,7 +53,7 @@ Focused scripts are `test:rules`, `test:transforms`, `test:state`, `test:records
 | `src/session.ts` | Committed run, transactions, time and Undo |
 | `src/navigation.ts` | Screen-only history, root returns and reconciled abandonment |
 | `src/records.ts`, `src/onboarding.ts` | Top-five ranking and the independent handled-offer flag |
-| `src/app.ts`, `src/styles.css`, `index.html` | Stable HTML/SVG, input, dialogs and compact layout |
+| `src/app.ts`, `src/styles.css`, `index.html` | Stable HTML/SVG, input, dialogs and shared responsive game/exercise layout |
 | `src/tutorial.ts`, `src/exercise.ts`, `src/teaching-data.ts`, `src/piece-art.ts` | Self-paced teaching examples and shared original piece artwork |
 | `src/tray-geometry.ts` | Matching tray artwork/hit-region bounds |
 | `fixtures/rolls.json`, `tests/`, `scripts/verify-all.mjs` | Literal regressions, fixtures and independent verification |

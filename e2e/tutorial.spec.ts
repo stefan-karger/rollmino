@@ -21,21 +21,24 @@ test('self-paced panels only draw an ordinary roll after Home, Play and Start', 
   await expect(page.locator('#tutorial-heading')).toBeFocused();
   await expect(page.getByRole('timer')).toHaveCount(0);
   await expect(page.locator('#tutorial-panel [data-example-piece]')).toHaveCount(29);
+  await expect(page.locator('#tutorial-progress')).toHaveText('1 of 6');
+  await expect(page.locator('#tutorial-back')).toBeDisabled();
+  await expect(page.locator('#try-exercise')).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Replay example' })).toHaveCount(0);
+  const art = await page.locator('#tutorial-panel').innerHTML();
   await page.clock.fastForward(600000);
-  await expect(page.locator('.example-active')).toHaveCount(0);
-  await page.locator('#replay-example').click();
-  await expect(page.locator('.example-active')).toHaveCount(1);
-  await page.clock.runFor(2100);
-  await expect(page.getByRole('status')).toContainText('Example replayed');
+  expect(await page.locator('#tutorial-panel').innerHTML()).toBe(art);
   for (let i = 2; i <= 6; i++) {
     await page.locator('#tutorial-next').click();
-    await expect(page.locator('#tutorial-progress')).toHaveText(`Panel ${i} of 6`);
+    await expect(page.locator('#tutorial-progress')).toHaveText(`${i} of 6`);
     await expect(page.locator('#tutorial-heading')).toBeFocused();
+    await expect(page.locator('#try-exercise')).toBeVisible({ visible: i === 6 });
   }
-  await expect(page.locator('#tutorial-next')).toBeDisabled();
+  await expect(page.locator('#tutorial-next')).toBeHidden();
   await page.locator('#tutorial-back').click();
   await expect(page.locator('#tutorial-heading')).toHaveText('Choose a level');
-  await page.locator('#replay-example').click();
+  await expect(page.locator('#try-exercise')).toBeHidden();
+  await expect(page.locator('#tutorial-next')).toBeVisible();
   await page.locator('#tutorial-home').click();
   await expect(page.locator('#play')).toBeFocused();
   await page.clock.fastForward(5000);
@@ -71,8 +74,6 @@ test('keyboard panels show literal clockwise and mirror geometry with occupied a
     expect(cells).toEqual(value.cells);
     await expect(diagram.locator('[data-example-anchor]')).toHaveAttribute('data-example-anchor', value.anchor);
   }
-  await activate(page, '#replay-example', true);
-  await expect(page.locator('#replay-example')).toBeFocused();
   await activate(page, '#tutorial-back', true);
   await expect(page.locator('#tutorial-heading')).toHaveText('Place and move');
   await page.keyboard.press('Shift+Tab');
@@ -89,9 +90,22 @@ test('exact level groups and static reduced-motion panels pass axe and narrow re
   for (let index = 0; index < 6; index++) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze()).violations).toEqual([]);
-    await page.locator('#replay-example').click();
-    await expect(page.getByRole('status')).toContainText('Static example shown');
-    await expect(page.locator('.example-active')).toHaveCount(0);
+    await page.locator('.tutorial-navigation').scrollIntoViewIfNeeded();
+    await expect(page.locator('.tutorial-navigation')).toBeInViewport();
+    const navigation = await page.locator('.tutorial-navigation button:visible').evaluateAll(buttons => buttons.map(button => {
+      const box = button.getBoundingClientRect();
+      return { top: box.top, bottom: box.bottom, height: box.height, left: box.left, right: box.right };
+    }));
+    expect(navigation).toHaveLength(2);
+    expect(Math.abs(navigation[0].top - navigation[1].top)).toBeLessThan(1);
+    for (const button of navigation) {
+      expect(button.height).toBeGreaterThanOrEqual(44);
+      expect(button.left).toBeGreaterThanOrEqual(0);
+      expect(button.right).toBeLessThanOrEqual(320);
+      // Native scrolling rounds fractional positions at the viewport edge.
+      expect(button.top).toBeGreaterThanOrEqual(-1);
+      expect(button.bottom).toBeLessThanOrEqual(569);
+    }
     if (index === 4) {
       const groups: Record<string, string[]> = { STARTER: [], JUNIOR: ['navy', 'brown'], EXPERT: ['navy', 'brown', 'orange'], MASTER: ['brown', 'orange', 'purple'], WIZARD: ['navy', 'brown', 'orange', 'purple'] };
       for (const [level, group] of Object.entries(groups)) {

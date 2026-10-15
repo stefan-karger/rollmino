@@ -87,7 +87,7 @@ test('legal off-step recovery, reordered completion and review preserve the fixe
   await page.locator('#remove').click();
   await page.locator('#undo').click();
   await expect(page.locator('#grid [data-content="brown"]')).toHaveCount(2);
-  await page.locator('#reset-step').click();
+  await page.locator('#undo').click();
   await expect(page.locator('#grid [data-content="empty"]')).toHaveCount(10);
   await expect(page.locator('#undo')).toBeDisabled();
   await expect(page.locator('#draft-art rect')).toHaveCount(0);
@@ -109,7 +109,7 @@ test('legal off-step recovery, reordered completion and review preserve the fixe
   await expect(page.locator('#tutorial-heading')).toHaveText('Fill the board');
 });
 
-test('native mouse cannot move prepared pieces and reset cancels a held learner drag', { tag: '@desktop' }, async ({ page }) => {
+test('native mouse cannot move prepared pieces and Redo cancels a held learner drag', { tag: '@desktop' }, async ({ page }) => {
   // Narrow layout makes the initial instruction wrap more than the post-Undo task.
   await page.setViewportSize({ width: 320, height: 1400 });
   await page.goto('./');
@@ -127,11 +127,12 @@ test('native mouse cannot move prepared pieces and reset cancels a held learner 
   await page.mouse.down();
   await page.mouse.move(to.x, to.y, { steps: 5 });
   await expect(page.locator('#draft-art rect')).toHaveCount(2);
-  await page.locator('#reset-step').dispatchEvent('click');
+  await page.locator('#redo-exercise').dispatchEvent('click');
   await page.mouse.up();
   await expect(page.locator('#undo')).toBeDisabled();
   await expect(page.locator('#draft-art rect')).toHaveCount(0);
   await expect(page.locator('#grid [data-content="brown"]')).toHaveCount(0);
+  await expect(page.locator('#exercise-step')).toContainText('Select Brown domino');
   await mouseDrag(page, await trayPoint(page, 'brown', [0, 0]), await center(cell(page, 1, 0)));
   await expect(cell(page, 1, 0)).toHaveAttribute('data-content', 'brown');
 });

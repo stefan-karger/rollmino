@@ -68,52 +68,32 @@ const panels = [
   },
   {
     title: 'Start ordinary play',
-    text: 'Start reveals the puzzle and starts the clock together. Time continues through Undo, confirmations and leaving the app in the background. Replay repeats a layout as timed practice and never enters Personal bests.',
+    text: 'Start reveals the puzzle and starts the clock together. Time continues through Undo, confirmations and leaving the app in the background. Replay repeats a layout as timed practice and never enters Highscores.',
     art: () => figure('Before Start: the ordinary puzzle is hidden.', Array.from({ length: 36 }, (_, i) => rect(i % 6, Math.floor(i / 6), '#182230')).join(''))
       + figure('After Start: seven blockers appear and timing begins.', board([])),
-    detail: () => '<p>Return Home and choose Play when you are ready. The tutorial is untimed; ordinary ranked and practice games are always timed.</p>',
+    detail: () => '<p>Try the untimed exercise, or return Home and choose Play for a timed game.</p>',
   },
 ];
 
-/** Six deliberate panels; their examples never touch the ordinary game controller. */
+/** Six static panels; their examples never touch the ordinary game controller. */
 export function tutorialPanels(announce: (text: string) => void) {
   const panel = document.getElementById('tutorial-panel')!;
   const back = document.getElementById('tutorial-back') as HTMLButtonElement;
   const next = document.getElementById('tutorial-next') as HTMLButtonElement;
-  const replay = document.getElementById('replay-example') as HTMLButtonElement;
+  const exercise = document.getElementById('try-exercise') as HTMLButtonElement;
   let index = 0;
-  let timeout: ReturnType<typeof setTimeout> | undefined;
 
-  function cancelReplay(): void {
-    clearTimeout(timeout);
-    timeout = undefined;
-    panel.querySelectorAll('.example-active').forEach(figure => figure.classList.remove('example-active'));
-  }
   function render(): void {
-    cancelReplay();
     const item = panels[index];
     panel.innerHTML = `<h2 id="tutorial-heading" tabindex="-1">${item.title}</h2><p>${item.text}</p><div class="tutorial-examples">${item.art()}</div>${item.detail?.() ?? ''}`;
-    document.getElementById('tutorial-progress')!.textContent = `Panel ${index + 1} of ${panels.length}`;
+    document.getElementById('tutorial-progress')!.textContent = `${index + 1} of ${panels.length}`;
     back.disabled = index === 0;
-    next.disabled = index === panels.length - 1;
+    next.hidden = index === panels.length - 1;
+    exercise.hidden = !next.hidden;
     document.getElementById('tutorial-heading')!.focus();
     announce('');
   }
   back.addEventListener('click', () => { if (index > 0) { index--; render(); } });
   next.addEventListener('click', () => { if (index < panels.length - 1) { index++; render(); } });
-  replay.addEventListener('click', () => {
-    cancelReplay();
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      announce('Static example shown. ' + panels[index].text);
-      return;
-    }
-    const figures = [...panel.querySelectorAll('figure')];
-    function highlight(frame: number): void {
-      figures.forEach((figure, i) => figure.classList.toggle('example-active', i === frame));
-      if (frame < figures.length) timeout = setTimeout(() => highlight(frame + 1), 700);
-      else { cancelReplay(); announce('Example replayed. ' + panels[index].text); }
-    }
-    highlight(0);
-  });
-  return { open() { index = 0; render(); }, close: cancelReplay };
+  return { open() { index = 0; render(); } };
 }

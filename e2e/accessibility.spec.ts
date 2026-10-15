@@ -37,7 +37,8 @@ for (const viewport of [
     await openGame(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     const mainWidth = await page.locator('main').evaluate(el => el.getBoundingClientRect().width);
-    expect(mainWidth).toBeLessThanOrEqual(Math.min(viewport.width, 440));
+    const maxWidth = viewport.width >= 900 ? Math.min(940, viewport.height + 130) : 440;
+    expect(mainWidth).toBeLessThanOrEqual(Math.min(viewport.width, maxWidth));
     for (const [x, y] of [[0, 0], [5, 0], [0, 5], [5, 5], [3, 3]]) {
       expect(await boardOffset(page, x, y)).toBeLessThan(1);
     }
@@ -117,8 +118,8 @@ test('200 percent CSS zoom reflows and keeps board geometry aligned', { tag: '@d
   await page.locator('#tutorial').click();
   for (let index = 0; index < 6; index++) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await page.locator('#try-exercise').scrollIntoViewIfNeeded();
-    await expect(page.locator('#try-exercise')).toBeInViewport();
+    await page.locator('.tutorial-navigation').scrollIntoViewIfNeeded();
+    await expect(page.locator('.tutorial-navigation')).toBeInViewport();
     if (index < 5) await page.locator('#tutorial-next').click();
   }
   await page.locator('#try-exercise').click();

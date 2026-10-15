@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { canPlace, isSolved, ORIENTATIONS } from '../engine/core.ts';
-import { beginExercise, exercisePlace, exerciseRemove, exerciseUndo, resetStep, fixedPiece, exerciseTarget } from '../src/exercise.ts';
+import { beginExercise, exercisePlace, exerciseRemove, exerciseUndo, fixedPiece, exerciseTarget } from '../src/exercise.ts';
 import { assertSolution } from './oracle.mjs';
 
 const fixed = [
@@ -59,31 +59,40 @@ test('exercise transactions reject fixed, invalid and no-op edits while Undo sto
   assert.deepEqual(baseline.game.placed, Object.fromEntries(fixed.map(p => [p.id, p])));
 });
 
-test('off-step legal moves commit and reset restores both board and history checkpoint', () => {
+test('Undo recovers off-step moves and removals; restarting restores the initial lesson', () => {
   let exercise = beginExercise();
   const offStep = { id: 'brown', orientation: 1, x: 5, y: 2 };
   assert.equal(canPlace(exercise.game, offStep), true);
   exercise = exercisePlace(exercise, offStep);
   assert.equal(exercise.step, 0);
   assert.equal(exercise.history.length, 1);
-  exercise = resetStep(exercise);
+  exercise = exerciseUndo(exercise);
   assert.deepEqual(exercise.game, beginExercise().game);
   assert.deepEqual(exercise.history, []);
   exercise = exerciseUndo(exercisePlace(exercise, brown));
   exercise = exercisePlace(exercise, brown);
   assert.equal(exercise.step, 3);
   assert.equal(exerciseTarget(exercise), 'F3');
-  const checkpoint = exercise;
+  const beforeRemove = exercise;
   exercise = exerciseRemove(exercise, 'brown');
   assert.equal(exercise.step, 2);
-  exercise = exercisePlace(exercise, brown);
+  exercise = exerciseUndo(exercise);
   assert.equal(exercise.step, 3);
-  const moved = exercisePlace(exercise, { ...cyan, x: 4, y: 0 });
+  assert.deepEqual(exercise.game, beforeRemove.game);
+  assert.deepEqual(exercise.history, beforeRemove.history);
+  const moved = exercisePlace(exercise, cyan);
   assert.equal(moved.step, 3);
-  const reset = resetStep(moved);
-  assert.deepEqual(reset.game, checkpoint.game);
-  assert.equal(reset.history.length, exercise.history.length);
-  assert.deepEqual(Object.values(reset.game.placed).filter(p => fixedPiece(p.id)), fixed);
+  const recovered = exerciseUndo(moved);
+  assert.deepEqual(recovered.game, exercise.game);
+  assert.deepEqual(recovered.history, exercise.history);
+  while (exercise.history.length) exercise = exerciseUndo(exercise);
+  assert.deepEqual(exercise.game, beginExercise().game);
+  assert.equal(exercise.step, 2);
+  const restarted = beginExercise();
+  assert.equal(restarted.step, 0);
+  assert.deepEqual(restarted.history, []);
+  assert.deepEqual(Object.values(restarted.game.placed), fixed);
+  assert.deepEqual(Object.values(moved.game.placed).filter(p => fixedPiece(p.id)), fixed);
 });
 
 test('intended Undo path, early alternative finish and terminal editing use exact solved coverage', () => {
@@ -101,7 +110,6 @@ test('intended Undo path, early alternative finish and terminal editing use exac
   assert.equal(exercisePlace(exercise, brown), exercise);
   assert.equal(exerciseRemove(exercise, 'brown'), exercise);
   assert.equal(exerciseUndo(exercise), exercise);
-  assert.equal(resetStep(exercise), exercise);
   let reordered = beginExercise();
   for (const p of [cyan, grey, brown]) reordered = exercisePlace(reordered, p);
   assert.equal(reordered.phase, 'completed');

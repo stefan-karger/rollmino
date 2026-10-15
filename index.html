@@ -13,36 +13,45 @@
         <img class="home-mark" src="./favicon.svg" width="112" height="112" alt="" />
         <h1>Rollmino</h1>
         <p>Fill the board around seven blockers.</p>
-        <div class="home-actions"><button id="play" disabled>Play</button><button id="tutorial" disabled>Tutorial</button><button id="personal-bests" disabled>Personal bests</button></div>
+        <div class="home-actions"><button id="play" class="primary" disabled>Play</button><button id="tutorial" disabled>Tutorial</button><button id="highscores" disabled>Highscores</button></div>
         <p id="tutorial-offer" class="help">New here? Tutorial explains the controls<br />and offers an untimed exercise. It’s optional.</p>
       </section>
       <section id="game-screen" aria-label="Game" hidden>
-        <div class="screen-heading"><h1>Rollmino</h1><button id="game-home">Home</button></div>
+        <h1 class="visually-hidden">Rollmino</h1>
         <div class="run-header">
-          <span class="level-picker"><label for="level">Level</label> <select id="level"></select></span>
           <span id="timer" role="timer" aria-label="Elapsed time" aria-live="off">00:00.00</span>
         </div>
-        <p id="rule"></p><p id="mode"></p>
         <div id="ordinary-board"><section id="game" aria-label="Puzzle controls">
           <div class="board-frame">
             <svg id="board-art" viewBox="-0.45 -0.45 6.5 6.5" aria-hidden="true"></svg>
             <div id="grid" role="grid" aria-label="Puzzle board"></div>
-            <div id="ready"><p>Puzzle hidden until Start.</p><button id="start">Start</button></div>
+            <div id="ready"><p>Puzzle hidden until Start.</p><button id="start" class="primary">Start</button></div>
           </div>
           <div class="tools">
             <button id="rotate">Rotate</button><button id="flip">Flip</button>
             <button id="remove">Remove</button><button id="undo">Undo</button>
           </div>
+          <div id="tray" aria-label="Piece tray"></div>
           <p id="preview">Select a piece, then a board cell.</p>
           <p id="game-storage-notice" class="help" hidden></p>
-          <div id="tray" aria-label="Piece tray"></div>
         </section></div>
         <div id="game-status"><p id="status" role="status" aria-live="polite" aria-atomic="true">Press Start to reveal your puzzle.</p></div>
-        <div class="run-actions"><button id="new-game">New game</button><button id="replay">Replay</button></div>
-        <p class="help">Tap a piece, then a cell. Rotate clockwise or flip left/right. Keyboard: arrows, R, F, Delete and Escape.</p>
+        <footer id="game-secondary">
+          <div class="secondary-actions">
+            <label class="visually-hidden" for="level">Level</label><select id="level"></select>
+            <button id="new-game" class="primary">New game</button><button id="replay">Replay</button>
+            <button id="game-home">Home</button>
+          </div>
+          <details>
+            <summary>Rules &amp; keyboard</summary>
+            <p id="rule"></p>
+            <p class="help">Tap a piece, then a cell. Rotate clockwise or flip left/right. Keyboard: arrows, R, F, Delete and Escape.</p>
+          </details>
+          <p id="mode"></p>
+        </footer>
       </section>
       <section id="records-screen" aria-labelledby="records-title" hidden>
-        <div class="screen-heading"><h1 id="records-title" tabindex="-1">Personal bests</h1><button id="records-home">Home</button></div>
+        <div class="screen-heading"><h1 id="records-title" tabindex="-1">Highscores</h1><a id="records-home" class="home-link" href="./" tabindex="0">Home</a></div>
         <label for="records-level">Records level</label> <select id="records-level"></select>
         <p id="records-empty">No completed ranked runs for this level yet.</p>
         <ol id="records-list"></ol>
@@ -52,28 +61,33 @@
         <p class="help">Best five for this level, saved in this browser. Records stay on your device. Private browsing or clearing site data can erase them. Changing browser or site address does not move your records.</p>
       </section>
       <section id="tutorial-screen" aria-label="Tutorial" hidden>
-        <div class="screen-heading"><h1>Tutorial</h1><button id="tutorial-home">Home</button></div>
-        <p class="help">Learn at your own pace. No clock or records.</p>
-        <div id="tutorial-explanation"><p id="tutorial-progress" class="help"></p>
-        <div id="tutorial-panel"></div>
-        <button id="replay-example">Replay example</button>
-        <div class="tutorial-actions"><button id="tutorial-back">Back</button><button id="tutorial-next">Next</button></div>
-        <button id="try-exercise">Try the exercise</button></div>
+        <div class="screen-heading">
+          <h1>Tutorial</h1>
+          <a id="tutorial-home" class="home-link" href="./" tabindex="0">Home</a>
+        </div>
+        <div id="tutorial-explanation">
+          <div id="tutorial-panel"></div>
+          <nav class="tutorial-navigation" aria-label="Tutorial steps">
+            <button id="tutorial-back">Back</button>
+            <span id="tutorial-progress"></span>
+            <button id="tutorial-next" class="primary">Next</button>
+            <button id="try-exercise" class="primary" hidden>Try exercise</button>
+          </nav>
+        </div>
         <section id="exercise" aria-labelledby="exercise-title" hidden>
           <h2 id="exercise-title" tabindex="-1">Starter exercise</h2>
           <p class="help">Untimed. Six prepared pieces are fixed for this lesson. Move Brown domino, Grey line and Cyan L. In ordinary games every piece can move.</p>
           <p id="exercise-step"></p>
           <div id="exercise-board"></div>
-          <button id="reset-step">Reset step</button>
-          <div id="exercise-completion" hidden><button id="exercise-play">Play</button><button id="review-tutorial">Review tutorial</button></div>
           <button id="redo-exercise">Redo exercise</button>
+          <div id="exercise-completion" hidden><button id="exercise-play" class="primary">Play</button><button id="review-tutorial">Review tutorial</button></div>
         </section>
         <div id="tutorial-status"></div>
       </section>
     </main>
     <dialog id="confirm-dialog" aria-labelledby="confirm-title">
       <h2 id="confirm-title">Abandon this run?</h2><p id="confirm-text"></p>
-      <form method="dialog"><button value="cancel" autofocus>Cancel</button><button value="confirm">Confirm</button></form>
+      <form method="dialog"><button value="cancel" autofocus>Cancel</button><button value="confirm" class="primary">Confirm</button></form>
     </dialog>
     <script type="module" src="./src/app.ts"></script>
   </body>

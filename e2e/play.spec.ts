@@ -17,7 +17,7 @@ test('loads the Rollmino entry and its styles without page or asset errors', asy
   await expect(page.getByRole('grid')).toHaveCount(0);
   await page.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(page).toHaveTitle('Rollmino');
-  await expect(page.getByRole('heading', { name: 'Rollmino', level: 1 })).toBeVisible();
+  await expect(page.getByRole('timer', { name: 'Elapsed time' })).toBeVisible();
   await expect(page.locator('#ready')).toContainText('Puzzle hidden until Start.');
   await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(18, 22, 29)');
   expect(errors).toEqual([]);

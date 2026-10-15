@@ -108,7 +108,7 @@ export async function openRecords(page: Page, level: Level = 'WIZARD'): Promise<
     await page.locator('#game-home').click();
     if (running) await page.getByRole('button', { name: 'Confirm', exact: true }).click();
   }
-  await page.locator('#personal-bests').click();
+  await page.locator('#highscores').click();
   await page.locator('#records-level').selectOption(level);
   await expect(page.locator('#records-title')).toBeVisible();
 }

@@ -75,7 +75,7 @@ test.describe('shared record scenarios', { tag: '@shared' }, () => {
     await openGame(page);
     await slot(page, 'navy').click();
     await cell(page, 4, 5).click();
-    await expect(page.getByRole('button', { name: 'Personal bests', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Highscores', exact: true })).toHaveCount(0);
     await page.locator('#game-home').click();
     await page.clock.fastForward(10000);
     await page.getByRole('button', { name: 'Cancel', exact: true }).click();
@@ -111,7 +111,7 @@ test.describe('shared record scenarios', { tag: '@shared' }, () => {
     await page.getByRole('button', { name: 'Confirm', exact: true }).click();
     await expect(page.locator('#records-list li')).toHaveCount(0);
     await page.locator('#records-home').click();
-    await page.locator('#personal-bests').click();
+    await page.locator('#highscores').click();
     await expect(page.locator('#records-list li')).toHaveCount(0);
     expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!).WIZARD, key)).toEqual([]);
   });

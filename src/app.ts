@@ -9,7 +9,7 @@ import { navigation } from './navigation.ts';
 import type { Screen } from './navigation.ts';
 import { colors, names, rect, pieceArt, restrictionMark as mark } from './piece-art.ts';
 import { tutorialPanels } from './tutorial.ts';
-import { beginExercise, exercisePlace, exerciseRemove, exerciseUndo, resetStep, fixedPiece, exerciseInstruction, exerciseTarget } from './exercise.ts';
+import { beginExercise, exercisePlace, exerciseRemove, exerciseUndo, fixedPiece, exerciseInstruction, exerciseTarget } from './exercise.ts';
 import type { Exercise } from './exercise.ts';
 import { tutorialOffer } from './onboarding.ts';
 
@@ -32,7 +32,6 @@ try { storage = window.localStorage; } catch { /* The records module supplies th
 const records = new Records(storage);
 const offer = tutorialOffer(storage);
 function renderOffer(): void {
-  element('tutorial').classList.toggle('offered', offer.offered);
   element('tutorial-offer').style.visibility = offer.offered ? 'visible' : 'hidden';
 }
 renderOffer();
@@ -86,7 +85,8 @@ for (const id of PIECE_IDS) {
   const button = document.createElement('button');
   button.className = 'piece-slot';
   button.dataset.piece = id;
-  button.innerHTML = `<span class="piece-art" aria-hidden="true"><svg viewBox="-0.15 -0.15 4.3 3.3"></svg><span class="grab-regions"></span></span><span class="piece-label">${names[id]}</span>`;
+  button.title = names[id];
+  button.innerHTML = `<span class="piece-art" aria-hidden="true"><svg viewBox="-0.15 -0.15 4.3 3.3"></svg><span class="grab-regions"></span></span><span class="placed-mark" aria-hidden="true">✓</span>`;
   button.addEventListener('click', () => { selectPiece(id); button.focus({ preventScroll: true }); });
   slots.set(id, button);
   tray.append(button);
@@ -130,6 +130,8 @@ function renderGame(): void {
   const current = exercise ?? session;
   const active = current.phase === 'running';
   levelControl.value = session.level;
+  element('game-screen').dataset.mode = session.mode;
+  element('game-screen').dataset.phase = session.phase;
   element('ready').hidden = current.phase !== 'ready';
   startButton.textContent = session.mode === 'practice' ? 'Start practice' : 'Start';
   element('mode').textContent = session.phase === 'completed'
@@ -166,11 +168,13 @@ function renderGame(): void {
     // Committed updates happen after gesture cleanup. Draft movement keeps capture sources mounted.
     const cells = ORIENTATIONS[id][orientation];
     const bounds = trayBounds(cells);
+    const originX = (Math.max(...cells.map(([x]) => x)) + 1 - bounds.width) / 2;
+    const originY = (Math.max(...cells.map(([, y]) => y)) + 1 - bounds.height) / 2;
     const svg = button.querySelector('svg')!;
-    svg.setAttribute('viewBox', `-0.15 -0.15 ${bounds.width} ${bounds.height}`);
+    svg.setAttribute('viewBox', `${originX} ${originY} ${bounds.width} ${bounds.height}`);
     svg.innerHTML = `${shape(id, orientation)}<text x="${anchor[0] + .5}" y="${anchor[1] + .65}" text-anchor="middle" class="anchor-mark">+</text>`;
     button.querySelector('.grab-regions')!.innerHTML = cells.map(([x, y]) =>
-      `<span data-anchor="${x},${y}" class="grab-square ${active && !(exercise && fixedPiece(id)) ? 'draggable-source' : ''}" style="left:${(x + .19) / bounds.width * 100}%;top:${(y + .19) / bounds.height * 100}%;width:${.92 / bounds.width * 100}%;height:${.92 / bounds.height * 100}%"></span>`).join('');
+      `<span data-anchor="${x},${y}" class="grab-square ${active && !(exercise && fixedPiece(id)) ? 'draggable-source' : ''}" style="left:${(x + .04 - originX) / bounds.width * 100}%;top:${(y + .04 - originY) / bounds.height * 100}%;width:${.92 / bounds.width * 100}%;height:${.92 / bounds.height * 100}%"></span>`).join('');
   }
   element<HTMLButtonElement>('undo').disabled = current.phase !== 'running' || current.history.length === 0;
   element<HTMLButtonElement>('replay').disabled = session.phase === 'ready';
@@ -178,7 +182,6 @@ function renderGame(): void {
   if (exercise) {
     element('exercise-step').textContent = exerciseInstruction(exercise);
     element('exercise-completion').hidden = exercise.phase !== 'completed';
-    element<HTMLButtonElement>('reset-step').disabled = exercise.phase === 'completed';
   }
   renderDraft();
   updateTimer();
@@ -203,6 +206,7 @@ function renderDraft(): void {
   }
   draftArt.innerHTML = ghost;
   element('preview').textContent = feedback;
+  element('preview').classList.toggle('idle', !draft && current.phase !== 'completed');
 }
 
 function renderRecords(): void {
@@ -564,7 +568,6 @@ const nav = navigation(next => {
   if (pending) finishConfirmation(false);
   homeTrigger = undefined;
   cancelGesture();
-  tutorial.close();
   exercise = undefined;
   element('ordinary-board').append(gameWidget);
   element('tutorial-explanation').hidden = false;
@@ -573,6 +576,7 @@ const nav = navigation(next => {
   draft = undefined;
   focusedCell = 0;
   screen = next;
+  document.body.dataset.screen = next;
   element('home-screen').hidden = next !== 'home';
   element('game-screen').hidden = next !== 'game';
   element('records-screen').hidden = next !== 'records';
@@ -593,16 +597,21 @@ const nav = navigation(next => {
   } else accept();
 }, () => {
   element<HTMLButtonElement>('play').disabled = false;
-  element<HTMLButtonElement>('personal-bests').disabled = false;
+  element<HTMLButtonElement>('highscores').disabled = false;
   element<HTMLButtonElement>('tutorial').disabled = false;
 });
 element('play').addEventListener('click', () => { offer.handle(); renderOffer(); nav.open('game'); });
-element('personal-bests').addEventListener('click', () => nav.open('records'));
+element('highscores').addEventListener('click', () => nav.open('records'));
 element('tutorial').addEventListener('click', () => { offer.handle(); renderOffer(); nav.open('tutorial'); });
-element('tutorial-home').addEventListener('click', () => nav.home());
+for (const id of ['tutorial-home', 'records-home']) {
+  element<HTMLAnchorElement>(id).addEventListener('click', event => {
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    nav.home();
+  });
+}
 function openExercise(): void {
   cancelGesture();
-  tutorial.close();
   exercise = beginExercise();
   draft = undefined;
   focusedCell = 0;
@@ -615,14 +624,6 @@ function openExercise(): void {
 }
 element('try-exercise').addEventListener('click', openExercise);
 element('redo-exercise').addEventListener('click', openExercise);
-element('reset-step').addEventListener('click', () => {
-  if (!exercise) return;
-  cancelGesture();
-  draft = undefined;
-  exercise = resetStep(exercise);
-  announce('Step reset. ' + exerciseInstruction(exercise));
-  renderGame();
-});
 element('review-tutorial').addEventListener('click', () => {
   cancelGesture();
   exercise = undefined;
@@ -634,7 +635,6 @@ element('review-tutorial').addEventListener('click', () => {
   tutorial.open();
 });
 element('exercise-play').addEventListener('click', () => nav.play());
-element('records-home').addEventListener('click', () => nav.home());
 element('game-home').addEventListener('click', event => {
   homeTrigger = event.currentTarget as HTMLElement;
   nav.home();

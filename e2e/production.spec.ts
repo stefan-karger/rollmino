@@ -28,7 +28,7 @@ test('dist includes required app assets and excludes provenance and test content
   for (const file of files) {
     expect(file).not.toMatch(/(?:original-handoff|research-archive|fixtures|tests|e2e)(?:[/\\]|$)|SHA256SUMS|\.test\./);
     const text = readFileSync(`dist/${file}`, 'utf8');
-    for (const forbidden of ['original-handoff', 'research-archive', 'resetTestRandom', 'pointerEvidence', 'tests/oracle', 'Invalid answer for roll', 'opening-seed', 'exerciseRandomCalls', 'tutorialRandomCalls']) {
+    for (const forbidden of ['original-handoff', 'research-archive', 'resetTestRandom', 'pointerEvidence', 'tests/oracle', 'Invalid answer for roll', 'opening-seed', 'exerciseRandomCalls', 'tutorialRandomCalls', 'prototype-switch', 'data-prototype', 'applyPrototype', 'replay-example', 'example-active']) {
       expect(text).not.toContain(forbidden);
     }
   }
@@ -42,7 +42,7 @@ test('production starts hidden and loads required assets without runtime service
   await expect(page.getByRole('grid')).toHaveCount(0);
   await page.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(page).toHaveTitle('Rollmino');
-  await expect(page.getByRole('heading', { name: 'Rollmino', exact: true })).toBeVisible();
+  await expect(page.getByRole('timer', { name: 'Elapsed time' })).toBeVisible();
   await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
   await expect(page.locator('#board-art circle')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /hint|solution/i })).toHaveCount(0);
@@ -67,6 +67,15 @@ test('production starts hidden and loads required assets without runtime service
   await slot(page, 'navy').click();
   await cell(page, 4, 5).click();
   await expect(cell(page, 4, 5)).toHaveAttribute('data-content', 'navy');
+  await expect(page.locator('#tray button')).toHaveCount(9);
+  await expect(slot(page, 'navy')).toHaveAttribute('aria-label', /Navy square.*placed/);
+  await page.reload();
+  await expect(page.locator('#play')).toBeEnabled();
+  expect(new URL(page.url()).pathname).toBe(new URL(baseURL!).pathname);
+  expect(new URL(page.url()).search).toBe('');
+  await page.locator('#play').click();
+  await expect(page.locator('#tray .piece-label')).toHaveCount(0);
+  await expect(page.locator('#grid button[aria-label$="hidden"]')).toHaveCount(36);
   expect(errors).toEqual([]);
 });
 
@@ -98,13 +107,14 @@ test(`production completes ${fixture.id}, freezes, replays as practice and retai
   await expect(page.locator('#records-list li')).toHaveCount(1);
   await expect(page.locator('#records-list')).toContainText('00:54.32');
   await page.locator('#records-home').click();
-  await expect(page.locator('#tutorial')).not.toHaveClass('offered');
+  await expect(page.locator('#tutorial-offer')).toBeHidden();
   await enterExercise(page);
   await finishExercise(page);
   await page.clock.fastForward(600000);
   expect(await page.evaluate(() => localStorage.getItem('rollmino.records.v1'))).toBe(saved);
   await page.locator('#review-tutorial').click();
   await expect(page.locator('#tutorial-heading')).toHaveText('Fill the board');
+  for (let i = 0; i < 5; i++) await page.locator('#tutorial-next').click();
   await page.locator('#try-exercise').click();
   await page.locator('[data-piece="brown"]').click();
   await cell(page, 1, 0).click();
