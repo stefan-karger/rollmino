@@ -25,6 +25,7 @@ button:focus-visible, select:focus-visible, .home-link:focus-visible { outline: 
 .home-actions { display: grid; gap: 12px; margin: 28px auto 0; max-width: 280px; }
 #tutorial-offer { margin: 16px 0 0; color: #c6efe2; }
 .tutorial-navigation { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; margin-top: 16px; }
+.tutorial-navigation button { align-self: stretch; }
 #tutorial-progress { padding-inline: 4px; color: #c0ccda; font-size: .75rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 #tutorial-panel h2 { font-size: 1.3rem; margin: 12px 0; }
 .tutorial-examples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }

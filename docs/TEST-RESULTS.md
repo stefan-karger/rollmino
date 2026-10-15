@@ -2,6 +2,14 @@
 
 The [contract](../IMPLEMENTATION_PLAN.md#verification) defines current checks. This file records performed results and their limits; [archived ticket evidence](#historical-archive) supplies implementation details. Local checks do not establish a new deployment.
 
+## Tutorial navigation wrapping correction
+
+On 2026-10-15, [T41](tickets/T41-tutorial-button-alignment.md) investigated the reported Linux CI failure with a 6px navigation-button offset. The grid centered each button independently, allowing a wrapped Try exercise label to make one control taller. A local 320px/20px-text reproduction produced 45px and 72px button heights and a 13.5px offset before the fix. The buttons now stretch to their shared row height while progress remains centered. The same preview then measured both buttons at the same top edge with 72px height and no horizontal overflow.
+
+The existing strict narrow tutorial check now also forces the final label to wrap with larger default text and checks equal heights/top edges, centered progress, 44px targets, viewport fit and subsequent landscape/Home reachability. Its alignment tolerance is unchanged. The regression failed before the CSS fix and passed afterward in 4.4 seconds. All 75 pure tests and the strict build passed; all 145 browser cases passed without skips in 4.9 minutes, followed by all five production cases at both mounts in 8.8 seconds against that build. Independent verification checked all 62,208 Wizard answers in 28.68 seconds. Documentation and whitespace checks passed. The temporary server-reuse wrapper was removed, and the user's process 15372 remains on port 5173.
+
+The ticket records exact commands and the failing-before/passing-after evidence. These are Windows local checks; the larger-text scenario reproduces wrapping without claiming the same Linux font, exact CI geometry or a rerun of remote CI. Mobile projects remain emulation, and text-size/CSS zoom checks cover reflow. No physical-device, pen, screen-reader or publication pass is claimed.
+
 ## Shared action styles, headers and placed-piece states
 
 On 2026-10-15, [T40](tickets/T40-unframed-tutorial.md) applied the user's follow-up refinements: unframed tutorial navigation/examples, secondary Back and primary Next around plain progress, and one Tutorial heading. All labeled action buttons now share the exercise Play primary style or Review tutorial secondary style. Highscores replaces Personal bests and shares identical heading typography and text-only Home links with Tutorial. Explicit tab indices retain the links in WebKit's native keyboard order. The ordinary footer follows Level, New game, Replay, Home, with two columns on narrow phones. The exercise has one compact Redo action; Reset step and its checkpoint code are removed, while individual Undo recovery remains.

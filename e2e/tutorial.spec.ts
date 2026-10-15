@@ -123,6 +123,28 @@ test('exact level groups and static reduced-motion panels pass axe and narrow re
     }
     if (index < 5) await page.locator('#tutorial-next').click();
   }
+  // Larger default text reproduces the wrapped final label seen with CI font metrics.
+  await page.evaluate(() => { document.documentElement.style.fontSize = '20px'; });
+  await page.locator('.tutorial-navigation').scrollIntoViewIfNeeded();
+  const enlarged = await page.locator('.tutorial-navigation button:visible').evaluateAll(buttons => buttons.map(button => {
+    const box = button.getBoundingClientRect();
+    const text = document.createRange();
+    text.selectNodeContents(button);
+    return { top: box.top, bottom: box.bottom, height: box.height, left: box.left, right: box.right, lines: text.getClientRects().length };
+  }));
+  expect(enlarged).toHaveLength(2);
+  expect(enlarged[1].lines).toBeGreaterThan(1);
+  expect(Math.abs(enlarged[0].top - enlarged[1].top)).toBeLessThan(1);
+  expect(Math.abs(enlarged[0].height - enlarged[1].height)).toBeLessThan(1);
+  const progress = await page.locator('#tutorial-progress').boundingBox();
+  expect(Math.abs(progress!.y + progress!.height / 2 - enlarged[0].top - enlarged[0].height / 2)).toBeLessThan(1);
+  for (const button of enlarged) {
+    expect(button.height).toBeGreaterThanOrEqual(44);
+    expect(button.left).toBeGreaterThanOrEqual(0);
+    expect(button.right).toBeLessThanOrEqual(320);
+    expect(button.top).toBeGreaterThanOrEqual(-1);
+    expect(button.bottom).toBeLessThanOrEqual(569);
+  }
   await page.setViewportSize({ width: 667, height: 375 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.locator('#tutorial-home').scrollIntoViewIfNeeded();
